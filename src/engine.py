@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, List, Set
+from typing import TYPE_CHECKING
 
 from .models import (
     AIGeneratedOutput,
@@ -24,7 +24,7 @@ class ComplianceEngine:
     @staticmethod
     def verify(
         patient: PatientProfile, context: EMRContext, ai_output: AIGeneratedOutput
-    ) -> Result[VerificationResult, List[ComplianceAlert]]:
+    ) -> Result[VerificationResult, list[ComplianceAlert]]:
         """
         Pure function that verifies AI output against EMR source of truth.
         Returns a Result object wrapping either a VerificationResult or a list of critical alerts.

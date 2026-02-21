@@ -57,7 +57,7 @@ async def main():
             for alert in result.value.alerts:
                 print(f"  [{alert.severity}] {alert.rule_id}: {alert.message}")
     else:
-        print(f"Verification failed with critical violations")
+        print("Verification failed with critical violations")
         print(f"Violations ({len(result.error)}):")
         for alert in result.error:
             print(f"  [{alert.severity}] {alert.rule_id}: {alert.message}")

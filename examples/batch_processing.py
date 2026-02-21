@@ -2,7 +2,6 @@
 """Batch processing example with concurrent verification."""
 
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime
 
 from src.engine import ComplianceEngine
@@ -11,9 +10,9 @@ from src.models import (
     ComplianceAlert,
     EMRContext,
     PatientProfile,
+    Result,
     VerificationResult,
 )
-from src.models import Result
 
 
 async def process_single(
@@ -80,7 +79,7 @@ async def main():
     successful = sum(1 for r in results if r.is_success)
     failed = len(results) - successful
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Successful: {successful}")
     print(f"  Failed: {failed}")
 

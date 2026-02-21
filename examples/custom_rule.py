@@ -12,9 +12,9 @@ from src.models import (
     ComplianceSeverity,
     EMRContext,
     PatientProfile,
+    Result,
     VerificationResult,
 )
-from src.models import Result
 
 
 class CustomComplianceEngine(ComplianceEngine):
@@ -53,7 +53,10 @@ class CustomComplianceEngine(ComplianceEngine):
             alerts.append(
                 ComplianceAlert(
                     rule_id="CUSTOM_DUPLICATE_MEDICATION",
-                    message=f"Duplicate medication mentioned: {set(m for m in meds if meds.count(m) > 1)}",
+                    message=(
+                        f"Duplicate medication mentioned: "
+                        f"{set(m for m in meds if meds.count(m) > 1)}"
+                    ),
                     severity=ComplianceSeverity.HIGH,
                     field="summary_text",
                 )
