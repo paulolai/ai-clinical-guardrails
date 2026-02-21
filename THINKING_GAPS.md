@@ -13,7 +13,7 @@ When you encounter a significant design decision that lacks a thinking document:
 
 ### 1. PYTHON_STANDARDS_THINKING.md
 **Location:** `docs/PYTHON_STANDARDS_THINKING.md`
-**Status:** ❌ Not started
+**Status:** ✅ Complete
 
 **Decisions to capture:**
 - **Strict typing**: Why `mypy --strict` vs gradual typing? What problems has it caught?
@@ -25,7 +25,7 @@ When you encounter a significant design decision that lacks a thinking document:
 
 ### 2. TESTING_FRAMEWORK_THINKING.md
 **Location:** `docs/TESTING_FRAMEWORK_THINKING.md`
-**Status:** ❌ Not started
+**Status:** ✅ Complete
 
 **Decisions to capture:**
 - **Testing pyramid inversion**: Why Component tests (real APIs) as PRIMARY over unit tests?
