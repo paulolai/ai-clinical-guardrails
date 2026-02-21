@@ -2,14 +2,12 @@
 
 import json
 from datetime import date
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from src.extraction.llm_parser import LLMTranscriptParser
 from src.extraction.models import (
-    ExtractedDiagnosis,
-    ExtractedMedication,
     MedicationStatus,
     StructuredExtraction,
 )
@@ -26,7 +24,7 @@ class TestLLMTranscriptParser:
         return client
 
     @pytest.fixture
-    def sample_llm_response(self) -> dict:
+    def sample_llm_response(self) -> dict[str, object]:
         """Sample LLM JSON response."""
         return {
             "patient_name": "John Doe",
@@ -73,7 +71,7 @@ class TestLLMTranscriptParser:
     async def test_parse_success(
         self,
         mock_llm_client: MagicMock,
-        sample_llm_response: dict,
+        sample_llm_response: dict[str, object],
     ) -> None:
         """Test successful parsing of transcript."""
         mock_llm_client.complete.return_value = json.dumps(sample_llm_response)
@@ -114,7 +112,7 @@ class TestLLMTranscriptParser:
     async def test_parse_with_temporal_expressions(
         self,
         mock_llm_client: MagicMock,
-        sample_llm_response: dict,
+        sample_llm_response: dict[str, object],
     ) -> None:
         """Test that temporal expressions are resolved correctly."""
         mock_llm_client.complete.return_value = json.dumps(sample_llm_response)

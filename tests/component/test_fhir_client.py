@@ -5,7 +5,7 @@ from src.models import PatientProfile
 
 
 @pytest.mark.asyncio
-async def test_fhir_client_can_fetch_patient():
+async def test_fhir_client_can_fetch_patient() -> None:
     """Component Test: Verifies integration with HAPI FHIR Sandbox."""
     client = FHIRClient()
     # Using a verified ID found in the sandbox
@@ -22,7 +22,7 @@ async def test_fhir_client_can_fetch_patient():
 
 
 @pytest.mark.asyncio
-async def test_fhir_client_handles_missing_patient():
+async def test_fhir_client_handles_missing_patient() -> None:
     client = FHIRClient()
     try:
         # Purposely using an unlikely random string

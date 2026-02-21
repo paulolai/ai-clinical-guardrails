@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from typing import Any
 
 from hypothesis import given
 from hypothesis import strategies as st
@@ -9,7 +10,7 @@ from src.models import AIGeneratedOutput, EMRContext, PatientProfile
 
 # Hypothesis Strategies for generating randomized but valid clinical data
 @st.composite
-def patient_strategy(draw):
+def patient_strategy(draw: Any) -> PatientProfile:
     return PatientProfile(
         patient_id=draw(st.text(min_size=5, max_size=10)),
         first_name=draw(st.text(min_size=2, max_size=20)),
@@ -21,7 +22,7 @@ def patient_strategy(draw):
 
 
 @st.composite
-def context_strategy(draw):
+def context_strategy(draw: Any) -> EMRContext:
     admission = draw(st.datetimes(min_value=datetime(2023, 1, 1), max_value=datetime(2024, 1, 1)))
     return EMRContext(
         visit_id=draw(st.text(min_size=5, max_size=10)),
@@ -35,7 +36,7 @@ def context_strategy(draw):
 
 class TestComplianceEngine:
     @given(patient=patient_strategy(), context=context_strategy())
-    def test_date_integrity_invariant(self, patient, context):
+    def test_date_integrity_invariant(self, patient: PatientProfile, context: EMRContext) -> None:
         """
         Property: If the AI generates a date NOT in the EMR source, it MUST return a Failure Result.
         """
@@ -50,10 +51,11 @@ class TestComplianceEngine:
 
         # Verify it's a failure
         assert not result.is_success
+        assert result.error is not None
         assert any(a.rule_id == "INVARIANT_DATE_MISMATCH" for a in result.error)
 
     @given(patient=patient_strategy(), context=context_strategy())
-    def test_pii_leakage_invariant(self, patient, context):
+    def test_pii_leakage_invariant(self, patient: PatientProfile, context: EMRContext) -> None:
         """
         Property: If summary contains a Medicare Number pattern, it MUST return a Failure Result.
         """
@@ -68,10 +70,11 @@ class TestComplianceEngine:
         result = ComplianceEngine.verify(patient, context, ai_output)
 
         assert not result.is_success
+        assert result.error is not None
         assert any(a.rule_id == "SAFETY_PII_LEAK" for a in result.error)
 
     @given(patient=patient_strategy(), context=context_strategy())
-    def test_sepsis_protocol_invariant(self, patient, context):
+    def test_sepsis_protocol_invariant(self, patient: PatientProfile, context: EMRContext) -> None:
         """
         Property: If Sepsis is detected, Antibiotics must be mentioned (High severity alert).
         """
@@ -85,5 +88,6 @@ class TestComplianceEngine:
 
         # Non-critical alerts should still allow a Success result but with alerts inside
         assert result.is_success
+        assert result.value is not None
         assert any(a.rule_id == "PROTOCOL_ADHERENCE_MISSING" for a in result.value.alerts)
         assert result.value.score < 1.0

@@ -12,7 +12,7 @@ def verify_integrated(
     id: str = typer.Option(..., help="Patient ID in EMR"),
     text: str = typer.Option(..., help="AI generated summary text"),
     dates: str | None = typer.Option(None, help="Comma-separated dates (YYYY-MM-DD)"),
-):
+) -> None:
     """Verify AI output using the service's FHIR integration."""
     extracted_dates = dates.split(",") if dates else []
     payload = {"ai_output": {"summary_text": text, "extracted_dates": extracted_dates}}
@@ -25,7 +25,7 @@ def verify_integrated(
 
 
 @app.command()
-def stats():
+def stats() -> None:
     """Check current compliance session statistics from the API."""
     try:
         response = httpx.get(f"{API_BASE}/stats")
@@ -34,7 +34,7 @@ def stats():
         console.print(f"[red]❌ API Error:[/red] {str(e)}")
 
 
-def _print_verification(response):
+def _print_verification(response: httpx.Response) -> None:
     if response.status_code != 200:
         console.print(f"[red]❌ Server Error ({response.status_code}):[/red] {response.text}")
         return

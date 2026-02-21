@@ -8,13 +8,14 @@ Per WORKFLOW_SPEC.md Step 6: Component Testing (Integration Proof)
 
 import json
 import os
+from collections.abc import AsyncGenerator
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from src.extraction import LLMTranscriptParser, SyntheticLLMClient
-
 
 # Mark all tests in this module as component tests
 pytestmark = [
@@ -96,7 +97,7 @@ class TestLLMParserIntegration:
         return os.environ.get("SYNTHETIC_API_KEY")
 
     @pytest.fixture
-    async def parser(self, api_key: str | None):
+    async def parser(self, api_key: str | None) -> AsyncGenerator[LLMTranscriptParser, None]:
         """Create parser with real client if key available, mock otherwise."""
         if api_key:
             client = SyntheticLLMClient(api_key=api_key)
@@ -105,7 +106,7 @@ class TestLLMParserIntegration:
         else:
             pytest.skip("SYNTHETIC_API_KEY not set")
 
-    async def test_parser_extracts_patient_name(self, parser) -> None:
+    async def test_parser_extracts_patient_name(self, parser: LLMTranscriptParser) -> None:
         """Verify parser can extract patient name from transcript."""
         transcript = "Mrs. Sarah Johnson came in yesterday for her follow-up visit."
 
@@ -114,7 +115,7 @@ class TestLLMParserIntegration:
         # Should extract name or mark as low confidence
         assert result.patient_name is not None or result.confidence < 0.6
 
-    async def test_parser_extracts_medications(self, parser) -> None:
+    async def test_parser_extracts_medications(self, parser: LLMTranscriptParser) -> None:
         """Verify parser can extract medication information."""
         transcript = """
         Patient started on Lisinopril 10mg daily for hypertension.
@@ -126,9 +127,8 @@ class TestLLMParserIntegration:
         # Should find at least one medication
         assert len(result.medications) >= 1
 
-    async def test_parser_extracts_temporal_expressions(self, parser) -> None:
+    async def test_parser_extracts_temporal_expressions(self, parser: LLMTranscriptParser) -> None:
         """Verify parser resolves temporal expressions correctly."""
-        from datetime import date
 
         ref_date = date(2024, 1, 15)
         parser.temporal_resolver.reference_date = ref_date
@@ -145,7 +145,7 @@ class TestLLMParserIntegration:
         if yesterday_expr:
             assert yesterday_expr[0].normalized_date == date(2024, 1, 14)
 
-    async def test_parser_handles_complex_transcript(self, parser) -> None:
+    async def test_parser_handles_complex_transcript(self, parser: LLMTranscriptParser) -> None:
         """Verify parser handles complex clinical dictation."""
         transcript = """
         Mr. David Martinez presents today with chest pain that started last night.
@@ -165,14 +165,15 @@ class TestSampleTranscriptValidation:
     """Validate parser against sample transcripts from fixtures."""
 
     @pytest.fixture
-    def sample_transcripts(self) -> list[dict]:
+    def sample_transcripts(self) -> list[dict[str, Any]]:
         """Load sample transcripts from fixtures."""
         fixtures_path = Path("tests/fixtures/sample_transcripts.json")
         if not fixtures_path.exists():
             pytest.skip("Sample transcripts fixture not found")
 
-        data = json.loads(fixtures_path.read_text())
-        return data.get("transcripts", [])
+        data: dict[str, Any] = json.loads(fixtures_path.read_text())
+        transcripts: list[dict[str, Any]] = data.get("transcripts", [])
+        return transcripts
 
     @pytest.fixture
     def api_key(self) -> str | None:
@@ -180,7 +181,7 @@ class TestSampleTranscriptValidation:
         return os.environ.get("SYNTHETIC_API_KEY")
 
     @pytest.fixture
-    async def parser(self, api_key: str | None):
+    async def parser(self, api_key: str | None) -> AsyncGenerator[LLMTranscriptParser, None]:
         """Create parser with real client."""
         if not api_key:
             pytest.skip("SYNTHETIC_API_KEY not set")
@@ -192,8 +193,8 @@ class TestSampleTranscriptValidation:
     @pytest.mark.parametrize("index", range(3))  # Test first 3 samples
     async def test_extraction_on_sample_transcripts(
         self,
-        parser,
-        sample_transcripts: list[dict],
+        parser: LLMTranscriptParser,
+        sample_transcripts: list[dict[str, Any]],
         index: int,
     ) -> None:
         """Test extraction on sample transcripts from fixtures."""

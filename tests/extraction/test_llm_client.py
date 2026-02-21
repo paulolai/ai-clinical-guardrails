@@ -27,9 +27,11 @@ class TestSyntheticLLMClient:
 
     def test_init_without_api_key_raises(self) -> None:
         """Test that initialization fails without API key."""
-        with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError, match="Synthetic API key required"):
-                SyntheticLLMClient()
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            pytest.raises(ValueError, match="Synthetic API key required"),
+        ):
+            SyntheticLLMClient()
 
     def test_init_from_env(self) -> None:
         """Test initialization from environment variable."""

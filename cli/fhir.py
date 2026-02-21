@@ -6,17 +6,17 @@ from src.integrations.fhir.client import FHIRClient
 
 
 @click.group()
-def cli():
+def cli() -> None:
     """Interface handle for the Upstream FHIR EMR."""
     pass
 
 
 @cli.command()
 @click.argument("patient_id")
-def inspect(patient_id):
+def inspect(patient_id: str) -> None:
     """Directly inspect raw-to-wrapped FHIR data for a patient."""
 
-    async def _run():
+    async def _run() -> None:
         client = FHIRClient()
         try:
             click.echo(f"🔍 [FHIR] Fetching Patient {patient_id}...")

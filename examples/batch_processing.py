@@ -29,19 +29,17 @@ async def process_batch(
     engine: ComplianceEngine, items: list[tuple[PatientProfile, EMRContext, AIGeneratedOutput]]
 ) -> list[Result[VerificationResult, list[ComplianceAlert]]]:
     """Process multiple verifications concurrently."""
-    tasks = [
-        process_single(engine, patient, context, ai_output) for patient, context, ai_output in items
-    ]
+    tasks = [process_single(engine, patient, context, ai_output) for patient, context, ai_output in items]
     return await asyncio.gather(*tasks)
 
 
-async def main():
+async def main() -> None:
     """Demonstrate batch processing."""
     engine = ComplianceEngine()
 
     # Prepare test data
     base_date = datetime(2025, 2, 21)
-    batch_items = []
+    batch_items: list[tuple[PatientProfile, EMRContext, AIGeneratedOutput]] = []
 
     for i in range(5):
         patient = PatientProfile(
@@ -86,9 +84,15 @@ async def main():
     for i, result in enumerate(results):
         patient_id = batch_items[i][0].patient_id
         if result.is_success:
+            if result.value is None:
+                print(f"\n  {patient_id}: ERROR (null result)")
+                continue
             print(f"\n  {patient_id}: OK (score: {result.value.score:.2f})")
         else:
             print(f"\n  {patient_id}: FAILED")
+            if result.error is None:
+                print("    - Error: null error")
+                continue
             for alert in result.error:
                 print(f"    - {alert.rule_id}: {alert.message}")
 

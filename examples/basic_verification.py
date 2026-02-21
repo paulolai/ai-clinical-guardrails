@@ -12,7 +12,7 @@ from src.models import (
 )
 
 
-async def main():
+async def main() -> None:
     """Verify a simple AI output."""
 
     # Setup
@@ -49,6 +49,9 @@ async def main():
 
     # Handle result
     if result.is_success:
+        if result.value is None:
+            print("Error: Verification returned null value")
+            return
         print(f"Decision: {'APPROVED' if result.value.is_safe_to_file else 'REJECTED'}")
         print(f"Safe to file: {result.value.is_safe_to_file}")
         print(f"Score: {result.value.score}")
@@ -57,6 +60,9 @@ async def main():
             for alert in result.value.alerts:
                 print(f"  [{alert.severity}] {alert.rule_id}: {alert.message}")
     else:
+        if result.error is None:
+            print("Error: Verification returned null error")
+            return
         print("Verification failed with critical violations")
         print(f"Violations ({len(result.error)}):")
         for alert in result.error:

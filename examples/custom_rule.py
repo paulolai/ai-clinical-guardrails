@@ -32,19 +32,30 @@ class CustomComplianceEngine(ComplianceEngine):
             return result
 
         # Apply custom rules
+        if result.value is None:
+            return Result.failure(
+                error=[
+                    ComplianceAlert(
+                        rule_id="CUSTOM_NULL_RESULT",
+                        message="Verification returned null result",
+                        severity=ComplianceSeverity.CRITICAL,
+                    )
+                ]
+            )
+
         verification = result.value
         CustomComplianceEngine._check_medication_duplicates(ai_output, verification.alerts)
         CustomComplianceEngine._verify_allergy_warnings(patient, ai_output, verification.alerts)
 
         # Recalculate score if new alerts added
-        if any(a.severity == ComplianceSeverity.CRITICAL for a in verification.alerts):
+        if verification.alerts and any(a.severity == ComplianceSeverity.CRITICAL for a in verification.alerts):
             critical = [a for a in verification.alerts if a.severity == ComplianceSeverity.CRITICAL]
             return Result.failure(error=critical)
 
         return Result.success(value=verification)
 
     @staticmethod
-    def _check_medication_duplicates(ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]):
+    def _check_medication_duplicates(ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]) -> None:
         """Custom Rule: Detect duplicate medications."""
         meds = re.findall(r"\b(Metformin|Lisinopril|Insulin)\b", ai_output.summary_text)
         unique_meds = set(meds)
@@ -53,10 +64,7 @@ class CustomComplianceEngine(ComplianceEngine):
             alerts.append(
                 ComplianceAlert(
                     rule_id="CUSTOM_DUPLICATE_MEDICATION",
-                    message=(
-                        f"Duplicate medication mentioned: "
-                        f"{set(m for m in meds if meds.count(m) > 1)}"
-                    ),
+                    message=(f"Duplicate medication mentioned: {set(m for m in meds if meds.count(m) > 1)}"),
                     severity=ComplianceSeverity.HIGH,
                     field="summary_text",
                 )
@@ -65,7 +73,7 @@ class CustomComplianceEngine(ComplianceEngine):
     @staticmethod
     def _verify_allergy_warnings(
         patient: PatientProfile, ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]
-    ):
+    ) -> None:
         """Custom Rule: Verify allergy warnings are present."""
         if not patient.allergies:
             return
@@ -82,7 +90,7 @@ class CustomComplianceEngine(ComplianceEngine):
                 )
 
 
-async def main():
+async def main() -> None:
     """Demonstrate custom rules."""
     engine = CustomComplianceEngine()
 
@@ -113,12 +121,18 @@ async def main():
     result = engine.verify(patient, context, ai_output)
 
     if result.is_success:
+        if result.value is None:
+            print("Error: Verification returned null value")
+            return
         print(f"Safe to file: {result.value.is_safe_to_file}")
         print(f"Score: {result.value.score}")
         print(f"Alerts ({len(result.value.alerts)}):")
         for alert in result.value.alerts:
             print(f"  [{alert.severity}] {alert.rule_id}: {alert.message}")
     else:
+        if result.error is None:
+            print("Error: Verification returned null error")
+            return
         print(f"Critical violations found: {len(result.error)}")
         for alert in result.error:
             print(f"  [{alert.severity}] {alert.message}")

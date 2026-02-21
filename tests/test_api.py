@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Any
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -8,13 +9,13 @@ from src.api import app
 client = TestClient(app)
 
 
-def test_health_endpoint():
+def test_health_endpoint() -> None:
     response = client.get("/health")
     assert response.status_code == 200
     assert "emr_integration" in response.json()
 
 
-def test_verify_success():
+def test_verify_success() -> None:
     payload = {
         "patient": {
             "patient_id": "P001",
@@ -42,7 +43,7 @@ def test_verify_success():
 
 @patch("src.api.emr_client.get_patient_profile")
 @patch("src.api.emr_client.get_latest_encounter")
-def test_verify_fhir_integrated(mock_encounter, mock_patient):
+def test_verify_fhir_integrated(mock_encounter: Any, mock_patient: Any) -> None:
     # Setup mock FHIR data
     from src.models import EMRContext, PatientProfile
 
@@ -71,7 +72,7 @@ def test_verify_fhir_integrated(mock_encounter, mock_patient):
 
 
 @patch("src.api.emr_client.get_patient_profile")
-def test_verify_fhir_not_found(mock_patient):
+def test_verify_fhir_not_found(mock_patient: Any) -> None:
     mock_patient.side_effect = ValueError("Patient not found")
     payload = {"ai_output": {"summary_text": "text", "extracted_dates": []}}
 

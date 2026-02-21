@@ -88,7 +88,7 @@ class SyntheticLLMClient:
             response_format={"type": "json_object"},  # Enforce JSON output
         )
 
-        content = response.choices[0].message.content
+        content: str | None = response.choices[0].message.content
         if content is None:
             raise ValueError("LLM returned empty response")
 
