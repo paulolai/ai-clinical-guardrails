@@ -71,7 +71,7 @@ Staff engineering isn't about getting it right the first time; it's about spotti
 My background in Engineering Management (Team Topologies, Conway's Law) directly informed the architecture of this repository.
 
 I treat AI agents like junior engineers who struggle with context switching. Just as I would structure a team to minimize cognitive load, I structured the code to minimize "context pollution" for the AI:
-*   **Bounded Contexts:** I enforced strict modularity (e.g., `src/integrations/` vs `src/engine/`) so the AI could work on isolated modules without context pollution—similar to how I'd minimize cognitive load for junior engineers.
+*   **Bounded Contexts:** I enforced strict modularity (e.g., `src/integrations/` vs `src/engine/`) so the AI never has to "hold the whole system in its head" at once.
 *   **Explicit Contracts:** The `AGENTS.md` files act as "Team Charters," defining the exact inputs, outputs, and behaviors expected of each module, preventing the "drift" that occurs in human teams.
 *   **Loose Coupling:** By using a functional, message-passing style, I created a system where individual components can be swapped or upgraded without complex refactoring.
 
@@ -88,6 +88,17 @@ Don't just look at the code syntax. Look at the **meta-structure**:
 3.  **Inspect the Tests:** See `tests/test_compliance.py` for how `Hypothesis` is used to catch "unknown unknowns."
 
 **This is what I bring to a leadership role: The ability to harness powerful but chaotic forces (like AI or large teams) and channel them into reliable, high-quality software through rigorous engineering design.**
+
+---
+
+## 🎩 The Curator’s Note: Engineering as "Black Tie"
+In an era where anyone can buy a tuxedo (the code), the true value lies in knowing the **Dress Code** for the occasion.
+
+A tuxedo is a masterpiece of design, but wearing it to a beach barbecue isn’t "good taste"—it’s a lack of situational awareness. Similarly, engineering "Taste" is the ability to understand the **Venue** (in this case, a safety-critical clinical environment) and tailor the technical "Outfit" accordingly.
+
+AI is a "Yes, And" machine. It will happily give you clever decorators, complex inheritance, and experimental libraries if you ask. My role as the Author was to say **"No"** to 90% of those suggestions. I chose a specific composition—**Pydantic + Hypothesis + Result Pattern**—not because they are the trendiest tools, but because they together create a singular, reinforced defense-in-depth strategy suited for the mission.
+
+**I am the author of this repository not because I typed the characters, but because I provided the Judgment. I understood the Venue, I defined the Dress Code, and I had the Taste to ensure the system wasn't just a collection of features, but a cohesive, auditable platform.**
 
 ---
 
