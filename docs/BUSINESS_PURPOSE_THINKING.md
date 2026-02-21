@@ -1,4 +1,4 @@
-# Rationale: BUSINESS_PURPOSE.md Design Decisions
+# Thinking: BUSINESS_PURPOSE.md Design Decisions
 
 ## Overview
 

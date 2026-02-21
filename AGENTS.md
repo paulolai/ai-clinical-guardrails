@@ -5,6 +5,16 @@ AI Coding Assistants (Gemini, Claude, Copilot) must strictly adhere to these pro
 
 ---
 
+## 🚀 Start Here
+
+**New?** Read [RATIONALE.md](RATIONALE.md) → [BUSINESS_PURPOSE.md](docs/BUSINESS_PURPOSE.md) → this doc.
+
+**Fixing a bug?** → [Debugging Guide](docs/DEBUGGING_GUIDE.md)
+**Adding a feature?** → See [Thinking Documentation](#thinking-documentation)
+**Reviewing code?** → Check [Definition of Done](#definition-of-done)
+
+---
+
 ## Quick Reference
 
 **Project:** AI Clinical Guardrails
@@ -144,6 +154,24 @@ A feature is only complete when:
 3. Update relevant AGENTS.md if patterns changed
 4. Document significant learnings in `docs/learnings/`
 
+## When Tests Fail
+
+**Property test failure:** Check `docs/learnings/pbt_debugging.md`
+**Component test failure:** Verify sandbox is running: `uv run python cli/fhir.py inspect 90128869`
+**Type check failure:** Run `uv run mypy src/` and fix errors before committing
+
+---
+
+## 🧠 Thinking Documentation
+
+**The Rule:** Significant decisions need two files: `{name}.md` (the output) and `{name}_THINKING.md` (the decision process).
+
+**When:** Multiple approaches, trade-offs, or revisit conditions exist.
+
+**Why:** Context management + keeping thinking accessible when needed.
+
+**See:** [docs/THINKING_STANDARD.md](docs/THINKING_STANDARD.md) for full details and template.
+
 ---
 
 ## 📚 Documentation
@@ -156,6 +184,7 @@ Single source of truth for all documentation.
 - **[GLOSSARY.md](docs/GLOSSARY.md)** - Terminology reference
 
 ### Core Documentation
+- **[BUSINESS_PURPOSE.md](docs/BUSINESS_PURPOSE.md)** - What we're building and why
 - **[PYTHON_STANDARDS.md](docs/PYTHON_STANDARDS.md)** - Code standards, patterns, integration guidelines
 - **[TESTING_FRAMEWORK.md](docs/TESTING_FRAMEWORK.md)** - Testing philosophy
 - **[TESTING_WORKFLOWS.md](docs/TESTING_WORKFLOWS.md)** - Command reference
@@ -164,6 +193,7 @@ Single source of truth for all documentation.
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design
 
 ### Reference
+- **[THINKING_STANDARD.md](docs/THINKING_STANDARD.md)** - When and how to document decisions
 - **[ARCHITECTURE_DECISIONS.md](docs/ARCHITECTURE_DECISIONS.md)** - ADRs
 - **[DEBUGGING_GUIDE.md](docs/DEBUGGING_GUIDE.md)** - Troubleshooting
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to extend

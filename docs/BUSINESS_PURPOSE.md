@@ -101,4 +101,4 @@ This repository demonstrates a critical leadership competency: **Scaling enginee
 
 The bulk of implementation code is AI-generated. The value is in the governance: the constraints, interfaces, and verification systems that make AI reliable in a safety-critical domain.
 
-See [RATIONALE.md](../RATIONALE.md) for the full architectural reasoning.
+See [BUSINESS_PURPOSE_THINKING.md](./BUSINESS_PURPOSE_THINKING.md) for the decision process and trade-offs.
