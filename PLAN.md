@@ -86,6 +86,29 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 
 **Next Actions (Prioritized):**
 
+### Phase 0: Test Data Generation (Start here)
+
+**Prerequisite for all extraction work** - Need realistic clinical dictation samples to validate extraction.
+
+**Task 0.1: Create manual sample transcript fixtures**
+- **File:** `tests/fixtures/sample_transcripts.json`
+- **Goal:** 5-10 realistic clinical dictation examples covering:
+  - Different visit types (follow-up, acute complaint, routine check)
+  - Various temporal expressions ("yesterday", "last week", "in two days")
+  - Medication mentions with dosages
+  - Protocol triggers (sepsis, chest pain, etc.)
+  - PII edge cases (accidental SSN mentions)
+- **Definition of Done:** File exists with varied, realistic examples
+- **Format:** JSON with fields: `id`, `text`, `expected_extractions`, `metadata`
+
+**Task 0.2: Build synthetic transcript generator (Optional)**
+- **File:** `scripts/generate_transcripts.py`
+- **Goal:** Generate unlimited synthetic transcripts with controlled parameters
+- **Definition of Done:** Script can generate 100+ varied transcripts on demand
+- **Value:** Demonstrates testing-at-scale capability
+
+---
+
 ### Phase 1: Voice Transcription Extraction Layer (Ready to start)
 
 **Task 1.1: Create extraction module structure**
