@@ -25,7 +25,7 @@ We verify that the FastAPI `/verify` endpoint correctly consumes EMR context and
 ## 🤖 Zero-Trust Date Strategy
 As learned from high-scale AI systems, LLMs are notoriously bad at calendar logic. Our testing framework enforces a **Zero-Trust policy**:
 1.  We generate randomized `EMRContext` objects with strict admission/discharge windows.
-2.  We generate `AIOutput` with dates outside those windows.
+2.  We generate `AIGeneratedOutput` with dates outside those windows.
 3.  We prove the engine **mathematically blocks** the documentation every single time.
 
 ## 📊 Attestation Reporting
