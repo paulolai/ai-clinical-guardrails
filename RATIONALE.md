@@ -63,9 +63,8 @@ My primary contribution was not the implementation, but the **Taste** to guide i
 
 ## The "Correction" Loop (A War Story)
 Staff engineering isn't about getting it right the first time; it's about spotting the *wrong* path early.
-*   **The Failure:** Early on, the AI tried to use a "smart" regex to parse dates from clinical notes. It hallucinated "next Friday" as a specific date without checking the year.
-*   **The Correction:** I stopped the implementation and mandated a **deterministic date resolution policy** injected as a dependency.
-*   **The Result:** See `src/engine.py`—date logic is now purely functional and testable against the EMR source of truth, not embedded in regex.
+
+<!-- TODO: Add a concrete example of an architectural course correction here once a significant one occurs during development. -->
 
 ## Socio-Technical Design: The "Agent" as a Team Member
 My background in Engineering Management (Team Topologies, Conway's Law) directly informed the architecture of this repository.
