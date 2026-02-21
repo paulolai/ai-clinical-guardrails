@@ -106,10 +106,13 @@ uv run pytest tests/ --cov=src --cov-report=html
 
 | Document | Purpose |
 |----------|---------|
+| **[RATIONALE](RATIONALE.md)** | Why this architecture exists |
+| **[BUSINESS_PURPOSE](docs/BUSINESS_PURPOSE.md)** | What we're building and for whom |
 | **[QUICKSTART](docs/QUICKSTART.md)** | 15-minute tutorial |
-| **[AGENTS](AGENTS.md)** | Engineering principles |
+| **[AGENTS](AGENTS.md)** | Engineering principles & standards |
 | **[PYTHON_STANDARDS](docs/PYTHON_STANDARDS.md)** | Code standards & patterns |
 | **[ARCHITECTURE](docs/ARCHITECTURE.md)** | System design |
+| **[THINKING_STANDARD](docs/THINKING_STANDARD.md)** | When and how to document decisions |
 | **[FAQ](docs/FAQ.md)** | Common questions |
 | **[GLOSSARY](docs/GLOSSARY.md)** | Terminology |
 | **[CONTRIBUTING](CONTRIBUTING.md)** | How to extend |
