@@ -26,10 +26,10 @@ The **Verification/Compliance Engine** is complete and tested - it successfully 
 | **FHIR Integration** | ✅ Working | HAPI FHIR sandbox integration with wrapper pattern |
 | **CLI Tools** | ✅ Working | `cli/fhir.py` and `cli/api.py` functional |
 | **Tests** | ✅ Passing | 9/9 tests pass (3 PBT, 4 API, 2 component) |
-| **Extraction Layer** | ⏳ NOT STARTED | Voice → structured data (Phase 0 & 1 in PLAN.md) |
-| **Sample Transcripts** | ⏳ NOT STARTED | Test fixtures for extraction validation |
+| **Extraction Layer** | 🔄 IN PROGRESS | LLM-based parser scaffolded, needs LLM client integration |
+| **Sample Transcripts** | ✅ COMPLETE | 10 test transcripts in tests/fixtures/sample_transcripts.json |
 
-### ✅ Documentation (COMPLETE)
+### ✅ Documentation (COMPLETE - Core)
 
 | Document | Status | Purpose |
 |----------|--------|---------|
@@ -46,6 +46,18 @@ The **Verification/Compliance Engine** is complete and tested - it successfully 
 | DEBUGGING_GUIDE.md | ✅ | Troubleshooting |
 | WORKFLOW_SPEC.md | ✅ | Development workflow |
 | ARCHITECTURE_DECISIONS.md | ✅ | ADRs |
+
+### ✅ Documentation (NEW - Extraction Layer Business)
+
+| Document | Status | Purpose |
+|----------|--------|---------|
+| PRODUCT_CASE.md | ✅ | Strategic justification (replaced financial business case) |
+| VOICE_TRANSCRIPTION_REQUIREMENTS.md | ✅ | Detailed functional requirements (Australian context) |
+| VOICE_DATA_COMPLIANCE.md | ✅ | Privacy Act & My Health Record compliance |
+| CLINICAL_WORKFLOW_INTEGRATION.md | ✅ | End-to-end clinical workflow |
+| PRE_MORTEM.md | ✅ | 20 failure scenarios identified |
+| RISK_MITIGATION.md | ✅ | Mitigation strategies for all risks |
+| Plus 8 more technical/clinical docs | ✅ | See docs/ directory |
 
 ### ✅ Examples (COMPLETE)
 

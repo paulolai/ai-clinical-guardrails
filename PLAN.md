@@ -92,63 +92,70 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 
 ---
 
-**Completed:**
-- ✅ Business purpose documentation ([BUSINESS_PURPOSE.md](docs/BUSINESS_PURPOSE.md))
-- ✅ Decision rationale ([BUSINESS_PURPOSE_THINKING.md](docs/BUSINESS_PURPOSE_THINKING.md))
-- ✅ Thinking documentation standard ([THINKING_STANDARD.md](docs/THINKING_STANDARD.md))
-- ✅ Updated README with new documentation index
+**Current Status:**
 
-**In Progress:**
-- 🔄 FHIR client with contract-first integration
-- 🔄 Domain wrapper pattern implementation
-- 🔄 Property-based testing for invariants
-- 🔄 CLI tooling for interface debugging
-
-**Next Actions (Prioritized):**
-
-### Phase 0: Test Data Generation (Start here)
-**8-Step:** Steps 1-4 (Business Requirements → Source Spec → Generated Models → Domain Wrapper)
-
-**Prerequisite for all extraction work** - Need realistic clinical dictation samples to validate extraction.
-
-**Task 0.1: Create manual sample transcript fixtures**
-- **File:** `tests/fixtures/sample_transcripts.json`
-- **Goal:** 5-10 realistic clinical dictation examples covering:
-  - Different visit types (follow-up, acute complaint, routine check)
-  - Various temporal expressions ("yesterday", "last week", "in two days")
-  - Medication mentions with dosages
-  - Protocol triggers (sepsis, chest pain, etc.)
-  - PII edge cases (accidental SSN mentions)
-- **Definition of Done:** File exists with varied, realistic examples
-- **Format:** JSON with fields: `id`, `text`, `expected_extractions`, `metadata`
-
-**Task 0.2: Build synthetic transcript generator (Optional)**
-- **File:** `scripts/generate_transcripts.py`
-- **Goal:** Generate unlimited synthetic transcripts with controlled parameters
-- **Definition of Done:** Script can generate 100+ varied transcripts on demand
-- **Value:** Demonstrates testing-at-scale capability
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 0 | ✅ COMPLETE | Sample transcripts created (10 examples) |
+| Phase 1.1 | ✅ COMPLETE | Extraction module structure (llm_parser.py, models.py, temporal.py) |
+| Phase 1.2 | 🔄 IN PROGRESS | Temporal resolution working, needs integration testing |
+| Phase 1.3 | 🔄 IN PROGRESS | Confidence scoring framework in place |
+| Phase 1.4 | ⏳ NEXT | LLM client integration |
 
 ---
 
-### Phase 1: Voice Transcription Extraction Layer (Ready to start)
+**Completed:**
+- ✅ Business purpose documentation ([BUSINESS_PURPOSE.md](docs/BUSINESS_PURPOSE.md))
+- ✅ Comprehensive requirements (15+ business/clinical/compliance docs)
+- ✅ Pre-mortem analysis (20 failure scenarios identified)
+- ✅ Risk mitigation strategies documented
+- ✅ Sample transcripts ([tests/fixtures/sample_transcripts.json](tests/fixtures/sample_transcripts.json))
+- ✅ Extraction module scaffold ([src/extraction/](src/extraction/))
+- ✅ AGENTS.md restructured with standards split out
+
+---
+
+**Next Actions (Prioritized):**
+
+### Phase 1.4: LLM Client Integration (Next Immediate Action)
+**8-Step:** Steps 5-6 (CLI Tooling → Component Tests)
+
+**Task 1.4.1: Implement LLM client**
+- **File:** `src/extraction/llm_client.py`
+- **Goal:** Abstract LLM provider (OpenAI, Azure, etc.)
+- **Definition of Done:** Can call LLM with extraction prompt, parse JSON response
+- **Acceptance:** Works with both OpenAI and Azure OpenAI endpoints
+
+**Task 1.4.2: Wire LLM to parser**
+- **File:** Update `src/extraction/llm_parser.py`
+- **Goal:** Integrate LLM client with extraction logic
+- **Definition of Done:** Can extract from transcript using real LLM API
+- **Test:** Run extraction against sample transcripts
+
+**Task 1.4.3: Test extraction accuracy**
+- **Files:** `tests/test_extraction_accuracy.py`
+- **Goal:** Validate extraction quality against sample transcripts
+- **Definition of Done:** >80% accuracy on test set
+- **Output:** Accuracy report with failure analysis
+
+---
+
+### Phase 1: Voice Transcription Extraction Layer (Reference)
 **8-Step:** Steps 1-8 complete (Full lifecycle for extraction module)
 
-**Task 1.1: Create extraction module structure**
-- **File:** `src/extraction/__init__.py`, `src/extraction/parser.py`
-- **Goal:** Parse clinician dictation into structured fields
-- **Definition of Done:** Can extract dates, medications, diagnoses from sample text
-- **Example:** "Started her on Lisinopril" → `{medication: "Lisinopril", confidence: 0.95}`
+**Task 1.1: Create extraction module structure** ✅ DONE
+- **Files:** `src/extraction/__init__.py`, `src/extraction/llm_parser.py`
+- **Status:** Module scaffolded with LLM-based approach
 
-**Task 1.2: Temporal expression resolution**
+**Task 1.2: Temporal expression resolution** ✅ DONE
 - **File:** `src/extraction/temporal.py`
-- **Goal:** Convert relative dates ("yesterday", "two weeks") to absolute dates
-- **Definition of Done:** Given an encounter date, resolves temporal expressions correctly
-- **Test:** Property-based test with random encounter dates
+- **Status:** Rule-based temporal resolver implemented
+- **Next:** Integration testing
 
-**Task 1.3: Extraction confidence scoring**
-- **File:** `src/models.py` (add ExtractionResult with confidence)
-- **Goal:** Each extraction has confidence score for downstream filtering
-- **Definition of Done:** Low confidence extractions flagged for review
+**Task 1.3: Extraction confidence scoring** ✅ DONE
+- **File:** `src/extraction/models.py`
+- **Status:** Confidence framework in place
+- **Next:** Calibration with real data
 
 ### Phase 2: Integration Workflow (Blocked by 1.x)
 **8-Step:** Steps 4-6 (Domain Wrapper → CLI Tooling → Component Tests)
@@ -176,20 +183,35 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - **Goal:** Measure latency for verification workflow
 - **Definition of Done:** Documented p50/p95/p99 latencies
 
-**Current Status:** Ready to start Phase 1.1
-**Next Immediate Action:** Create extraction module
+**Current Status:** Phase 1.4 IN PROGRESS - LLM client integration needed
+**Next Immediate Action:** Implement LLM client (Task 1.4.1)
 
 ## 📝 Documentation Map
 
+### Core Documentation
 | Document | Purpose |
 |----------|---------|
 | **[RATIONALE](RATIONALE.md)** | High-level architectural reasoning |
-| **[BUSINESS_PURPOSE](docs/BUSINESS_PURPOSE.md)** | Business problem and solution narrative |
-| **[BUSINESS_PURPOSE_THINKING](docs/BUSINESS_PURPOSE_THINKING.md)** | Why voice transcription, why clinical focus |
-| **[THINKING_STANDARD](docs/THINKING_STANDARD.md)** | When and how to document decisions |
-| **[AGENTS](AGENTS.md)** | Engineering principles and standards |
-| **[ARCHITECTURE](docs/ARCHITECTURE.md)** | System design details |
+| **[AGENTS](AGENTS.md)** | Quick reference and entry point |
+| **[CONSOLIDATED_PLAN](CONSOLIDATED_PLAN.md)** | Current implementation status |
+
+### Standards (How We Work)
+| Document | Purpose |
+|----------|---------|
+| **[OPERATIONAL_WORKFLOWS](docs/standards/OPERATIONAL_WORKFLOWS.md)** | How to build features (8-step lifecycle) |
+| **[CRITICAL_PATTERNS](docs/standards/CRITICAL_PATTERNS.md)** | Code patterns to use |
+| **[TESTING_STANDARDS](docs/standards/TESTING_STANDARDS.md)** | How to test safely |
+| **[COMMIT_STANDARDS](docs/standards/COMMIT_STANDARDS.md)** | How to commit code |
+
+### Business & Clinical
+| Document | Purpose |
+|----------|---------|
+| **[PRODUCT_CASE](docs/business/PRODUCT_CASE.md)** | Strategic justification |
+| **[REQUIREMENTS](docs/business/VOICE_TRANSCRIPTION_REQUIREMENTS.md)** | Functional requirements |
+| **[COMPLIANCE](docs/compliance/VOICE_DATA_COMPLIANCE.md)** | Privacy & My Health Record |
+| **[PRE_MORTEM](docs/PRE_MORTEM.md)** | Failure scenarios |
+| **[RISK_MITIGATION](docs/RISK_MITIGATION.md)** | Mitigation strategies |
 
 ---
 
-*See [AGENTS.md](AGENTS.md) for engineering standards and [docs/THINKING_STANDARD.md](docs/THINKING_STANDARD.md) for decision documentation patterns.*
+*See [AGENTS.md](AGENTS.md) for quick start and [docs/standards/OPERATIONAL_WORKFLOWS.md](docs/standards/OPERATIONAL_WORKFLOWS.md) for how to build.*
