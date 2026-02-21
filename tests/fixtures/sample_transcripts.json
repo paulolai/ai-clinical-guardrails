@@ -1,0 +1,515 @@
+{
+  "transcripts": [
+    {
+      "id": "TX-001-follow-up",
+      "text": "Mrs. Sarah Johnson came in yesterday for her follow-up visit. She's been taking Lisinopril 10 milligrams daily and her blood pressure has improved significantly. Started two weeks ago. Next appointment scheduled for in two weeks to check her progress.",
+      "expected_extractions": {
+        "patient_name": "Mrs. Sarah Johnson",
+        "temporal_expressions": [
+          {
+            "text": "yesterday",
+            "type": "relative_date",
+            "normalized": "encounter_date - 1 day"
+          },
+          {
+            "text": "two weeks ago",
+            "type": "relative_date",
+            "normalized": "encounter_date - 14 days"
+          },
+          {
+            "text": "in two weeks",
+            "type": "relative_date",
+            "normalized": "encounter_date + 14 days"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "dosage": "10 milligrams",
+            "frequency": "daily",
+            "start_date": "two weeks ago"
+          }
+        ],
+        "visit_type": "follow-up"
+      },
+      "metadata": {
+        "scenario": "routine_follow_up",
+        "complexity": "low",
+        "expected_alerts": [],
+        "notes": "Standard follow-up with clear temporal references and medication mention"
+      }
+    },
+    {
+      "id": "TX-002-acute-complaint",
+      "text": "Patient David Martinez presents today with chest pain that started last night. Pain is 7 out of 10, radiating to left arm. Suspected acute coronary syndrome. EKG shows ST elevation. Started on aspirin 325 milligrams and nitroglycerin sublingual. Admitted for cardiac catheterization. Follow up in cardiology clinic in three days post-discharge.",
+      "expected_extractions": {
+        "patient_name": "David Martinez",
+        "temporal_expressions": [
+          {
+            "text": "today",
+            "type": "relative_date",
+            "normalized": "encounter_date"
+          },
+          {
+            "text": "last night",
+            "type": "relative_date",
+            "normalized": "encounter_date - 1 day"
+          },
+          {
+            "text": "in three days post-discharge",
+            "type": "relative_date",
+            "normalized": "discharge_date + 3 days"
+          }
+        ],
+        "medications": [
+          {
+            "name": "aspirin",
+            "dosage": "325 milligrams",
+            "frequency": null,
+            "route": "oral"
+          },
+          {
+            "name": "nitroglycerin",
+            "dosage": null,
+            "frequency": "as needed",
+            "route": "sublingual"
+          }
+        ],
+        "diagnoses": [
+          {
+            "text": "chest pain",
+            "icd10_code": "R07.9"
+          },
+          {
+            "text": "suspected acute coronary syndrome",
+            "icd10_code": "I24.9"
+          }
+        ],
+        "protocol_triggers": ["chest pain", "acute coronary syndrome", "ST elevation"],
+        "visit_type": "acute_complaint"
+      },
+      "metadata": {
+        "scenario": "acute_cardiac_event",
+        "complexity": "high",
+        "expected_alerts": ["protocol_adherence_required"],
+        "notes": "Acute cardiac presentation requiring protocol adherence verification"
+      }
+    },
+    {
+      "id": "TX-003-sepsis-protocol",
+      "text": "Emma Thompson, 68 years old, presents with fever 101.2, tachycardia 110, hypotension 90 over 60. Suspected sepsis from urinary tract infection. Blood cultures drawn. Started on ceftriaxone 1 gram IV q24h. Lactate level ordered. Fluid resuscitation initiated with 2 liters normal saline. Patient meets sepsis criteria.",
+      "expected_extractions": {
+        "patient_name": "Emma Thompson",
+        "temporal_expressions": [],
+        "medications": [
+          {
+            "name": "ceftriaxone",
+            "dosage": "1 gram",
+            "frequency": "q24h",
+            "route": "IV"
+          }
+        ],
+        "vital_signs": [
+          {
+            "type": "temperature",
+            "value": "101.2",
+            "unit": "F"
+          },
+          {
+            "type": "heart_rate",
+            "value": "110",
+            "unit": "bpm"
+          },
+          {
+            "type": "blood_pressure",
+            "value": "90/60",
+            "unit": "mmHg"
+          }
+        ],
+        "protocol_triggers": ["sepsis", "suspected sepsis"],
+        "visit_type": "acute_complaint"
+      },
+      "metadata": {
+        "scenario": "sepsis_protocol",
+        "complexity": "high",
+        "expected_alerts": ["protocol_adherence_required", "sepsis_bundle"],
+        "notes": "Sepsis case requiring complete documentation of sepsis bundle elements"
+      }
+    },
+    {
+      "id": "TX-004-routine-check",
+      "text": "Annual physical for Robert Williams. Last visit was twelve months ago. Blood pressure 128 over 82. Weight stable at 185 pounds. Continue current medications: Metformin 500 milligrams twice daily and Atorvastatin 20 milligrams daily. Labs ordered: CBC, CMP, lipid panel, HbA1c. Follow up in six months with results.",
+      "expected_extractions": {
+        "patient_name": "Robert Williams",
+        "temporal_expressions": [
+          {
+            "text": "twelve months ago",
+            "type": "relative_date",
+            "normalized": "encounter_date - 365 days"
+          },
+          {
+            "text": "in six months",
+            "type": "relative_date",
+            "normalized": "encounter_date + 182 days"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Metformin",
+            "dosage": "500 milligrams",
+            "frequency": "twice daily",
+            "status": "continue"
+          },
+          {
+            "name": "Atorvastatin",
+            "dosage": "20 milligrams",
+            "frequency": "daily",
+            "status": "continue"
+          }
+        ],
+        "vital_signs": [
+          {
+            "type": "blood_pressure",
+            "value": "128/82",
+            "unit": "mmHg"
+          },
+          {
+            "type": "weight",
+            "value": "185",
+            "unit": "pounds"
+          }
+        ],
+        "labs_ordered": ["CBC", "CMP", "lipid panel", "HbA1c"],
+        "visit_type": "routine_check"
+      },
+      "metadata": {
+        "scenario": "annual_physical",
+        "complexity": "low",
+        "expected_alerts": [],
+        "notes": "Routine annual physical with medication reconciliation"
+      }
+    },
+    {
+      "id": "TX-005-medication-change",
+      "text": "Jennifer Lee returning for diabetes management. Her HbA1c was 8.2 last week. Increasing Metformin from 500 milligrams to 1000 milligrams twice daily. Stopping Glipizide 5 milligrams due to hypoglycemia episodes. Starting Januvia 100 milligrams daily. Recheck HbA1c in three months. See back in four weeks to assess tolerance.",
+      "expected_extractions": {
+        "patient_name": "Jennifer Lee",
+        "temporal_expressions": [
+          {
+            "text": "last week",
+            "type": "relative_date",
+            "normalized": "encounter_date - 7 days"
+          },
+          {
+            "text": "in three months",
+            "type": "relative_date",
+            "normalized": "encounter_date + 90 days"
+          },
+          {
+            "text": "in four weeks",
+            "type": "relative_date",
+            "normalized": "encounter_date + 28 days"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Metformin",
+            "dosage": "1000 milligrams",
+            "frequency": "twice daily",
+            "status": "increased",
+            "previous_dosage": "500 milligrams"
+          },
+          {
+            "name": "Glipizide",
+            "dosage": "5 milligrams",
+            "status": "discontinued",
+            "reason": "hypoglycemia episodes"
+          },
+          {
+            "name": "Januvia",
+            "dosage": "100 milligrams",
+            "frequency": "daily",
+            "status": "started"
+          }
+        ],
+        "lab_results": [
+          {
+            "test": "HbA1c",
+            "value": "8.2",
+            "date": "last week"
+          }
+        ],
+        "visit_type": "follow-up"
+      },
+      "metadata": {
+        "scenario": "medication_adjustment",
+        "complexity": "medium",
+        "expected_alerts": [],
+        "notes": "Medication changes with dosage adjustments and discontinuations"
+      }
+    },
+    {
+      "id": "TX-006-pii-edge-case",
+      "text": "Patient Michael Brown, SSN 123-45-6789, came in today for his Medicare wellness visit. His Medicare number is 1EG4-TE5-MK73. He reports taking his medications as prescribed. Started on Lisinopril 10 milligrams daily last month for hypertension. Blood pressure today 138 over 88. Next visit scheduled for three months.",
+      "expected_extractions": {
+        "patient_name": "Michael Brown",
+        "temporal_expressions": [
+          {
+            "text": "today",
+            "type": "relative_date",
+            "normalized": "encounter_date"
+          },
+          {
+            "text": "last month",
+            "type": "relative_date",
+            "normalized": "encounter_date - 30 days"
+          },
+          {
+            "text": "three months",
+            "type": "relative_date",
+            "normalized": "encounter_date + 90 days"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "dosage": "10 milligrams",
+            "frequency": "daily",
+            "start_date": "last month"
+          }
+        ],
+        "vital_signs": [
+          {
+            "type": "blood_pressure",
+            "value": "138/88",
+            "unit": "mmHg"
+          }
+        ],
+        "pii_detected": [
+          {
+            "type": "ssn",
+            "text": "123-45-6789",
+            "severity": "critical"
+          },
+          {
+            "type": "medicare_number",
+            "text": "1EG4-TE5-MK73",
+            "severity": "critical"
+          }
+        ],
+        "visit_type": "routine_check"
+      },
+      "metadata": {
+        "scenario": "pii_leak",
+        "complexity": "high",
+        "expected_alerts": ["pii_detected", "compliance_violation"],
+        "notes": "Contains SSN and Medicare number - should trigger PII detection alerts"
+      }
+    },
+    {
+      "id": "TX-007-multiple-dates",
+      "text": "Mary Johnson seen today for post-operative visit after knee replacement surgery two weeks ago. Incision healing well. Started physical therapy three days ago. Last pain medication taken yesterday morning. Follow up appointment in one week with orthopedics. Next primary care visit scheduled for six weeks from today.",
+      "expected_extractions": {
+        "patient_name": "Mary Johnson",
+        "temporal_expressions": [
+          {
+            "text": "today",
+            "type": "relative_date",
+            "normalized": "encounter_date"
+          },
+          {
+            "text": "two weeks ago",
+            "type": "relative_date",
+            "normalized": "encounter_date - 14 days"
+          },
+          {
+            "text": "three days ago",
+            "type": "relative_date",
+            "normalized": "encounter_date - 3 days"
+          },
+          {
+            "text": "yesterday morning",
+            "type": "relative_date",
+            "normalized": "encounter_date - 1 day"
+          },
+          {
+            "text": "in one week",
+            "type": "relative_date",
+            "normalized": "encounter_date + 7 days"
+          },
+          {
+            "text": "six weeks from today",
+            "type": "relative_date",
+            "normalized": "encounter_date + 42 days"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "knee replacement surgery",
+            "date": "two weeks ago"
+          }
+        ],
+        "visit_type": "post-operative"
+      },
+      "metadata": {
+        "scenario": "multiple_temporal_references",
+        "complexity": "medium",
+        "expected_alerts": [],
+        "notes": "Tests ability to resolve multiple temporal expressions with different offsets"
+      }
+    },
+    {
+      "id": "TX-008-ambiguous-date",
+      "text": "Thomas Anderson was seen recently for his diabetes follow-up. He started taking the new medication a few days ago and says he's feeling better. We discussed his diet and exercise routine. Plan to see him again soon for lab recheck.",
+      "expected_extractions": {
+        "patient_name": "Thomas Anderson",
+        "temporal_expressions": [
+          {
+            "text": "recently",
+            "type": "relative_date",
+            "normalized": null,
+            "confidence": 0.3,
+            "note": "ambiguous temporal reference"
+          },
+          {
+            "text": "a few days ago",
+            "type": "relative_date",
+            "normalized": null,
+            "confidence": 0.5,
+            "note": "imprecise temporal reference"
+          },
+          {
+            "text": "soon",
+            "type": "relative_date",
+            "normalized": null,
+            "confidence": 0.2,
+            "note": "ambiguous temporal reference"
+          }
+        ],
+        "medications": [
+          {
+            "name": "new medication",
+            "dosage": null,
+            "frequency": null,
+            "start_date": "a few days ago",
+            "confidence": 0.4,
+            "note": "medication name not specified"
+          }
+        ],
+        "visit_type": "follow-up"
+      },
+      "metadata": {
+        "scenario": "ambiguous_dates",
+        "complexity": "high",
+        "expected_alerts": ["low_confidence_extractions"],
+        "notes": "Tests handling of ambiguous temporal expressions with low confidence scoring"
+      }
+    },
+    {
+      "id": "TX-009-pediatric-visit",
+      "text": "Emily Chen, 5 years old, here for well-child check. Last visit was 6 months ago. Weight 42 pounds, height 42 inches. Up to date on immunizations. Development on track. No concerns from parents. Next well-child visit in 6 months at age 5 and a half.",
+      "expected_extractions": {
+        "patient_name": "Emily Chen",
+        "patient_age": "5 years old",
+        "temporal_expressions": [
+          {
+            "text": "6 months ago",
+            "type": "relative_date",
+            "normalized": "encounter_date - 180 days"
+          },
+          {
+            "text": "in 6 months",
+            "type": "relative_date",
+            "normalized": "encounter_date + 180 days"
+          }
+        ],
+        "vital_signs": [
+          {
+            "type": "weight",
+            "value": "42",
+            "unit": "pounds"
+          },
+          {
+            "type": "height",
+            "value": "42",
+            "unit": "inches"
+          }
+        ],
+        "visit_type": "well_child_check"
+      },
+      "metadata": {
+        "scenario": "pediatric_routine",
+        "complexity": "low",
+        "expected_alerts": [],
+        "notes": "Pediatric well-child visit with growth measurements"
+      }
+    },
+    {
+      "id": "TX-010-urgent-same-day",
+      "text": "Patient called this morning with severe sore throat. Seen same day at 2 PM. Rapid strep test positive. Started on amoxicillin 500 milligrams three times daily for 10 days. Patient instructed to return if not improved in 48 hours or if rash develops. Follow up only if needed.",
+      "expected_extractions": {
+        "patient_name": null,
+        "temporal_expressions": [
+          {
+            "text": "this morning",
+            "type": "relative_date",
+            "normalized": "encounter_date morning"
+          },
+          {
+            "text": "same day",
+            "type": "relative_date",
+            "normalized": "encounter_date"
+          },
+          {
+            "text": "2 PM",
+            "type": "absolute_time",
+            "normalized": "14:00"
+          },
+          {
+            "text": "10 days",
+            "type": "duration",
+            "normalized": "10 days"
+          },
+          {
+            "text": "in 48 hours",
+            "type": "relative_date",
+            "normalized": "encounter_date + 2 days"
+          }
+        ],
+        "medications": [
+          {
+            "name": "amoxicillin",
+            "dosage": "500 milligrams",
+            "frequency": "three times daily",
+            "duration": "10 days"
+          }
+        ],
+        "diagnoses": [
+          {
+            "text": "strep throat",
+            "test": "rapid strep test",
+            "result": "positive"
+          }
+        ],
+        "visit_type": "urgent_same_day"
+      },
+      "metadata": {
+        "scenario": "urgent_same_day",
+        "complexity": "medium",
+        "expected_alerts": [],
+        "notes": "Same-day urgent visit with specific time reference and conditional follow-up"
+      }
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "created_date": "2026-02-21",
+    "total_transcripts": 10,
+    "coverage": {
+      "visit_types": ["follow-up", "acute_complaint", "routine_check", "post-operative", "well_child_check", "urgent_same_day"],
+      "temporal_patterns": ["yesterday", "today", "last week", "last month", "ago", "in X days/weeks/months", "specific times", "ambiguous references"],
+      "protocol_triggers": ["chest pain", "sepsis"],
+      "edge_cases": ["pii_detection", "ambiguous_dates", "low_confidence_extractions"]
+    }
+  }
+}
