@@ -84,7 +84,7 @@ AI Service → Guardrails API → ComplianceEngine → Audit Store
 **Test:** `test_clinical_protocol_invariant` (Hypothesis PBT)
 
 ### 3. PII Detection Check
-**Rule:** SSN patterns detected in summaries
+**Rule:** Medicare Number patterns detected in summaries
 **Implementation:** `engine.py:_verify_data_safety()`
 **Test:** `test_data_safety_invariant` (Hypothesis PBT)
 

@@ -15,7 +15,7 @@ A patient visit or interaction with healthcare system. Has admission/discharge d
 Any health information that can identify a patient. Protected under HIPAA.
 
 **PII (Personally Identifiable Information)**
-Any data that could identify a specific individual (SSN, name, DOB, etc.).
+Any data that could identify a specific individual (Medicare Number, name, DOB, etc.).
 
 ## Engineering Terms
 

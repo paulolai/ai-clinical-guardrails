@@ -55,11 +55,12 @@ class TestComplianceEngine:
     @given(patient=patient_strategy(), context=context_strategy())
     def test_pii_leakage_invariant(self, patient, context):
         """
-        Property: If the summary contains an SSN pattern, it MUST return a Failure Result.
+        Property: If summary contains a Medicare Number pattern, it MUST return a Failure Result.
         """
-        ssn_summary = "Patient SSN is 000-00-0000. Proceed with care."
+        # Medicare format: 10 digits, often space separated
+        medicare_summary = "Patient Medicare is 1234 56789 1. Proceed with care."
         ai_output = AIGeneratedOutput(
-            summary_text=ssn_summary,
+            summary_text=medicare_summary,
             extracted_dates=[context.admission_date.date()],
             extracted_diagnoses=[],
         )

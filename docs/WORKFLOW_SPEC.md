@@ -60,7 +60,7 @@ This document defines the 8-step engineering lifecycle used to build the Clinica
 - **Invariants:**
     1. **Date Integrity:** AI dates must exist in the EMR window.
     2. **Protocol Adherence:** Clinical triggers (Sepsis) require specific documentation.
-    3. **Administrative Safety:** Scan for PII (SSN patterns).
+    3. **Administrative Safety:** Scan for PII (Medicare Number patterns).
 
 ### Step 8: System Verification (PBT)
 **Goal:** Prove the logic holds for all valid inputs.

@@ -74,7 +74,7 @@ uv run python main.py
 
 1.  **Date Integrity:** Every date extracted by the AI MUST exist within the patient's actual EMR context window.
 2.  **Protocol Adherence:** Clinical triggers (e.g., Sepsis) must force documentation of mandatory actions.
-3.  **Data Safety (PII):** Automated summaries are scanned for illegal patterns (e.g., SSN) before they are safe to file.
+3.  **Data Safety (PII):** Automated summaries are scanned for illegal patterns (e.g., Medicare Number) before they are safe to file.
 
 ---
 

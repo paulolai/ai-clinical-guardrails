@@ -15,7 +15,7 @@ For clinical documentation, "it works on my machine" is insufficient. We use **P
 ### 1. Domain Invariants (Hypothesis)
 We don't test single examples. We define **Invariants**—rules that must *always* be true.
 - **The Date Lock Invariant:** `assert not ComplianceEngine.verify(..., hallucinated_date).is_success`
-- **The PII Firewall Invariant:** `assert not ComplianceEngine.verify(..., ssn_pattern).is_success`
+- **The PII Firewall Invariant:** `assert not ComplianceEngine.verify(..., medicare_pattern).is_success`
 
 ### 2. Integration Tests (API)
 We verify that the FastAPI `/verify` endpoint correctly consumes EMR context and returns the structured `Result` type, ensuring a safe contract for external integrations.

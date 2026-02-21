@@ -107,15 +107,16 @@ class ComplianceEngine:
 
     @staticmethod
     def _verify_data_safety(ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]) -> None:
-        # Original regex for generic PII detection (SSN-like patterns)
-        # Demonstrates administrative safety without using external libraries
-        pii_regex = r"\b\d{3}-\d{2}-\d{4}\b"
+        # Original regex for generic PII detection (Medicare Number pattern)
+        # Matches 10 digits, optionally space-separated (e.g., 2222 33333 1)
+        pii_regex = r"\b\d{4}[ ]?\d{5}[ ]?\d{1}\b"
         if re.search(pii_regex, ai_output.summary_text):
             alerts.append(
                 ComplianceAlert(
                     rule_id="SAFETY_PII_LEAK",
                     message=(
-                        "Administrative Safety: Potential PII (SSN pattern) detected in summary."
+                        "Administrative Safety: Potential PII (Medicare Number pattern) "
+                        "detected in summary."
                     ),
                     severity=ComplianceSeverity.CRITICAL,
                     field="summary_text",
