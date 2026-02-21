@@ -3,6 +3,7 @@
 Converts clinician dictation into structured clinical data using LLM-based parsing.
 """
 
+from src.extraction.llm_client import SyntheticLLMClient
 from src.extraction.llm_parser import LLMTranscriptParser
 from src.extraction.models import (
     ExtractedDiagnosis,
@@ -24,5 +25,6 @@ __all__ = [
     "MedicationStatus",
     "TemporalType",
     "LLMTranscriptParser",
+    "SyntheticLLMClient",
     "TemporalResolver",
 ]

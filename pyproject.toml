@@ -11,10 +11,12 @@ dependencies = [
     "hypothesis>=6.151.9",
     "jsonlines>=4.0.0",
     "mypy>=1.11.0",
+    "openai>=1.0.0",
     "pre-commit>=3.8.0",
     "pydantic>=2.12.5",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
+    "python-dotenv>=1.0.0",
     "ruff>=0.15.2",
     "typer>=0.15.1",
     "uvicorn>=0.41.0",
@@ -62,3 +64,6 @@ exclude = ["src/integrations/fhir/generated.py"]
 asyncio_mode = "strict"
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = [
+    "component: marks tests as component/integration tests (may require external services)",
+]

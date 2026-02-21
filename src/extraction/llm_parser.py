@@ -8,6 +8,7 @@ import json
 from datetime import date
 from typing import Any
 
+from src.extraction.llm_client import SyntheticLLMClient
 from src.extraction.models import (
     ExtractedDiagnosis,
     ExtractedMedication,
@@ -29,14 +30,14 @@ Transcript:
 Reference Date: {reference_date}
 
 Return this JSON structure:
-{
+{{
   "patient_name": "extracted name or null",
   "patient_age": "age or null",
   "visit_type": "follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null",
   "confidence": 0.0-1.0,
   "extraction_notes": "any ambiguities",
   "medications": [
-    {
+    {{
       "name": "medication name",
       "dosage": "dosage or null",
       "frequency": "frequency or null",
@@ -44,41 +45,41 @@ Return this JSON structure:
       "status": "started|stopped|continued|increased|decreased|unknown",
       "confidence": 0.0-1.0,
       "raw_text": "exact text from transcript"
-    }
+    }}
   ],
   "diagnoses": [
-    {
+    {{
       "condition": "condition name",
       "icd10_code": "ICD-10 code or null",
       "confidence": 0.0-1.0,
       "raw_text": "exact text from transcript"
-    }
+    }}
   ],
   "temporal_expressions": [
-    {
+    {{
       "text": "exact text from transcript",
       "interpretation": "what this likely means",
       "confidence": 0.0-1.0
-    }
+    }}
   ],
   "vital_signs": [
-    {
+    {{
       "type": "blood-pressure|temperature|heart-rate|weight|height|respiratory-rate",
       "value": "value with units",
       "raw_text": "exact text from transcript"
-    }
+    }}
   ],
   "procedures": [
-    {
+    {{
       "name": "procedure name",
       "date_description": "when it occurred or null",
       "raw_text": "exact text from transcript"
-    }
+    }}
   ],
   "protocol_triggers": ["sepsis|stroke|MI|trauma"],
   "follow_up": "follow-up instructions or null",
   "additional_context": "other relevant information"
-}
+}}
 
 Guidelines:
 - Do not hallucinate information not in the transcript
@@ -96,14 +97,19 @@ class LLMTranscriptParser:
     to understand context and extract meaning.
     """
 
-    def __init__(self, llm_client: Any, reference_date: date | None = None):
+    def __init__(
+        self,
+        llm_client: SyntheticLLMClient | Any | None = None,
+        reference_date: date | None = None,
+    ):
         """Initialize LLM parser.
 
         Args:
-            llm_client: Client for LLM API (e.g., OpenAI, Anthropic)
+            llm_client: LLM client for API calls. If None, creates SyntheticLLMClient.
+                       Can also accept a mock client for testing.
             reference_date: Base date for temporal calculations
         """
-        self.llm_client = llm_client
+        self.llm_client = llm_client or SyntheticLLMClient()
         self.temporal_resolver = TemporalResolver(reference_date)
 
     async def parse(self, text: str) -> StructuredExtraction:
@@ -145,8 +151,18 @@ class LLMTranscriptParser:
         )
 
     async def _call_llm(self, prompt: str) -> str:
-        """Call LLM with prompt."""
-        raise NotImplementedError("LLM client integration required. Pass an LLM client to the parser constructor.")
+        """Call LLM with prompt.
+
+        Args:
+            prompt: The formatted extraction prompt
+
+        Returns:
+            JSON string response from LLM
+
+        Raises:
+            Exception: If LLM call fails
+        """
+        return await self.llm_client.complete(prompt)
 
     def _parse_llm_response(self, response: str) -> dict[str, Any]:
         """Parse LLM JSON response."""
