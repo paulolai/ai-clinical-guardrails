@@ -2,6 +2,7 @@
 
 import re
 from datetime import date
+from typing import Any
 
 from src.extraction.models import (
     ExtractedDiagnosis,
@@ -176,9 +177,7 @@ class TranscriptParser:
         for pattern, status in med_patterns:
             for match in re.finditer(pattern, text, re.IGNORECASE):
                 name = match.group(1)
-                dosage = (
-                    match.group(2) + " mg" if len(match.groups()) > 1 and match.group(2) else None
-                )
+                dosage = match.group(2) + " mg" if len(match.groups()) > 1 and match.group(2) else None
 
                 # Extract frequency if mentioned
                 frequency = self._extract_frequency(text_lower, name.lower())
@@ -248,7 +247,6 @@ class TranscriptParser:
     def _extract_diagnoses(self, text: str) -> list[ExtractedDiagnosis]:
         """Extract diagnosis mentions from transcript."""
         diagnoses = []
-        text_lower = text.lower()
 
         # Common diagnosis patterns
         diag_patterns = [
@@ -271,7 +269,7 @@ class TranscriptParser:
 
         return diagnoses
 
-    def _extract_vital_signs(self, text: str) -> list[dict]:
+    def _extract_vital_signs(self, text: str) -> list[dict[str, Any]]:
         """Extract vital signs from transcript."""
         vitals = []
 

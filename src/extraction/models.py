@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from datetime import date
 from enum import StrEnum
+from typing import Any
 
 
 class TemporalType(StrEnum):
@@ -68,7 +69,7 @@ class ExtractionResult:
     confidence: float
     start_pos: int
     end_pos: int
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -81,7 +82,7 @@ class StructuredExtraction:
     temporal_expressions: list[ExtractedTemporalExpression] = field(default_factory=list)
     medications: list[ExtractedMedication] = field(default_factory=list)
     diagnoses: list[ExtractedDiagnosis] = field(default_factory=list)
-    vital_signs: list[dict] = field(default_factory=list)
+    vital_signs: list[dict[str, Any]] = field(default_factory=list)
     confidence: float = 1.0
 
     def has_low_confidence_extractions(self, threshold: float = 0.7) -> bool:

@@ -19,7 +19,7 @@ class TemporalResolver:
     """
 
     # Regex patterns for common temporal expressions
-    PATTERNS: dict[str, Pattern] = {
+    PATTERNS: dict[str, Pattern[str]] = {
         "today": re.compile(r"\btoday\b", re.IGNORECASE),
         "yesterday": re.compile(r"\byesterday\b", re.IGNORECASE),
         "tomorrow": re.compile(r"\btomorrow\b", re.IGNORECASE),
@@ -69,9 +69,7 @@ class TemporalResolver:
 
         return results
 
-    def _resolve_expression(
-        self, pattern_name: str, text: str, quantity: str | None
-    ) -> ExtractedTemporalExpression:
+    def _resolve_expression(self, pattern_name: str, text: str, quantity: str | None) -> ExtractedTemporalExpression:
         """Resolve a single temporal expression."""
         resolvers = {
             "today": self._resolve_today,

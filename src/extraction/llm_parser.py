@@ -18,7 +18,8 @@ from src.extraction.models import (
 )
 from src.extraction.temporal import TemporalResolver
 
-EXTRACTION_PROMPT_TEMPLATE = """You are a clinical data extraction assistant. Parse unstructured clinical dictation and extract structured information.
+EXTRACTION_PROMPT_TEMPLATE = """You are a clinical data extraction assistant.
+Parse unstructured clinical dictation and extract structured information.
 
 Extract the following from the clinical transcript below. Return ONLY a JSON object.
 
@@ -145,11 +146,9 @@ class LLMTranscriptParser:
 
     async def _call_llm(self, prompt: str) -> str:
         """Call LLM with prompt."""
-        raise NotImplementedError(
-            "LLM client integration required. Pass an LLM client to the parser constructor."
-        )
+        raise NotImplementedError("LLM client integration required. Pass an LLM client to the parser constructor.")
 
-    def _parse_llm_response(self, response: str) -> dict:
+    def _parse_llm_response(self, response: str) -> dict[str, Any]:
         """Parse LLM JSON response."""
         cleaned = response.strip()
         if cleaned.startswith("```json"):
@@ -160,9 +159,10 @@ class LLMTranscriptParser:
             cleaned = cleaned[:-3]
         cleaned = cleaned.strip()
 
-        return json.loads(cleaned)
+        result: dict[str, Any] = json.loads(cleaned)
+        return result
 
-    def _convert_to_structured(self, data: dict, raw_text: str) -> dict:
+    def _convert_to_structured(self, data: dict[str, Any], raw_text: str) -> dict[str, Any]:
         """Convert LLM output to structured extraction format."""
         result = {
             "patient_name": data.get("patient_name") or None,
@@ -213,7 +213,7 @@ class LLMTranscriptParser:
         return result
 
     def _merge_temporal_expressions(
-        self, resolved_expressions: list[ExtractedTemporalExpression], llm_temporal: list[dict]
+        self, resolved_expressions: list[ExtractedTemporalExpression], llm_temporal: list[dict[str, Any]]
     ) -> list[ExtractedTemporalExpression]:
         """Merge rule-based temporal resolution with LLM insights."""
         merged = list(resolved_expressions)
@@ -283,9 +283,7 @@ class LLMTranscriptParser:
 
         return mapping.get(status.lower().strip(), MedicationStatus.UNKNOWN)
 
-    def _create_fallback_extraction(
-        self, raw_text: str, error_message: str
-    ) -> StructuredExtraction:
+    def _create_fallback_extraction(self, raw_text: str, error_message: str) -> StructuredExtraction:
         """Create low-confidence extraction when LLM fails."""
         return StructuredExtraction(
             patient_name=None,
