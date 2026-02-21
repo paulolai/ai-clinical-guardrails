@@ -84,11 +84,53 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - 🔄 Property-based testing for invariants
 - 🔄 CLI tooling for interface debugging
 
-**Next Steps:**
-- 📋 Component tests against real FHIR sandbox
-- 📋 Complete verification engine with all three invariants
-- 📋 Integration workflow demonstration
-- 📋 Performance benchmarking and optimization
+**Next Actions (Prioritized):**
+
+### Phase 1: Voice Transcription Extraction Layer (Ready to start)
+
+**Task 1.1: Create extraction module structure**
+- **File:** `src/extraction/__init__.py`, `src/extraction/parser.py`
+- **Goal:** Parse clinician dictation into structured fields
+- **Definition of Done:** Can extract dates, medications, diagnoses from sample text
+- **Example:** "Started her on Lisinopril" → `{medication: "Lisinopril", confidence: 0.95}`
+
+**Task 1.2: Temporal expression resolution**
+- **File:** `src/extraction/temporal.py`
+- **Goal:** Convert relative dates ("yesterday", "two weeks") to absolute dates
+- **Definition of Done:** Given an encounter date, resolves temporal expressions correctly
+- **Test:** Property-based test with random encounter dates
+
+**Task 1.3: Extraction confidence scoring**
+- **File:** `src/models.py` (add ExtractionResult with confidence)
+- **Goal:** Each extraction has confidence score for downstream filtering
+- **Definition of Done:** Low confidence extractions flagged for review
+
+### Phase 2: Integration Workflow (Blocked by 1.x)
+
+**Task 2.1: Wire FHIR client to verification engine**
+- **File:** `src/integrations/fhir/workflow.py`
+- **Goal:** Fetch PatientProfile + EMRContext from FHIR, run verification
+- **Definition of Done:** `verify_patient_documentation(patient_id, ai_output)` returns Result
+
+**Task 2.2: Build end-to-end example**
+- **File:** `examples/complete_workflow.py`
+- **Goal:** Demonstrate full flow: Dictation → Extract → Verify → Result
+- **Definition of Done:** Runnable example with sample clinical encounter
+
+### Phase 3: Demonstration & Polish (Blocked by 2.x)
+
+**Task 3.1: Add FastAPI endpoints**
+- **File:** `src/api.py` (expand existing)
+- **Goal:** POST `/verify` endpoint accepts transcription, returns verification
+- **Definition of Done:** Can curl the endpoint with sample data
+
+**Task 3.2: Performance benchmarking**
+- **File:** `tests/benchmarks/`, `scripts/benchmark.py`
+- **Goal:** Measure latency for verification workflow
+- **Definition of Done:** Documented p50/p95/p99 latencies
+
+**Current Status:** Ready to start Phase 1.1
+**Next Immediate Action:** Create extraction module
 
 ## 📝 Documentation Map
 
