@@ -1,21 +1,24 @@
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import StrEnum
-from typing import TypeVar
+from typing import Generic, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 T = TypeVar("T")
 E = TypeVar("E")
 
 
-class Result(BaseModel):
-    """Standard Result pattern for deterministic error handling."""
+@dataclass(frozen=True)
+class Result(Generic[T, E]):
+    """Standard Result pattern for deterministic error handling.
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    Uses dataclass instead of Pydantic BaseModel to support proper generic typing.
+    """
 
+    is_success: bool
     value: T | None = None
     error: E | None = None
-    is_success: bool
 
     @classmethod
     def success(cls, value: T) -> "Result[T, E]":
@@ -24,9 +27,6 @@ class Result(BaseModel):
     @classmethod
     def failure(cls, error: E) -> "Result[T, E]":
         return cls(error=error, is_success=False)
-
-    def __class_getitem__(cls, item):
-        return super().__class_getitem__(item)
 
 
 class ComplianceSeverity(StrEnum):
