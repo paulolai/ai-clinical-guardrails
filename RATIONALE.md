@@ -105,14 +105,14 @@ AI is a "Yes, And" machine. It will happily give you clever decorators, complex 
 ## Interview Context: What to Ask Me About
 *Conversation starters for Staff+ interviews*
 
-**"How do you prevent AI from introducing subtle bugs?"**  
+**"How do you prevent AI from introducing subtle bugs?"**
 → My Property-Based Testing strategy and why unit tests fail for generated code
 
-**"How do you maintain code quality at scale?"**  
+**"How do you maintain code quality at scale?"**
 → Contract-First design and the Wrapper Pattern for isolation
 
-**"What's your approach to AI-assisted development?"**  
+**"What's your approach to AI-assisted development?"**
 → `AGENTS.md` as a cultural artifact - encoding standards so AI (and humans) know the rules
 
-**"How do you handle regulated environments?"**  
+**"How do you handle regulated environments?"**
 → Zero-Trust verification and why deterministic systems beat probabilistic ones in healthcare/finance

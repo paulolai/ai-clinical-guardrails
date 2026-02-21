@@ -1,12 +1,20 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from .engine import ComplianceEngine
-from .instrumentation import ComplianceTracer
+from .instrumentation import ComplianceTracer, StatsDict
 from .integrations.fhir.client import FHIRClient
-from .models import AIGeneratedOutput, EMRContext, PatientProfile, Result, VerificationResult
+from .models import (
+    AIGeneratedOutput,
+    ComplianceAlert,
+    EMRContext,
+    PatientProfile,
+    Result,
+    VerificationResult,
+)
 
 # Global instances
 tracer = ComplianceTracer(run_id="api-session")
@@ -15,7 +23,7 @@ emr_client = FHIRClient()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
     await emr_client.close()
 
@@ -35,7 +43,7 @@ class ComplianceRequest(BaseModel):
 
 
 @app.post("/verify", response_model=VerificationResult)
-async def verify_compliance(request: ComplianceRequest):
+async def verify_compliance(request: ComplianceRequest) -> VerificationResult:
     """Manual verification endpoint."""
     if not request.patient or not request.context:
         raise HTTPException(status_code=400, detail="Manual patient and context required")
@@ -45,7 +53,7 @@ async def verify_compliance(request: ComplianceRequest):
 
 
 @app.post("/verify/fhir/{patient_id}", response_model=VerificationResult)
-async def verify_fhir_compliance(patient_id: str, request: ComplianceRequest):
+async def verify_fhir_compliance(patient_id: str, request: ComplianceRequest) -> VerificationResult:
     """
     EMR-Integrated verification using Wrapped FHIR Client.
     """
@@ -64,20 +72,26 @@ async def verify_fhir_compliance(patient_id: str, request: ComplianceRequest):
         raise HTTPException(status_code=500, detail=f"EMR Integration Error: {str(e)}") from e
 
 
-def _process_result(patient_id: str, visit_id: str, result: Result):
+def _process_result(
+    patient_id: str, visit_id: str, result: Result[VerificationResult, list[ComplianceAlert]]
+) -> VerificationResult:
+    verification: VerificationResult
     if result.is_success:
+        if result.value is None:
+            raise ValueError("Success result has no value")
         verification = result.value
     else:
-        verification = VerificationResult(is_safe_to_file=False, score=0.0, alerts=result.error)
+        alerts: list[ComplianceAlert] = result.error if result.error is not None else []
+        verification = VerificationResult(is_safe_to_file=False, score=0.0, alerts=alerts)
     tracer.log_interaction(patient_id, visit_id, verification)
     return verification
 
 
 @app.get("/stats")
-async def get_compliance_stats():
+async def get_compliance_stats() -> StatsDict:
     return tracer.stats
 
 
 @app.get("/health")
-async def health_check():
+async def health_check() -> dict[str, str]:
     return {"status": "operational", "emr_integration": "FHIR R4 Connected"}

@@ -7,9 +7,9 @@ AI Coding Assistants (Gemini, Claude, Copilot) must strictly adhere to these pro
 
 ## Quick Reference
 
-**Project:** AI Clinical Guardrails  
-**Domain:** Healthcare / Clinical AI Safety  
-**Stack:** Python 3.12+, FastAPI, FHIR, Hypothesis  
+**Project:** AI Clinical Guardrails
+**Domain:** Healthcare / Clinical AI Safety
+**Stack:** Python 3.12+, FastAPI, FHIR, Hypothesis
 **Package Manager:** `uv`
 
 ## Essential Commands

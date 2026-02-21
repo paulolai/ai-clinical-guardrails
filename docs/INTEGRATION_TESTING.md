@@ -93,10 +93,10 @@ async def test_mock_matches_real():
     """Verify mock matches actual API behavior."""
     real = FHIRClient()
     mock = create_mock()
-    
+
     real_result = await real.get_patient("123")
     mock_result = await mock.get_patient("123")
-    
+
     assert real_result.is_success == mock_result.is_success
 ```
 
@@ -152,7 +152,7 @@ async def test_external_api():
     - HAPI FHIR at FHIR_BASE_URL
     - Network connectivity
     - Patient 90128869 exists
-    
+
     Run: export FHIR_BASE_URL=http://hapi.fhir.org/baseR4
     """
     pass

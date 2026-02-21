@@ -65,8 +65,8 @@ class ComplianceEngine:
     @staticmethod
     def _verify_date_integrity(
         context: EMRContext, ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]
-    ):
-        allowed_dates: set[date] = {context.admission_date.date()}  # type: ignore
+    ) -> None:
+        allowed_dates: set[date] = {context.admission_date.date()}
         if context.discharge_date:
             allowed_dates.add(context.discharge_date.date())
 
@@ -85,7 +85,9 @@ class ComplianceEngine:
                 )
 
     @staticmethod
-    def _verify_clinical_protocols(ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]):
+    def _verify_clinical_protocols(
+        ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]
+    ) -> None:
         diagnoses_lower = [d.lower() for d in ai_output.extracted_diagnoses]
         is_sepsis_case = any("sepsis" in d for d in diagnoses_lower)
         mentions_antibiotics = "antibiotic" in ai_output.summary_text.lower()
@@ -104,7 +106,7 @@ class ComplianceEngine:
             )
 
     @staticmethod
-    def _verify_data_safety(ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]):
+    def _verify_data_safety(ai_output: AIGeneratedOutput, alerts: list[ComplianceAlert]) -> None:
         # Original regex for generic PII detection (SSN-like patterns)
         # Demonstrates administrative safety without using external libraries
         pii_regex = r"\b\d{3}-\d{2}-\d{4}\b"

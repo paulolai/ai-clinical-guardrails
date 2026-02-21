@@ -18,7 +18,7 @@ Add to `src/engine.py`:
 def _check_rules(self, ai_output: AIOutput, emr: EMRContext) -> list[Violation]:
     violations = []
     # Existing rules...
-    
+
     # Your new rule
     if self._check_medication_interactions(ai_output, emr):
         violations.append(Violation(
@@ -26,7 +26,7 @@ def _check_rules(self, ai_output: AIOutput, emr: EMRContext) -> list[Violation]:
             severity="CRITICAL",
             message="Potential medication interaction detected"
         ))
-    
+
     return violations
 ```
 

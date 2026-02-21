@@ -14,7 +14,7 @@ A deterministic verification platform designed to prevent LLM hallucinations and
 
 ## 🎯 The Mission: Clinical-Grade AI Engineering
 
-This project demonstrates how to productionize AI in highly regulated clinical environments using **Invariant-Based Verification**. 
+This project demonstrates how to productionize AI in highly regulated clinical environments using **Invariant-Based Verification**.
 
 It serves as a reference implementation for a modern, high-assurance AI stack using **Python (FastAPI)** and **FHIR**, adhering to the following engineering standards:
 

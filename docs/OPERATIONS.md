@@ -1,6 +1,6 @@
 # Operational Runbook (Local Development)
 
-**Scope:** Local development operations and troubleshooting  
+**Scope:** Local development operations and troubleshooting
 **Environment:** Python 3.12+, uv package manager
 
 ---

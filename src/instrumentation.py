@@ -1,8 +1,16 @@
 import os
 from datetime import datetime
-from typing import Any
+from typing import TypedDict
 
 import jsonlines
+
+from .models import VerificationResult
+
+
+class StatsDict(TypedDict):
+    total_runs: int
+    failed_compliance: int
+    rule_counts: dict[str, int]
 
 
 class ComplianceTracer:
@@ -17,9 +25,9 @@ class ComplianceTracer:
         self.run_dir = f"reports/{run_id}"
         os.makedirs(self.run_dir, exist_ok=True)
         self.trace_file = os.path.join(self.run_dir, "compliance_traces.jsonl")
-        self.stats = {"total_runs": 0, "failed_compliance": 0, "rule_counts": {}}
+        self.stats: StatsDict = {"total_runs": 0, "failed_compliance": 0, "rule_counts": {}}
 
-    def log_interaction(self, patient_id: str, visit_id: str, result: Any):
+    def log_interaction(self, patient_id: str, visit_id: str, result: VerificationResult) -> None:
         self.stats["total_runs"] += 1
         if not result.is_safe_to_file:
             self.stats["failed_compliance"] += 1
@@ -40,7 +48,7 @@ class ComplianceTracer:
         with jsonlines.open(self.trace_file, mode="a") as writer:
             writer.write(entry)
 
-    def generate_html_report(self):
+    def generate_html_report(self) -> str:
         report_path = os.path.join(self.run_dir, "attestation_report.html")
 
         rule_stats = "".join(

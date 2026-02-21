@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import httpx
 
@@ -37,11 +38,15 @@ class FHIRClient:
 
         last_name = str(name_obj.family.root) if (name_obj and name_obj.family) else "Unknown"
 
+        # Parse birth date string to date object
+        dob_str = raw_patient.birthDate.root if raw_patient.birthDate else "1900-01-01"
+        dob = datetime.strptime(dob_str, "%Y-%m-%d").date()
+
         return PatientProfile(
             patient_id=str(raw_patient.id.root) if raw_patient.id else patient_id,
             first_name=first_name,
             last_name=last_name,
-            dob=raw_patient.birthDate.root if raw_patient.birthDate else "1900-01-01",
+            dob=dob,
         )
 
     async def get_latest_encounter(self, patient_id: str) -> EMRContext:
@@ -60,16 +65,19 @@ class FHIRClient:
         raw_encounter = Encounter.model_validate(data["entry"][0]["resource"])
 
         # Admission/Discharge mapping with RootModel safety
-        admission_date = None
-        discharge_date = None
+        admission_date: datetime | None = None
+        discharge_date: datetime | None = None
 
         if raw_encounter.period:
             if raw_encounter.period.start:
-                admission_date = raw_encounter.period.start.root
+                admission_date = datetime.fromisoformat(raw_encounter.period.start.root)
             if raw_encounter.period.end:
-                discharge_date = raw_encounter.period.end.root
+                discharge_date = datetime.fromisoformat(raw_encounter.period.end.root)
 
         status = raw_encounter.status.value if raw_encounter.status else "unknown"
+
+        if admission_date is None:
+            raise ValueError(f"Encounter for patient {patient_id} has no admission date")
 
         return EMRContext(
             visit_id=str(raw_encounter.id.root) if raw_encounter.id else "VISIT-UNKNOWN",
@@ -80,5 +88,5 @@ class FHIRClient:
             raw_notes=f"Encounter status: {status}",
         )
 
-    async def close(self):
+    async def close(self) -> None:
         await self._client.aclose()

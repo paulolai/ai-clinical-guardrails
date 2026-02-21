@@ -20,7 +20,7 @@
 
 **Q:** I want to add a rule that checks for medication interactions. How?
 
-**A:** 
+**A:**
 1. Add rule to `src/engine.py` in `_check_rules()`
 2. Define violation type in `ViolationDetail`
 3. Write property test in `tests/test_compliance.py`
@@ -62,7 +62,7 @@ See [Contributing Guide](../CONTRIBUTING.md) for detailed steps.
 
 **Q:** What's the deployment process?
 
-**A:** 
+**A:**
 1. Set environment variables (see `.env.example`)
 2. Run `uv sync` to install dependencies
 3. Start with `uv run python main.py`
@@ -84,7 +84,7 @@ See [Operations Guide](OPERATIONS.md) (TODO).
 
 **Q:** I want to skip component tests during development.
 
-**A:** 
+**A:**
 ```bash
 uv run pytest tests/ -m "not component" -v
 ```

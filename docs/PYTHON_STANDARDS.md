@@ -137,10 +137,10 @@ class FHIRClient:
     async def get_patient(self, patient_id: str) -> Result[PatientProfile, FHIRError]:
         # Call external API
         response = await self._client.get(f"{self.base_url}/Patient/{patient_id}")
-        
+
         # Parse into generated model
         fhir_patient = Patient.model_validate(response.json())
-        
+
         # Map to domain model (clean interface)
         return Success(PatientProfile.from_fhir(fhir_patient))
 ```
@@ -199,19 +199,19 @@ class CircuitState(Enum):
 class CircuitBreaker:
     failure_threshold: int = 5
     timeout: timedelta = timedelta(minutes=1)
-    
+
     def __post_init__(self):
         self.failures = 0
         self.last_failure = None
         self.state = CircuitState.CLOSED
-    
+
     async def call(self, func):
         if self.state == CircuitState.OPEN:
             if self._should_reset():
                 self.state = CircuitState.HALF_OPEN
             else:
                 raise CircuitBreakerOpenError("Circuit is open")
-        
+
         try:
             result = await func()
             self._on_success()

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import StrEnum
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -10,7 +10,7 @@ E = TypeVar("E")
 
 
 @dataclass(frozen=True)
-class Result[T, E]:
+class Result(Generic[T, E]):
     """Standard Result pattern for deterministic error handling.
 
     Uses dataclass instead of Pydantic BaseModel to support proper generic typing.
