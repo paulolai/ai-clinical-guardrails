@@ -72,6 +72,26 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 
 ## 🛠 From Concept to Implementation
 
+### How This Plan Works
+
+**Phases** = *What* we build (features in priority order)
+**8-Step Workflow** = *How* we build each component (contract-first engineering standard)
+
+**See:** [WORKFLOW_SPEC.md](docs/WORKFLOW_SPEC.md) for the complete 8-step lifecycle
+
+**Mapping:**
+
+| PLAN Phase | 8-Step Workflow Applied | Purpose |
+|:-----------|:------------------------|:--------|
+| **Phase 0** | Steps 1-4: Business reqs → Source spec → Generated models | Create test fixtures |
+| **Phase 1** | Steps 1-8: Complete extraction layer | Voice → structured data |
+| **Phase 2** | Steps 4-6: Wrapper → CLI → Component tests | Wire extraction to FHIR |
+| **Phase 3** | Steps 7-8: Business logic → PBT verification | FastAPI + end-to-end |
+
+**Each phase follows:** Business Requirements → Spec → Models → Wrapper → CLI → Tests → Logic → Verification
+
+---
+
 **Completed:**
 - ✅ Business purpose documentation ([BUSINESS_PURPOSE.md](docs/BUSINESS_PURPOSE.md))
 - ✅ Decision rationale ([BUSINESS_PURPOSE_THINKING.md](docs/BUSINESS_PURPOSE_THINKING.md))
@@ -87,6 +107,7 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 **Next Actions (Prioritized):**
 
 ### Phase 0: Test Data Generation (Start here)
+**8-Step:** Steps 1-4 (Business Requirements → Source Spec → Generated Models → Domain Wrapper)
 
 **Prerequisite for all extraction work** - Need realistic clinical dictation samples to validate extraction.
 
@@ -110,6 +131,7 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 ---
 
 ### Phase 1: Voice Transcription Extraction Layer (Ready to start)
+**8-Step:** Steps 1-8 complete (Full lifecycle for extraction module)
 
 **Task 1.1: Create extraction module structure**
 - **File:** `src/extraction/__init__.py`, `src/extraction/parser.py`
@@ -129,6 +151,7 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - **Definition of Done:** Low confidence extractions flagged for review
 
 ### Phase 2: Integration Workflow (Blocked by 1.x)
+**8-Step:** Steps 4-6 (Domain Wrapper → CLI Tooling → Component Tests)
 
 **Task 2.1: Wire FHIR client to verification engine**
 - **File:** `src/integrations/fhir/workflow.py`
@@ -141,6 +164,7 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - **Definition of Done:** Runnable example with sample clinical encounter
 
 ### Phase 3: Demonstration & Polish (Blocked by 2.x)
+**8-Step:** Steps 7-8 (Pure-Functional Business Logic → System Verification/PBT)
 
 **Task 3.1: Add FastAPI endpoints**
 - **File:** `src/api.py` (expand existing)
