@@ -66,21 +66,7 @@ Staff engineering isn't about getting it right the first time; it's about spotti
 
 <!-- TODO: Add a concrete example of an architectural course correction here once a significant one occurs during development. -->
 
-### 5. The "Correction" Loop Applied: Medical Protocols
-A concrete example of architectural course correction occurred during the Medical Protocols implementation (Feb 2026).
-
-**The Problem:** Early in the medical protocols design, the plan proposed converting `AIGeneratedOutput` to `StructuredExtraction` inside the `ComplianceEngine`. This created a data flow gap—`AIGeneratedOutput` didn't contain structured medication data, so the conversion would be lossy.
-
-**The Correction:** Code review caught this before implementation. The fix was simple but critical:
-1. Add `extracted_medications` field to `AIGeneratedOutput` (data model fix)
-2. Populate it during extraction workflow
-3. Then implement protocol checkers
-
-**Why This Matters:** In safety-critical systems, data integrity is paramount. A lossy conversion would have meant drug interactions could be missed. The two-stage review (spec review + code review) caught the architectural flaw before it became a bug.
-
-**Evidence:** See the implementation plan (`docs/plans/2026-02-22-medical-protocols-implementation.md`) where Task 0 is explicitly labeled "CRITICAL" - fix the data model before implementing protocols.
-
-### 6. Extending Zero-Trust to Clinical Safety
+## Extending Zero-Trust to Clinical Safety
 The Medical Protocols layer extends the "Zero-Trust" methodology from technical safety (dates, PII) to clinical safety (drug interactions, allergies):
 
 *   **Invariant 4: Drug Interaction Detection** - "Warfarin + NSAID combinations MUST trigger CRITICAL alert"
