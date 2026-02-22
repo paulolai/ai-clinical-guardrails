@@ -22,24 +22,15 @@ from .models import (
 tracer = ComplianceTracer(run_id="api-session")
 # Formal Wrapped Client for EMR
 emr_client = FHIRClient()
-# Workflow instance for extraction (lazy initialization)
-_verification_workflow: VerificationWorkflow | None = None
-
-
-def get_verification_workflow() -> VerificationWorkflow:
-    """Lazy initialization of verification workflow to avoid import-time errors."""
-    global _verification_workflow
-    if _verification_workflow is None:
-        _verification_workflow = VerificationWorkflow(fhir_client=emr_client)
-    return _verification_workflow
+# Workflow instance for extraction
+verification_workflow = VerificationWorkflow(fhir_client=emr_client)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
     await emr_client.close()
-    if _verification_workflow is not None:
-        await _verification_workflow.close()
+    await verification_workflow.close()
 
 
 app = FastAPI(
@@ -161,8 +152,7 @@ async def extract_and_verify(request: ExtractionRequest) -> ExtractionResponse:
 
     try:
         # Run the complete workflow: extraction + verification
-        workflow = get_verification_workflow()
-        result = await workflow.verify_patient_documentation(
+        result = await verification_workflow.verify_patient_documentation(
             patient_id=request.patient_id,
             transcript=request.transcript,
             reference_date=request.reference_date,
@@ -185,7 +175,7 @@ async def extract_and_verify(request: ExtractionRequest) -> ExtractionResponse:
         extraction_result = ExtractionResult()
         try:
             # Get the last extraction from the workflow
-            last_ext = get_verification_workflow().get_last_extraction()
+            last_ext = verification_workflow.get_last_extraction()
             if last_ext:
                 extraction_result = ExtractionResult(
                     medications=[ExtractedMedication(name=m.name, status=m.status.value) for m in last_ext.medications],
