@@ -98,9 +98,10 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 |-------|--------|-------|
 | Phase 0 | ✅ COMPLETE | Sample transcripts created (10 examples) |
 | Phase 1.1 | ✅ COMPLETE | Extraction module structure (llm_parser.py, models.py, temporal.py) |
-| Phase 1.2 | ✅ COMPLETE | Temporal resolution working, needs integration testing |
+| Phase 1.2 | ✅ COMPLETE | Temporal resolution working |
 | Phase 1.3 | ✅ COMPLETE | Confidence scoring framework in place |
 | Phase 1.4 | ✅ COMPLETE | LLM client with multi-provider support and automatic retry |
+| Phase 2 | ✅ COMPLETE | Integration workflow complete (extraction → FHIR → verification) |
 
 ---
 
@@ -117,18 +118,31 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 
 **Next Actions (Prioritized):**
 
-### Phase 2: Integration Workflow (Next Immediate Action)
+### Phase 3: Demonstration & Polish (Next Immediate Action)
+**8-Step:** Steps 7-8 (Pure-Functional Business Logic → System Verification/PBT)
+
+**Task 3.1: Add FastAPI endpoints**
+- **File:** `src/api.py` (expand existing)
+- **Goal:** POST `/verify` endpoint accepts transcription, returns verification
+- **Definition of Done:** Can curl the endpoint with sample data
+
+**Task 3.2: Performance benchmarking**
+- **File:** `tests/benchmarks/`, `scripts/benchmark.py`
+- **Goal:** Measure latency for verification workflow
+- **Definition of Done:** Documented p50/p95/p99 latencies
+
+### Phase 2: Integration Workflow ✅ COMPLETE
 **8-Step:** Steps 4-6 (Domain Wrapper → CLI Tooling → Component Tests)
 
-**Task 2.1: Wire FHIR client to verification engine**
+**Task 2.1: Wire FHIR client to verification engine** ✅
 - **File:** `src/integrations/fhir/workflow.py`
-- **Goal:** Fetch PatientProfile + EMRContext from FHIR, run verification
-- **Definition of Done:** `verify_patient_documentation(patient_id, ai_output)` returns Result
+- **Status:** `VerificationWorkflow` class orchestrates complete pipeline
+- **Acceptance:** `verify_patient_documentation(patient_id, transcript)` returns Result
 
-**Task 2.2: Build end-to-end example**
+**Task 2.2: Build end-to-end example** ✅
 - **File:** `examples/complete_workflow.py`
-- **Goal:** Demonstrate full flow: Dictation → Extract → Verify → Result
-- **Definition of Done:** Runnable example with sample clinical encounter
+- **Status:** Runnable example showing Dictation → Extract → Verify → Result
+- **Acceptance:** Demonstrates real-world clinical encounter with HAPI FHIR sandbox
 
 ### Phase 1.4: LLM Client Integration ✅ COMPLETE
 **8-Step:** Steps 5-6 (CLI Tooling → Component Tests)
@@ -168,20 +182,20 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - **Status:** Confidence framework in place
 - **Next:** Calibration with real data
 
-### Phase 2: Integration Workflow (Blocked by 1.x)
+### Phase 2: Integration Workflow ✅ COMPLETE
 **8-Step:** Steps 4-6 (Domain Wrapper → CLI Tooling → Component Tests)
 
-**Task 2.1: Wire FHIR client to verification engine**
+**Task 2.1: Wire FHIR client to verification engine** ✅
 - **File:** `src/integrations/fhir/workflow.py`
-- **Goal:** Fetch PatientProfile + EMRContext from FHIR, run verification
-- **Definition of Done:** `verify_patient_documentation(patient_id, ai_output)` returns Result
+- **Status:** `VerificationWorkflow` class orchestrates complete pipeline
+- **Acceptance:** `verify_patient_documentation(patient_id, transcript)` returns Result
 
-**Task 2.2: Build end-to-end example**
+**Task 2.2: Build end-to-end example** ✅
 - **File:** `examples/complete_workflow.py`
-- **Goal:** Demonstrate full flow: Dictation → Extract → Verify → Result
-- **Definition of Done:** Runnable example with sample clinical encounter
+- **Status:** Runnable example showing Dictation → Extract → Verify → Result
+- **Acceptance:** Demonstrates real-world clinical encounter with HAPI FHIR sandbox
 
-### Phase 3: Demonstration & Polish (Blocked by 2.x)
+### Phase 3: Demonstration & Polish (Next Immediate Action)
 **8-Step:** Steps 7-8 (Pure-Functional Business Logic → System Verification/PBT)
 
 **Task 3.1: Add FastAPI endpoints**
