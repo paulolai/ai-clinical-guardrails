@@ -5,6 +5,8 @@ from datetime import date
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from src.extraction.llm_parser import LLMTranscriptParser
 from src.extraction.models import (
@@ -147,6 +149,7 @@ class TestLLMTranscriptParser:
         assert parser._normalise_visit_type("urgent") == "urgent_same_day"
         assert parser._normalise_visit_type(None) is None
 
+    @pytest.mark.component
     @pytest.mark.asyncio
     async def test_parse_with_real_synthetic_client(self) -> None:
         """Integration test - only runs with real API key.
@@ -171,3 +174,108 @@ class TestLLMTranscriptParser:
 
         assert isinstance(result, StructuredExtraction)
         assert result.patient_name is not None or result.confidence < 0.5
+
+
+# Property-based boundary and edge case tests
+class TestLLMParserBoundaryCases:
+    """Property-based tests for boundary conditions without hardcoded values."""
+
+    @pytest.mark.asyncio
+    @given(
+        transcript=st.text(
+            min_size=0,
+            max_size=100000,  # Very large transcripts
+            alphabet=st.characters(
+                whitelist_categories=("L", "N", "P", "Z"),  # Letters, numbers, punctuation, separators
+            ),
+        ),
+    )
+    async def test_parse_handles_various_transcript_lengths(self, transcript: str) -> None:
+        """Property: Parser should handle transcripts from empty to very large."""
+        mock_client = MagicMock()
+        mock_client.complete = AsyncMock(return_value='{"patient_name": null, "confidence": 0.5}')
+
+        parser = LLMTranscriptParser(
+            llm_client=mock_client,
+            reference_date=date(2024, 1, 15),
+        )
+
+        result = await parser.parse(transcript)
+
+        # Should always return a valid extraction
+        assert isinstance(result, StructuredExtraction)
+        assert 0.0 <= result.confidence <= 1.0
+
+    @pytest.mark.asyncio
+    @given(
+        ref_date=st.dates(min_value=date(1900, 1, 1), max_value=date(2100, 12, 31)),
+    )
+    async def test_parse_handles_various_reference_dates(self, ref_date: date) -> None:
+        """Property: Parser should work with any valid reference date."""
+        mock_client = MagicMock()
+        mock_client.complete = AsyncMock(return_value='{"patient_name": "Test", "confidence": 0.8}')
+
+        parser = LLMTranscriptParser(
+            llm_client=mock_client,
+            reference_date=ref_date,
+        )
+
+        result = await parser.parse("Patient seen yesterday.")
+
+        assert isinstance(result, StructuredExtraction)
+
+    @given(
+        status_text=st.text(min_size=0, max_size=100),
+    )
+    def test_medication_status_handles_unexpected_values(self, status_text: str) -> None:
+        """Property: Unknown medication statuses should map to UNKNOWN."""
+        parser = LLMTranscriptParser()
+
+        result = parser._parse_medication_status(status_text)
+
+        # If it's not one of the known values, it should be UNKNOWN
+        known_statuses = {"started", "stopped", "continued", "increased", "decreased"}
+        if status_text.lower() not in known_statuses:
+            assert result == MedicationStatus.UNKNOWN
+
+    @given(
+        visit_type=st.one_of(
+            st.none(),
+            st.text(min_size=0, max_size=200),
+        ),
+    )
+    def test_visit_type_normalization_boundaries(self, visit_type: str | None) -> None:
+        """Property: Visit type normalization should handle any input gracefully."""
+        parser = LLMTranscriptParser()
+
+        result = parser._normalise_visit_type(visit_type)
+
+        # Should never crash and should return None or a string
+        assert result is None or isinstance(result, str)
+
+    @pytest.mark.asyncio
+    @given(
+        confidence=st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),
+    )
+    async def test_parse_preserves_confidence_bounds(self, confidence: float) -> None:
+        """Property: Confidence should always be within [0, 1] range."""
+        mock_response = {
+            "patient_name": "Test Patient",
+            "confidence": confidence,
+            "medications": [],
+            "diagnoses": [],
+            "temporal_expressions": [],
+            "vital_signs": [],
+        }
+
+        mock_client = MagicMock()
+        mock_client.complete = AsyncMock(return_value=json.dumps(mock_response))
+
+        parser = LLMTranscriptParser(
+            llm_client=mock_client,
+            reference_date=date(2024, 1, 15),
+        )
+
+        result = await parser.parse("Test transcript")
+
+        assert 0.0 <= result.confidence <= 1.0

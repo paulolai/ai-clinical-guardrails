@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from src.integrations.fhir.client import FHIRClient
@@ -26,7 +27,8 @@ async def test_fhir_client_handles_missing_patient() -> None:
     client = FHIRClient()
     try:
         # Purposely using an unlikely random string
-        with pytest.raises(Exception):  # noqa: B017
+        # Should raise HTTP error for non-existent patient
+        with pytest.raises(httpx.HTTPStatusError):
             await client.get_patient_profile("NON_EXISTENT_ID_XYZ_123")
     finally:
         await client.close()
