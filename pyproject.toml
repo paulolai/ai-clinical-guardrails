@@ -73,3 +73,8 @@ markers = [
 ]
 # Syrupy configuration
 addopts = "--snapshot-warn-unused"
+
+[dependency-groups]
+dev = [
+    "pytest-benchmark>=5.2.3",
+]

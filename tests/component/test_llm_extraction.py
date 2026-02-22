@@ -40,11 +40,15 @@ class TestLLMClientIntegration:
             pytest.skip("SYNTHETIC_API_KEY not set - skipping real API test")
 
         async with SyntheticLLMClient(api_key=api_key) as client:
-            # Simple test prompt
+            # Simple test prompt - use higher max_tokens to ensure JSON output
             response = await client.complete(
-                prompt='You are a test assistant. Please return a JSON object with the key "status" and value "ok".',
+                prompt=(
+                    "You are a test assistant. Please return a JSON object "
+                    'with the key "status" and value "ok". '
+                    "Only return the JSON, no other text."
+                ),
                 temperature=0.0,
-                max_tokens=100,
+                max_tokens=500,
             )
 
             # Verify we got a valid JSON response
