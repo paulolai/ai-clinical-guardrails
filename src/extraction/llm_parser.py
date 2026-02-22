@@ -89,6 +89,26 @@ Guidelines:
 - Confidence: 0.9+ for clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"""
 
 
+MEDICATION_STATUS_MAPPING = {
+    "started": MedicationStatus.STARTED,
+    "new": MedicationStatus.STARTED,
+    "began": MedicationStatus.STARTED,
+    "initiated": MedicationStatus.STARTED,
+    "stopped": MedicationStatus.DISCONTINUED,
+    "discontinued": MedicationStatus.DISCONTINUED,
+    "ceased": MedicationStatus.DISCONTINUED,
+    "continued": MedicationStatus.ACTIVE,
+    "ongoing": MedicationStatus.ACTIVE,
+    "unchanged": MedicationStatus.ACTIVE,
+    "increased": MedicationStatus.INCREASED,
+    "upped": MedicationStatus.INCREASED,
+    "raised": MedicationStatus.INCREASED,
+    "decreased": MedicationStatus.DECREASED,
+    "reduced": MedicationStatus.DECREASED,
+    "lowered": MedicationStatus.DECREASED,
+}
+
+
 class LLMTranscriptParser:
     """Parse clinical dictation using LLM-based extraction.
 
@@ -279,26 +299,7 @@ class LLMTranscriptParser:
 
     def _parse_medication_status(self, status: str) -> MedicationStatus:
         """Parse medication status string to enum."""
-        mapping = {
-            "started": MedicationStatus.STARTED,
-            "new": MedicationStatus.STARTED,
-            "began": MedicationStatus.STARTED,
-            "initiated": MedicationStatus.STARTED,
-            "stopped": MedicationStatus.DISCONTINUED,
-            "discontinued": MedicationStatus.DISCONTINUED,
-            "ceased": MedicationStatus.DISCONTINUED,
-            "continued": MedicationStatus.ACTIVE,
-            "ongoing": MedicationStatus.ACTIVE,
-            "unchanged": MedicationStatus.ACTIVE,
-            "increased": MedicationStatus.INCREASED,
-            "upped": MedicationStatus.INCREASED,
-            "raised": MedicationStatus.INCREASED,
-            "decreased": MedicationStatus.DECREASED,
-            "reduced": MedicationStatus.DECREASED,
-            "lowered": MedicationStatus.DECREASED,
-        }
-
-        return mapping.get(status.lower().strip(), MedicationStatus.UNKNOWN)
+        return MEDICATION_STATUS_MAPPING.get(status.lower().strip(), MedicationStatus.UNKNOWN)
 
     def _create_fallback_extraction(self, raw_text: str, error_message: str) -> StructuredExtraction:
         """Create low-confidence extraction when LLM fails."""

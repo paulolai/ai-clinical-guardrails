@@ -67,6 +67,7 @@ class VerificationWorkflow:
         self.fhir_client = fhir_client or FHIRClient()
         self.llm_parser = llm_parser or LLMTranscriptParser()
         self.compliance_engine = ComplianceEngine()
+        self._last_extraction: StructuredExtraction | None = None
 
     async def verify_patient_documentation(
         self,
@@ -96,6 +97,7 @@ class VerificationWorkflow:
 
             # Step 2: Extract structured data from transcript
             extraction = await self._extract_transcript(transcript, reference_date)
+            self._last_extraction = extraction  # Store for later retrieval
 
             # Step 3: Convert extraction to AI output format
             ai_output = self._convert_to_ai_output(extraction, transcript)
@@ -224,6 +226,14 @@ class VerificationWorkflow:
             suggested_billing_codes=[],  # Could be populated from extraction
             contains_pii=False,  # Could be detected from extraction
         )
+
+    def get_last_extraction(self) -> "StructuredExtraction | None":
+        """Get the last extraction performed by this workflow.
+
+        Returns:
+            StructuredExtraction if available, None otherwise
+        """
+        return self._last_extraction
 
     async def close(self) -> None:
         """Clean up resources."""

@@ -45,6 +45,12 @@ if env_secrets_path.exists():
     load_dotenv(env_secrets_path)
 
 
+class EmptyResponseError(Exception):
+    """Raised when LLM returns an empty response."""
+
+    pass
+
+
 class LLMClient(ABC):
     """Abstract base class for LLM clients.
 
@@ -140,7 +146,7 @@ class OpenAILLMClient(LLMClient):
 
         self.client = AsyncOpenAI(**client_kwargs)
 
-    @retry(  # type: ignore[misc]
+    @retry(
         wait=wait_exponential_jitter(
             initial=LLM_RETRY_INITIAL_WAIT_SECONDS,
             max=LLM_RETRY_MAX_WAIT_SECONDS,
@@ -186,7 +192,7 @@ class OpenAILLMClient(LLMClient):
 
         content: str | None = response.choices[0].message.content
         if content is None:
-            raise ValueError("LLM returned empty response")
+            raise EmptyResponseError("LLM returned empty response")
 
         return content
 
@@ -264,7 +270,7 @@ class AzureOpenAILLMClient(LLMClient):
             api_version=self.api_version,
         )
 
-    @retry(  # type: ignore[misc]
+    @retry(
         wait=wait_exponential_jitter(
             initial=LLM_RETRY_INITIAL_WAIT_SECONDS,
             max=LLM_RETRY_MAX_WAIT_SECONDS,
@@ -307,7 +313,7 @@ class AzureOpenAILLMClient(LLMClient):
 
         content: str | None = response.choices[0].message.content
         if content is None:
-            raise ValueError("LLM returned empty response")
+            raise EmptyResponseError("LLM returned empty response")
 
         return content
 

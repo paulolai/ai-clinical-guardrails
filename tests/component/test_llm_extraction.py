@@ -41,7 +41,7 @@ class TestLLMClientIntegration:
         async with SyntheticLLMClient(api_key=api_key) as client:
             # Simple test prompt
             response = await client.complete(
-                prompt='Return a JSON object with {"status": "ok"}',
+                prompt='You are a test assistant. Please return a JSON object with the key "status" and value "ok".',
                 temperature=0.0,
                 max_tokens=100,
             )

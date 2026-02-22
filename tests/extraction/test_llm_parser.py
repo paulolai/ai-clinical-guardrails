@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from src.extraction.llm_parser import LLMTranscriptParser
+from src.extraction.llm_parser import MEDICATION_STATUS_MAPPING, LLMTranscriptParser
 from src.extraction.models import (
     MedicationStatus,
     StructuredExtraction,
@@ -234,8 +234,7 @@ class TestLLMParserBoundaryCases:
         result = parser._parse_medication_status(status_text)
 
         # If it's not one of the known values, it should be UNKNOWN
-        known_statuses = {"started", "stopped", "continued", "increased", "decreased"}
-        if status_text.lower() not in known_statuses:
+        if status_text.lower() not in MEDICATION_STATUS_MAPPING:
             assert result == MedicationStatus.UNKNOWN
 
     @given(

@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from src.extraction.llm_client import SyntheticLLMClient
+from src.extraction.llm_client import EmptyResponseError, SyntheticLLMClient
 
 
 class TestSyntheticLLMClient:
@@ -67,7 +67,7 @@ class TestSyntheticLLMClient:
 
     @pytest.mark.asyncio
     async def test_complete_empty_response_raises(self) -> None:
-        """Test that empty response raises ValueError."""
+        """Test that empty response raises EmptyResponseError."""
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = None
@@ -79,7 +79,7 @@ class TestSyntheticLLMClient:
             mock_openai.return_value = mock_client
             client = SyntheticLLMClient(api_key="test-key")
 
-            with pytest.raises(ValueError, match="empty response"):
+            with pytest.raises(EmptyResponseError, match="empty response"):
                 await client.complete("Test prompt")
 
     @pytest.mark.asyncio
