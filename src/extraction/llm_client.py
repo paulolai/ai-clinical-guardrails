@@ -146,7 +146,7 @@ class OpenAILLMClient(LLMClient):
 
         self.client = AsyncOpenAI(**client_kwargs)
 
-    @retry(  # type: ignore[misc]
+    @retry(
         wait=wait_exponential_jitter(
             initial=LLM_RETRY_INITIAL_WAIT_SECONDS,
             max=LLM_RETRY_MAX_WAIT_SECONDS,
@@ -270,7 +270,7 @@ class AzureOpenAILLMClient(LLMClient):
             api_version=self.api_version,
         )
 
-    @retry(  # type: ignore[misc]
+    @retry(
         wait=wait_exponential_jitter(
             initial=LLM_RETRY_INITIAL_WAIT_SECONDS,
             max=LLM_RETRY_MAX_WAIT_SECONDS,

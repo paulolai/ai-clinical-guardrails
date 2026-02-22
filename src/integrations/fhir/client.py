@@ -41,7 +41,7 @@ class FHIRClient:
 
         first_name = "Unknown"
         if name_obj and name_obj.given:
-            first_name = " ".join(name_obj.given)
+            first_name = " ".join(g for g in name_obj.given if g is not None)
 
         last_name = name_obj.family if (name_obj and name_obj.family) else "Unknown"
 

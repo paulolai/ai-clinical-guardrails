@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    name: Test and Lint
+    name: Run Tests
     runs-on: ubuntu-latest
     env:
       SYNTHETIC_API_KEY: ${{ secrets.SYNTHETIC_API_KEY }}
@@ -37,12 +37,6 @@ jobs:
       - name: Run Tests
         run: uv run pytest tests/ -v
 
-      - name: Run Linter
-        run: uv run ruff check .
-
-      - name: Run Type Checker
-        run: uv run mypy src/
-
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -51,6 +45,33 @@ jobs:
           path: |
             reports/
           retention-days: 30
+
+  lint-and-typecheck:
+    name: Run Linter and Type Checker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install Dependencies
+        run: uv sync
+
+      - name: Run Linter
+        run: uv run ruff check .
+
+      - name: Run Type Checker
+        run: uv run mypy src/
 
   # Daily re-recording validation to detect API drift
   validate-cassettes:
