@@ -5,7 +5,63 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from src.engine import ComplianceEngine
+from src.extraction.models import ExtractedMedication
 from src.models import AIGeneratedOutput, EMRContext, PatientProfile
+from src.protocols.models import ProtocolConfig, ProtocolRule, ProtocolSeverity
+
+
+def test_compliance_engine_with_protocols():
+    """Test that ComplianceEngine runs protocol checks."""
+    config = ProtocolConfig(
+        version="1.0",
+        settings={},
+        checkers={"drug_interactions": {"enabled": True}},
+        rules={
+            "drug_interactions": [
+                ProtocolRule(
+                    name="Warfarin NSAID",
+                    checker_type="drug_interactions",
+                    pattern={"trigger": {"medications": ["warfarin"]}, "conflicts": {"medications": ["ibuprofen"]}},
+                    severity=ProtocolSeverity.CRITICAL,
+                    message="Drug interaction detected",
+                )
+            ]
+        },
+    )
+
+    engine = ComplianceEngine(protocol_config=config)
+
+    patient = PatientProfile(
+        patient_id="P1",
+        first_name="John",
+        last_name="Doe",
+        dob=date(1980, 1, 1),
+        allergies=[],
+        diagnoses=[],
+    )
+
+    context = EMRContext(
+        visit_id="V1",
+        patient_id="P1",
+        admission_date=datetime(2024, 1, 1),
+        discharge_date=None,
+        attending_physician="Dr. Smith",
+        raw_notes="",
+    )
+
+    ai_output = AIGeneratedOutput(
+        summary_text="Patient prescribed warfarin and ibuprofen",
+        extracted_dates=[date(2024, 1, 1)],
+        extracted_diagnoses=[],
+        extracted_medications=[ExtractedMedication(name="warfarin"), ExtractedMedication(name="ibuprofen")],
+    )
+
+    result = engine.verify(patient, context, ai_output, protocol_config=config)
+
+    # Should fail due to drug interaction
+    assert not result.is_success
+    assert result.error is not None
+    assert any("Drug interaction" in str(a.message) for a in result.error)
 
 
 # Hypothesis Strategies for generating randomized but valid clinical data
