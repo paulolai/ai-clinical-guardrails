@@ -24,7 +24,7 @@ Unit tests are insufficient for safety-critical systems. We use **Property-Based
 
 **Property test failure:** Check `docs/learnings/pbt_debugging.md`
 
-**Component test failure:** Verify sandbox is running: `uv run python cli/fhir.py inspect 90128869`
+**Component test failure:** Verify sandbox is running: `uv run python cli/emr.py inspect 90128869`
 
 **Type check failure:** Run `uv run mypy src/` and fix errors before committing
 

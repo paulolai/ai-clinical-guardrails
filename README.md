@@ -19,7 +19,7 @@ This project demonstrates how to productionize AI in highly regulated clinical e
 It serves as a reference implementation for a modern, high-assurance AI stack using **Python (FastAPI)** and **FHIR**, adhering to the following engineering standards:
 
 - **Zero-Trust Data Policy:** LLMs are never trusted with calendar logic or data extraction. Every output is verified against the EMR source of truth via deterministic Pydantic schemas.
-- **Contract-First Integration:** Models generated directly from the **Full Official HL7 FHIR R4 JSON Schema**.
+- **Contract-First Integration:** Models validated against the **Full Official HL7 FHIR R5** standard.
 - **Interface-Specific Tooling:** Dedicated CLI handles for each system interface (EMR vs. API).
 - **Invariant-Based Testing:** Uses Property-Based Testing (Hypothesis) to mathematically prove the guardrails can catch data hallucinations.
 
@@ -29,7 +29,7 @@ It serves as a reference implementation for a modern, high-assurance AI stack us
 
 | Pattern | Tool | Purpose |
 | :--- | :--- | :--- |
-| **Full Spec Generation** | `HL7 FHIR R4` | Uses the actual 50,000-line industry standard for data models. |
+| **Full Spec Validation** | `fhir.resources` | Validates data against the 50,000-line industry standard (R5). |
 | **Domain Wrapper** | `FHIRClient` | Selective mapping that shields business logic from upstream EMR noise. |
 | **Schema-First** | `Pydantic v2` | Strict runtime validation of clinical data. |
 | **Result Pattern** | `Generic[T, E]` | Ensures deterministic error handling and prevents "exception-swallowing." |
@@ -54,7 +54,7 @@ The project provides specific CLI tools named after the interfaces they serve:
 ```bash
 export PYTHONPATH=$PYTHONPATH:.
 # Directly inspect data in the HAPI FHIR Sandbox
-uv run python cli/fhir.py inspect 90128869
+uv run python cli/emr.py inspect 90128869
 ```
 
 **Guardrails API Interface:**

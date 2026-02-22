@@ -1,0 +1,236 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a clinical data extraction
+      assistant.\nParse unstructured clinical dictation and extract structured information.\n\nExtract
+      the following from the clinical transcript below. Return ONLY a JSON object.\n\nTranscript:\nMrs.
+      Sarah Johnson came in yesterday for her follow-up visit.\n\nReference Date:
+      2026-02-22\n\nReturn this JSON structure:\n{\n  \"patient_name\": \"extracted
+      name or null\",\n  \"patient_age\": \"age or null\",\n  \"visit_type\": \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\",\n  \"confidence\":
+      0.0-1.0,\n  \"extraction_notes\": \"any ambiguities\",\n  \"medications\": [\n    {\n      \"name\":
+      \"medication name\",\n      \"dosage\": \"dosage or null\",\n      \"frequency\":
+      \"frequency or null\",\n      \"route\": \"route or null\",\n      \"status\":
+      \"started|stopped|continued|increased|decreased|unknown\",\n      \"confidence\":
+      0.0-1.0,\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"diagnoses\":
+      [\n    {\n      \"condition\": \"condition name\",\n      \"icd10_code\": \"ICD-10
+      code or null\",\n      \"confidence\": 0.0-1.0,\n      \"raw_text\": \"exact
+      text from transcript\"\n    }\n  ],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+      \"exact text from transcript\",\n      \"interpretation\": \"what this likely
+      means\",\n      \"confidence\": 0.0-1.0\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\":
+      \"blood-pressure|temperature|heart-rate|weight|height|respiratory-rate\",\n      \"value\":
+      \"value with units\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"procedures\":
+      [\n    {\n      \"name\": \"procedure name\",\n      \"date_description\": \"when
+      it occurred or null\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"protocol_triggers\":
+      [\"sepsis|stroke|MI|trauma\"],\n  \"follow_up\": \"follow-up instructions or
+      null\",\n  \"additional_context\": \"other relevant information\"\n}\n\nGuidelines:\n-
+      Do not hallucinate information not in the transcript\n- Mark unclear information
+      with lower confidence\n- Include exact raw text for verification\n- For Australian
+      context: recognise PBS medications, MBS terminology\n- Confidence: 0.9+ for
+      clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2450'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-cfa642da58d3d8a2aa10143c514f6b41","object":"chat.completion","created":1771745369,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": \"Sarah Johnson\",\n  \"patient_age\": null,\n  \"visit_type\":
+        \"follow-up\",\n  \"confidence\": 0.9,\n  \"extraction_notes\": \"Name clearly
+        identified from ''Mrs. Sarah Johnson''. Age not documented. Visit type explicitly
+        stated as ''follow-up visit''. Visit date inferred as 2026-02-21 based on
+        temporal expression ''yesterday'' relative to reference date 2026-02-22.\",\n  \"medications\":
+        [],\n  \"diagnoses\": [],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+        \"yesterday\",\n      \"interpretation\": \"Visit occurred on 2026-02-21 (one
+        day prior to reference date 2026-02-22)\",\n      \"confidence\": 0.9\n    }\n  ],\n  \"vital_signs\":
+        [],\n  \"procedures\": [],\n  \"protocol_triggers\": [],\n  \"follow_up\":
+        null,\n  \"additional_context\": \"Patient addressed with courtesy title ''Mrs.''
+        indicating adult female. Transcript contains minimal clinical detail beyond
+        patient identification and visit scheduling context.\"\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract structured clinical data from a transcript. Let
+        me analyze the provided text:\n\nTranscript: \"Mrs. Sarah Johnson came in
+        yesterday for her follow-up visit.\"\nReference Date: 2026-02-22\n\nLet me
+        extract each field:\n\n1. **patient_name**: \"Sarah Johnson\" (Mrs. Sarah
+        Johnson)\n2. **patient_age**: Not mentioned - null\n3. **visit_type**: \"follow-up\"
+        - explicitly stated as \"follow-up visit\"\n4. **confidence**: High confidence
+        for name and visit type (0.95), but age is missing (0.5 overall maybe? Or
+        high for what we have). Let''s say 0.9 overall since we have clear name and
+        visit type but missing other data.\n5. **extraction_notes**: \"Patient age
+        not mentioned. Visit date relative to reference date (2026-02-22) indicates
+        visit occurred on 2026-02-21 based on ''yesterday''.\"\n6. **medications**:
+        None mentioned - empty array []\n7. **diagnoses**: None mentioned - empty
+        array []\n8. **temporal_expressions**: \n   - \"yesterday\" - relative to
+        reference date 2026-02-22, this means 2026-02-21\n9. **vital_signs**: None
+        - empty array []\n10. **procedures**: None - empty array []\n11. **protocol_triggers**:
+        None - empty array []\n12. **follow_up**: null (this was the follow-up visit
+        itself, not instructions for future follow-up)\n13. **additional_context**:
+        \"Patient is referred to as ''Mrs.'' indicating marital status or courtesy
+        title. Visit occurred ''yesterday'' relative to reference date.\"\n\nWait,
+        I need to check if \"follow-up\" counts as follow_up instructions or if it''s
+        describing the visit type. The field \"follow_up\" seems to be for follow-up
+        instructions/plans, not the type of visit. Since this is a follow-up visit,
+        but no instructions are given, it should be null.\n\nLet me reconsider confidence:\n-
+        patient_name: 0.95 (clearly stated)\n- visit_type: 0.95 (clearly stated)\n-
+        overall confidence: 0.85 (high for what we have, but limited data)\n\nFor
+        temporal_expressions:\n- text: \"yesterday\"\n- interpretation: \"Visit occurred
+        on 2026-02-21 (one day before reference date 2026-02-22)\"\n- confidence:
+        0.9\n\nActually, looking at the JSON structure, the \"confidence\" field at
+        the top level seems to be overall confidence for the extraction.\n\nMedications:
+        empty array []\nDiagnoses: empty array []\nVital signs: empty array []\nProcedures:
+        empty array []\nProtocol triggers: empty array []\n\nWait, I should check
+        if there''s any implication of \"Mrs.\" - that''s a title, not a medical data
+        point, but could be noted in additional_context.\n\nAlso, is \"came in\" implying
+        admission? No, it likely means \"came in to the clinic/practice\".\n\nLet
+        me verify the visit_type options: \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\"\nThe
+        text says \"follow-up visit\" - so that''s clearly \"follow-up\".\n\nStructure
+        validation:\n- All arrays should be present even if empty\n- Null values should
+        be explicit null, not \"null\" string\n\nJSON construction:\n\n{\n  \"patient_name\":
+        \"Sarah Johnson\",\n  \"patient_age\": null,\n  \"visit_type\": \"follow-up\",\n  \"confidence\":
+        0.9,\n  \"extraction_notes\": \"Patient name clearly identified. Age not stated.
+        Visit explicitly described as follow-up. Temporal reference ''yesterday''
+        indicates visit date was 2026-02-21 relative to reference date.\",\n  \"medications\":
+        [],\n  \"diagnoses\": [],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+        \"yesterday\",\n      \"interpretation\": \"Visit occurred on 2026-02-21 (one
+        day before reference date 2026-02-22)\",\n      \"confidence\": 0.9\n    }\n  ],\n  \"vital_signs\":
+        [],\n  \"procedures\": [],\n  \"protocol_triggers\": [],\n  \"follow_up\":
+        null,\n  \"additional_context\": \"Patient addressed as ''Mrs.'' indicating
+        adult female patient. Minimal clinical detail provided in transcript.\"\n}\n\nI
+        should consider if \"Mrs. Sarah Johnson\" includes the title in the name or
+        just the name. Usually patient_name would be \"Sarah Johnson\", not including
+        the title.\n\nAlso, is there any ambiguity about \"yesterday\"? If the reference
+        date is 2026-02-22, then yesterday is 2026-02-21. That''s straightforward.\n\nConfidence
+        score: Since we have very limited information but what we have is clear, I''ll
+        give 0.85 or 0.9. Let''s go with 0.9.\n\nActually, looking at the guidelines:
+        \"0.9+ for clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain\"\nThe
+        name is clear. The visit type is clear. But we have very sparse data. However,
+        the confidence is about the extraction accuracy, not the completeness. So
+        0.9 is appropriate.\n\nOne final check: Are there any medications, diagnoses,
+        etc. implied? No. \"came in... for her follow-up visit\" - no medical conditions
+        mentioned, no drugs mentioned.\n\nI think this is complete. ","reasoning_content":"
+        The user wants me to extract structured clinical data from a transcript. Let
+        me analyze the provided text:\n\nTranscript: \"Mrs. Sarah Johnson came in
+        yesterday for her follow-up visit.\"\nReference Date: 2026-02-22\n\nLet me
+        extract each field:\n\n1. **patient_name**: \"Sarah Johnson\" (Mrs. Sarah
+        Johnson)\n2. **patient_age**: Not mentioned - null\n3. **visit_type**: \"follow-up\"
+        - explicitly stated as \"follow-up visit\"\n4. **confidence**: High confidence
+        for name and visit type (0.95), but age is missing (0.5 overall maybe? Or
+        high for what we have). Let''s say 0.9 overall since we have clear name and
+        visit type but missing other data.\n5. **extraction_notes**: \"Patient age
+        not mentioned. Visit date relative to reference date (2026-02-22) indicates
+        visit occurred on 2026-02-21 based on ''yesterday''.\"\n6. **medications**:
+        None mentioned - empty array []\n7. **diagnoses**: None mentioned - empty
+        array []\n8. **temporal_expressions**: \n   - \"yesterday\" - relative to
+        reference date 2026-02-22, this means 2026-02-21\n9. **vital_signs**: None
+        - empty array []\n10. **procedures**: None - empty array []\n11. **protocol_triggers**:
+        None - empty array []\n12. **follow_up**: null (this was the follow-up visit
+        itself, not instructions for future follow-up)\n13. **additional_context**:
+        \"Patient is referred to as ''Mrs.'' indicating marital status or courtesy
+        title. Visit occurred ''yesterday'' relative to reference date.\"\n\nWait,
+        I need to check if \"follow-up\" counts as follow_up instructions or if it''s
+        describing the visit type. The field \"follow_up\" seems to be for follow-up
+        instructions/plans, not the type of visit. Since this is a follow-up visit,
+        but no instructions are given, it should be null.\n\nLet me reconsider confidence:\n-
+        patient_name: 0.95 (clearly stated)\n- visit_type: 0.95 (clearly stated)\n-
+        overall confidence: 0.85 (high for what we have, but limited data)\n\nFor
+        temporal_expressions:\n- text: \"yesterday\"\n- interpretation: \"Visit occurred
+        on 2026-02-21 (one day before reference date 2026-02-22)\"\n- confidence:
+        0.9\n\nActually, looking at the JSON structure, the \"confidence\" field at
+        the top level seems to be overall confidence for the extraction.\n\nMedications:
+        empty array []\nDiagnoses: empty array []\nVital signs: empty array []\nProcedures:
+        empty array []\nProtocol triggers: empty array []\n\nWait, I should check
+        if there''s any implication of \"Mrs.\" - that''s a title, not a medical data
+        point, but could be noted in additional_context.\n\nAlso, is \"came in\" implying
+        admission? No, it likely means \"came in to the clinic/practice\".\n\nLet
+        me verify the visit_type options: \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\"\nThe
+        text says \"follow-up visit\" - so that''s clearly \"follow-up\".\n\nStructure
+        validation:\n- All arrays should be present even if empty\n- Null values should
+        be explicit null, not \"null\" string\n\nJSON construction:\n\n{\n  \"patient_name\":
+        \"Sarah Johnson\",\n  \"patient_age\": null,\n  \"visit_type\": \"follow-up\",\n  \"confidence\":
+        0.9,\n  \"extraction_notes\": \"Patient name clearly identified. Age not stated.
+        Visit explicitly described as follow-up. Temporal reference ''yesterday''
+        indicates visit date was 2026-02-21 relative to reference date.\",\n  \"medications\":
+        [],\n  \"diagnoses\": [],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+        \"yesterday\",\n      \"interpretation\": \"Visit occurred on 2026-02-21 (one
+        day before reference date 2026-02-22)\",\n      \"confidence\": 0.9\n    }\n  ],\n  \"vital_signs\":
+        [],\n  \"procedures\": [],\n  \"protocol_triggers\": [],\n  \"follow_up\":
+        null,\n  \"additional_context\": \"Patient addressed as ''Mrs.'' indicating
+        adult female patient. Minimal clinical detail provided in transcript.\"\n}\n\nI
+        should consider if \"Mrs. Sarah Johnson\" includes the title in the name or
+        just the name. Usually patient_name would be \"Sarah Johnson\", not including
+        the title.\n\nAlso, is there any ambiguity about \"yesterday\"? If the reference
+        date is 2026-02-22, then yesterday is 2026-02-21. That''s straightforward.\n\nConfidence
+        score: Since we have very limited information but what we have is clear, I''ll
+        give 0.85 or 0.9. Let''s go with 0.9.\n\nActually, looking at the guidelines:
+        \"0.9+ for clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain\"\nThe
+        name is clear. The visit type is clear. But we have very sparse data. However,
+        the confidence is about the extraction accuracy, not the completeness. So
+        0.9 is appropriate.\n\nOne final check: Are there any medications, diagnoses,
+        etc. implied? No. \"came in... for her follow-up visit\" - no medical conditions
+        mentioned, no drugs mentioned.\n\nI think this is complete. "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":586,"total_tokens":1969,"completion_tokens":1383,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:30:00 GMT
+      Set-Cookie:
+      - S=s%3Awxt7XE0w9SthIcuTpQTW6e9evzynzWFKuhz38TeszmU%3D.ek8oVyv%2F2gj%2FCGLSeQJCUJRyTOTMfk%2BeyfUwGxRnuNo;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":45,"renewsAt":"2026-02-22T10:41:43.711Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:30:00.712Z"}},"freeToolCalls":{"limit":2500,"requests":706,"renewsAt":"2026-02-22T23:05:44.721Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

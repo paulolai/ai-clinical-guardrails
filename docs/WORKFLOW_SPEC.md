@@ -26,10 +26,12 @@ This document defines the 8-step engineering lifecycle used to build the Clinica
 - **Tool:** `datamodel-code-generator`
 - **Command:**
   ```bash
+  # Generate as a modular package (directory) for 20ms import times
+  mkdir -p src/integrations/fhir/models/
   uv run datamodel-codegen \
       --input specs/fhir.r4.schema.json \
       --input-file-type jsonschema \
-      --output src/integrations/fhir/generated.py \
+      --output src/integrations/fhir/models/ \
       --output-model-type pydantic_v2.BaseModel \
       --target-python-version 3.12 \
       --field-constraints \
@@ -45,7 +47,7 @@ This document defines the 8-step engineering lifecycle used to build the Clinica
 
 ### Step 5: Interface-Specific CLI Tooling
 **Goal:** Enable developer debugging of the integration layer.
-- **Responsibility:** `cli/fhir.py` (Handles EMR) and `cli/api.py` (Handles Guardrails Service).
+- **Responsibility:** `cli/emr.py` (Handles EMR) and `cli/api.py` (Handles Guardrails Service).
 - **Standard:** Tools must be named after the interface they serve.
 
 ### Step 6: Component Testing (Integration Proof)

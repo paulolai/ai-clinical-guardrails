@@ -171,7 +171,6 @@ def benchmark_extract(iterations: int) -> dict[str, float]:
         StructuredExtraction,
         TemporalType,
     )
-    from src.models import Result, VerificationResult
 
     latencies = []
     payload = {
@@ -215,7 +214,7 @@ def benchmark_extract(iterations: int) -> dict[str, float]:
     )
 
     # Create mock verification result
-    mock_result: "Result[VerificationResult, Any]" = Result.success(
+    mock_result: Result[VerificationResult, Any] = Result.success(
         VerificationResult(
             is_safe_to_file=True,
             score=0.95,

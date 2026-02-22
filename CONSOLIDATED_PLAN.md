@@ -30,11 +30,11 @@ The **Verification/Compliance Engine** is complete and tested - it successfully 
 | **ComplianceEngine** | ✅ Working | 3 invariants implemented (Date Integrity, Sepsis Protocol, PII Detection) |
 | **FastAPI Service** | ✅ Working | `/verify`, `/verify/fhir/{id}`, `/extract` endpoints operational |
 | **FHIR Integration** | ✅ Working | HAPI FHIR sandbox integration with wrapper pattern |
-| **CLI Tools** | ✅ Working | `cli/fhir.py` and `cli/api.py` functional |
+| **CLI Tools** | ✅ Working | `cli/emr.py` and `cli/api.py` functional |
 | **Tests** | ✅ Passing | 46/47 tests pass (11 extraction + existing) |
 | **Extraction Layer** | ✅ COMPLETE | Multi-provider LLM client with retry, 11 accuracy tests |
 | **Sample Transcripts** | ✅ COMPLETE | 10 test transcripts in tests/fixtures/sample_transcripts.json |
-| **CLI Tools** | ✅ Working | `cli/fhir.py`, `cli/api.py`, `cli/test_extraction.py` functional |
+| **CLI Tools** | ✅ Working | `cli/emr.py`, `cli/api.py`, `cli/test_extraction.py` functional |
 | **Performance Benchmarks** | ✅ COMPLETE | `tests/benchmarks/`, `scripts/benchmark.py` with p50/p95/p99 metrics |
 
 ### ✅ Documentation (COMPLETE - Core)
@@ -133,7 +133,7 @@ uv run ruff check .
 uv run mypy src/
 
 # CLI: Inspect patient
-uv run python cli/fhir.py inspect 90128869
+uv run python cli/emr.py inspect 90128869
 
 # CLI: Verify AI output
 uv run python cli/api.py verify --id 90128869 --text "Seen today."

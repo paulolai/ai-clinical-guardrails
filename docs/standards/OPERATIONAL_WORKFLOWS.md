@@ -55,7 +55,7 @@ See [WORKFLOW_SPEC.md](../WORKFLOW_SPEC.md) for the complete canonical implement
 
 Every major system boundary must have a dedicated CLI handle for developer debugging.
 
-*   **EMR Integration:** `cli/fhir.py inspect <id>`
+*   **EMR Integration:** `cli/emr.py inspect <id>`
 *   **API Service:** `cli/api.py verify <id>`
 *   **Why?** If you can't debug the interface in isolation, you can't trust the system integration.
 
@@ -80,6 +80,6 @@ uv run mypy src/
 uv run python main.py
 
 # CLI tools
-uv run python cli/fhir.py inspect 90128869
+uv run python cli/emr.py inspect 90128869
 uv run python cli/api.py verify --id 90128869 --text "Seen today."
 ```

@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "datamodel-code-generator>=0.54.0",
     "fastapi>=0.129.0",
+    "fhir-resources>=8.0.0",
     "httpx>=0.28.1",
     "hypothesis>=6.151.9",
     "jsonlines>=4.0.0",

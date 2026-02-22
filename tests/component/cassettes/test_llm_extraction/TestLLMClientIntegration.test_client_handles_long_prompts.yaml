@@ -1,0 +1,133 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"Extract patient info from this transcript
+      and return JSON:\n\n        Mrs. Sarah Johnson came in yesterday for her follow-up
+      visit.\n        She''s been taking Lisinopril 10 milligrams daily and her blood\n        pressure
+      has improved significantly. Started two weeks ago.\n        Next appointment
+      scheduled for in two weeks to check her progress.\n        "}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":2000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '514'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-420bdbafad976f2103d77b73a858e136","object":"chat.completion","created":1771745360,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": \"Sarah Johnson\",\n  \"patient_title\": \"Mrs.\",\n  \"visit\":
+        {\n    \"type\": \"follow-up\",\n    \"date_relative\": \"yesterday\"\n  },\n  \"medications\":
+        [\n    {\n      \"name\": \"Lisinopril\",\n      \"dosage\": \"10 mg\",\n      \"frequency\":
+        \"daily\",\n      \"duration\": \"started two weeks ago\"\n    }\n  ],\n  \"clinical_status\":
+        \"blood pressure improved significantly\",\n  \"follow_up\": {\n    \"scheduled_in\":
+        \"two weeks\",\n    \"purpose\": \"check progress\"\n  }\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract patient information from a transcript and return
+        it as JSON.\n\n Key information I can extract:\n - Patient name: Mrs. Sarah
+        Johnson\n - Visit type: Follow-up visit\n - Visit date: yesterday (relative,
+        but I''ll note it)\n - Medication: Lisinopril 10 milligrams daily\n - Medication
+        start date: two weeks ago (relative to yesterday)\n - Condition: Blood pressure
+        (improved significantly)\n - Next appointment: in two weeks (from yesterday)\n\n
+        I should structure this as a JSON object with relevant fields. Common fields
+        would include:\n - patient_name\n - visit_date (or date context)\n - medications
+        (array with name, dosage, frequency, start_date)\n - condition/status\n -
+        next_appointment\n\n Since the dates are relative (\"yesterday\", \"two weeks
+        ago\", \"in two weeks\"), I should probably keep them as described or note
+        them as relative dates. The user didn''t specify to convert to absolute dates
+        (which would require knowing today''s date), so I''ll extract the relative
+        timeframes as stated.\n\n Let me structure the JSON:\n\n ```json\n {\n   \"patient_name\":
+        \"Sarah Johnson\",\n   \"patient_title\": \"Mrs.\",\n   \"visit\": {\n     \"type\":
+        \"follow-up\",\n     \"date_relative\": \"yesterday\"\n   },\n   \"medications\":
+        [\n     {\n       \"name\": \"Lisinopril\",\n       \"dosage\": \"10 mg\",\n       \"frequency\":
+        \"daily\",\n       \"start_date_relative\": \"two weeks ago\"\n     }\n   ],\n   \"condition\":
+        \"blood pressure improved significantly\",\n   \"next_appointment\": {\n     \"timeframe\":
+        \"in two weeks\",\n     \"purpose\": \"check progress\"\n   }\n }\n ```\n\n
+        Or a flatter structure if preferred. I''ll provide a clean, structured JSON
+        with the extracted information. ","reasoning_content":" The user wants me
+        to extract patient information from a transcript and return it as JSON.\n\n
+        Key information I can extract:\n - Patient name: Mrs. Sarah Johnson\n - Visit
+        type: Follow-up visit\n - Visit date: yesterday (relative, but I''ll note
+        it)\n - Medication: Lisinopril 10 milligrams daily\n - Medication start date:
+        two weeks ago (relative to yesterday)\n - Condition: Blood pressure (improved
+        significantly)\n - Next appointment: in two weeks (from yesterday)\n\n I should
+        structure this as a JSON object with relevant fields. Common fields would
+        include:\n - patient_name\n - visit_date (or date context)\n - medications
+        (array with name, dosage, frequency, start_date)\n - condition/status\n -
+        next_appointment\n\n Since the dates are relative (\"yesterday\", \"two weeks
+        ago\", \"in two weeks\"), I should probably keep them as described or note
+        them as relative dates. The user didn''t specify to convert to absolute dates
+        (which would require knowing today''s date), so I''ll extract the relative
+        timeframes as stated.\n\n Let me structure the JSON:\n\n ```json\n {\n   \"patient_name\":
+        \"Sarah Johnson\",\n   \"patient_title\": \"Mrs.\",\n   \"visit\": {\n     \"type\":
+        \"follow-up\",\n     \"date_relative\": \"yesterday\"\n   },\n   \"medications\":
+        [\n     {\n       \"name\": \"Lisinopril\",\n       \"dosage\": \"10 mg\",\n       \"frequency\":
+        \"daily\",\n       \"start_date_relative\": \"two weeks ago\"\n     }\n   ],\n   \"condition\":
+        \"blood pressure improved significantly\",\n   \"next_appointment\": {\n     \"timeframe\":
+        \"in two weeks\",\n     \"purpose\": \"check progress\"\n   }\n }\n ```\n\n
+        Or a flatter structure if preferred. I''ll provide a clean, structured JSON
+        with the extracted information. "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":93,"total_tokens":596,"completion_tokens":503,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:29:28 GMT
+      Set-Cookie:
+      - S=s%3AZ9mokQkPqV4tzoduEcZ9hwMO17aTqgYPGbPy2t8HMbg%3D.RBD4JUmJVXod6EzSI2LdM1BO5SJ8x4LVhH6ERASFeEQ;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":44,"renewsAt":"2026-02-22T10:41:43.905Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:29:28.906Z"}},"freeToolCalls":{"limit":2500,"requests":705,"renewsAt":"2026-02-22T23:05:44.915Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,92 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a test assistant. Please
+      return a JSON object with the key \"status\" and value \"ok\"."}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":100,"response_format":{"type":"json_object"},"temperature":0.0}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '250'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-9bc07f626b30f962f61bb9d0049beda1","object":"chat.completion","created":1771745326,"model":"moonshotai/Kimi-K2.5","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants a JSON object with the key \"status\" and value \"ok\". This
+        is a straightforward request. I should return valid JSON format.\n\nThe expected
+        output should be:\n```json\n{\n  \"status\": \"ok\"\n}\n```\n\nSince the user
+        asked me to return a JSON object, I should provide it in a code block or as
+        plain text, but typically JSON is presented in a code block for clarity. However,
+        looking at the request, they just want the JSON object returned.\n\n","reasoning_content":"
+        The user wants a JSON object with the key \"status\" and value \"ok\". This
+        is a straightforward request. I should return valid JSON format.\n\nThe expected
+        output should be:\n```json\n{\n  \"status\": \"ok\"\n}\n```\n\nSince the user
+        asked me to return a JSON object, I should provide it in a code block or as
+        plain text, but typically JSON is presented in a code block for clarity. However,
+        looking at the request, they just want the JSON object returned.\n\n"},"logprobs":null,"finish_reason":"length","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":30,"total_tokens":130,"completion_tokens":100,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:29:13 GMT
+      Set-Cookie:
+      - S=s%3AW%2BNhQnIB7QCUBZJ3K7RavFsOT6PTRN2o85Bx%2F6Jq90g%3D.JgMRm810JFAlS%2FNQjLYMJKx5Fp63JCWid2W3j5ltqZk;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":44,"renewsAt":"2026-02-22T10:41:43.797Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:29:13.797Z"}},"freeToolCalls":{"limit":2500,"requests":703,"renewsAt":"2026-02-22T23:05:44.809Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

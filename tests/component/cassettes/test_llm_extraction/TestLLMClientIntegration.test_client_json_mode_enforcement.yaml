@@ -1,0 +1,98 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"Extract: patient is 45 years old.
+      Return {\"age\": 45}"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.0}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '210'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-02c311af891fa80bb559cfce57706fd4","object":"chat.completion","created":1771745354,"model":"moonshotai/Kimi-K2.5","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\"age\": 45}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants to extract the age from the given text and return it in a specific
+        JSON format.\n\nInput text: \"patient is 45 years old.\"\nTarget output: {\"age\":
+        45}\n\nThe extraction is straightforward:\n- The text contains \"45 years
+        old\"\n- I need to extract the number 45\n- Format it as JSON with key \"age\"
+        and value 45 (as a number, not string)\n\nThe user is asking me to return
+        just the JSON object. I should provide exactly what was requested without
+        extra fluff.\n\nLet me verify:\n- \"45\" is the age mentioned\n- JSON format:
+        {\"age\": 45}\n- No additional text needed unless specified\n\nI should return
+        exactly: {\"age\": 45} ","reasoning_content":" The user wants to extract the
+        age from the given text and return it in a specific JSON format.\n\nInput
+        text: \"patient is 45 years old.\"\nTarget output: {\"age\": 45}\n\nThe extraction
+        is straightforward:\n- The text contains \"45 years old\"\n- I need to extract
+        the number 45\n- Format it as JSON with key \"age\" and value 45 (as a number,
+        not string)\n\nThe user is asking me to return just the JSON object. I should
+        provide exactly what was requested without extra fluff.\n\nLet me verify:\n-
+        \"45\" is the age mentioned\n- JSON format: {\"age\": 45}\n- No additional
+        text needed unless specified\n\nI should return exactly: {\"age\": 45} "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":24,"total_tokens":183,"completion_tokens":159,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:29:19 GMT
+      Set-Cookie:
+      - S=s%3AjCibEo14e%2BDUGSkjPsiBpQsxB%2F8gFXKovcYRLXdL6GU%3D.NasoZoX3zcZo%2B%2F9knM5KPJs2ihZo9rAeKOJ4Aje%2FNM8;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":44,"renewsAt":"2026-02-22T10:41:43.583Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:29:19.584Z"}},"freeToolCalls":{"limit":2500,"requests":704,"renewsAt":"2026-02-22T23:05:44.592Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

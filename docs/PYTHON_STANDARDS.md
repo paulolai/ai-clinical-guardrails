@@ -268,7 +268,7 @@ Every major interface needs a CLI for debugging.
 
 ```bash
 # FHIR Interface
-uv run python cli/fhir.py inspect <patient_id>
+uv run python cli/emr.py inspect <patient_id>
 
 # API Interface
 uv run python cli/api.py verify --id <id> --text <text>

@@ -51,7 +51,7 @@ uv run pytest tests/ -m "not component" -v
 
 ```bash
 # View patient data from HAPI FHIR sandbox
-uv run python cli/fhir.py inspect 90128869
+uv run python cli/emr.py inspect 90128869
 ```
 
 ## Next Steps

@@ -68,7 +68,7 @@ uv run python main.py
 ### Inspect Patient Data
 ```bash
 # Fetch patient from FHIR sandbox
-uv run python cli/fhir.py inspect 90128869
+uv run python cli/emr.py inspect 90128869
 ```
 
 ### Verify AI Output
@@ -91,7 +91,7 @@ uv run python cli/api.py verify \
 **Fix:**
 ```bash
 # Always run from project root with uv
-uv run python cli/fhir.py inspect 90128869
+uv run python cli/emr.py inspect 90128869
 
 # Or use module syntax
 uv run python -m cli.fhir inspect 90128869

@@ -1,0 +1,263 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a clinical data extraction
+      assistant.\nParse unstructured clinical dictation and extract structured information.\n\nExtract
+      the following from the clinical transcript below. Return ONLY a JSON object.\n\nTranscript:\nPatient
+      was seen yesterday and will return in two weeks.\n\nReference Date: 2024-01-15\n\nReturn
+      this JSON structure:\n{\n  \"patient_name\": \"extracted name or null\",\n  \"patient_age\":
+      \"age or null\",\n  \"visit_type\": \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\",\n  \"confidence\":
+      0.0-1.0,\n  \"extraction_notes\": \"any ambiguities\",\n  \"medications\": [\n    {\n      \"name\":
+      \"medication name\",\n      \"dosage\": \"dosage or null\",\n      \"frequency\":
+      \"frequency or null\",\n      \"route\": \"route or null\",\n      \"status\":
+      \"started|stopped|continued|increased|decreased|unknown\",\n      \"confidence\":
+      0.0-1.0,\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"diagnoses\":
+      [\n    {\n      \"condition\": \"condition name\",\n      \"icd10_code\": \"ICD-10
+      code or null\",\n      \"confidence\": 0.0-1.0,\n      \"raw_text\": \"exact
+      text from transcript\"\n    }\n  ],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+      \"exact text from transcript\",\n      \"interpretation\": \"what this likely
+      means\",\n      \"confidence\": 0.0-1.0\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\":
+      \"blood-pressure|temperature|heart-rate|weight|height|respiratory-rate\",\n      \"value\":
+      \"value with units\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"procedures\":
+      [\n    {\n      \"name\": \"procedure name\",\n      \"date_description\": \"when
+      it occurred or null\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"protocol_triggers\":
+      [\"sepsis|stroke|MI|trauma\"],\n  \"follow_up\": \"follow-up instructions or
+      null\",\n  \"additional_context\": \"other relevant information\"\n}\n\nGuidelines:\n-
+      Do not hallucinate information not in the transcript\n- Mark unclear information
+      with lower confidence\n- Include exact raw text for verification\n- For Australian
+      context: recognise PBS medications, MBS terminology\n- Confidence: 0.9+ for
+      clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2445'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-b9bae453938284687f8f5963b72065b5","object":"chat.completion","created":1771745440,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": null,\n  \"patient_age\": null,\n  \"visit_type\":
+        \"follow-up\",\n  \"confidence\": 0.6,\n  \"extraction_notes\": \"Visit type
+        inferred from context of previous visit and scheduled return. No explicit
+        clinical indicators (e.g., post-operative, acute complaint) provided. Patient
+        identifiers absent.\",\n  \"medications\": [],\n  \"diagnoses\": [],\n  \"temporal_expressions\":
+        [\n    {\n      \"text\": \"yesterday\",\n      \"interpretation\": \"2024-01-14
+        (one day prior to reference date 2024-01-15)\",\n      \"confidence\": 0.95\n    },\n    {\n      \"text\":
+        \"in two weeks\",\n      \"interpretation\": \"Approximately 2024-01-29 (14
+        days from reference date)\",\n      \"confidence\": 0.8\n    }\n  ],\n  \"vital_signs\":
+        [],\n  \"procedures\": [],\n  \"protocol_triggers\": [],\n  \"follow_up\":
+        \"Patient to return in two weeks (approximately 2024-01-29)\",\n  \"additional_context\":
+        \"Documentation indicates patient seen on 2024-01-14 with next scheduled encounter
+        approximately 2024-01-29. No diagnostic, therapeutic, or procedural details
+        provided in transcript.\"\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract structured clinical data from a short transcript.
+        Let me analyze the input:\n\nTranscript: \"Patient was seen yesterday and
+        will return in two weeks.\"\nReference Date: 2024-01-15\n\nKey observations:\n1.
+        Patient name: Not mentioned - null\n2. Patient age: Not mentioned - null\n3.
+        Visit type: \"was seen yesterday\" suggests a follow-up or recent visit, but
+        it''s ambiguous. Could be follow-up since they''re returning. \"will return
+        in two weeks\" suggests this is planning for future. Actually, the current
+        context seems to be today (reference date 2024-01-15), and patient was seen
+        yesterday (2024-01-14), and will return in two weeks (2024-01-29). This sounds
+        like a follow-up visit plan.\n4. Temporal expressions:\n   - \"yesterday\"
+        = 2024-01-14 (reference date 2024-01-15)\n   - \"two weeks\" from reference
+        date = 2024-01-29 or from yesterday? Likely from now or from the visit, but
+        ambiguous.\n5. No medications mentioned\n6. No diagnoses mentioned\n7. No
+        vital signs mentioned\n8. No procedures mentioned\n9. No protocol triggers
+        mentioned\n10. Follow up: \"will return in two weeks\" - this is the follow
+        up instruction\n\nVisit type classification:\n- follow-up: Patient was seen
+        and is returning - this fits\n- acute-complaint: Not indicated\n- routine-check:
+        Not specifically indicated\n- post-operative: Not mentioned\n- well-child-check:
+        Not indicated\n- urgent-same-day: Not indicated\n\nConfidence should be moderate
+        for visit_type since it''s inferred from context rather than explicitly stated.\n\nTemporal
+        expressions:\n- \"yesterday\" -> 2024-01-14 (high confidence)\n- \"in two
+        weeks\" -> 2024-01-29 (from reference date) or could mean 2024-01-28 (from
+        yesterday). I''ll interpret as approximately 2 weeks from reference date.\n\nStructure
+        requirements:\n- Must return ONLY JSON\n- No hallucination\n- Include raw_text
+        fields\n- Australian context guidelines mentioned but not relevant here (no
+        meds/procedures mentioned)\n\nLet me construct the JSON:\n\n{\n  \"patient_name\":
+        null,\n  \"patient_age\": null,\n  \"visit_type\": \"follow-up\",\n  \"confidence\":
+        0.7,\n  \"extraction_notes\": \"Visit type inferred from context of recent
+        visit and planned return. No specific patient identifiers present.\",\n  \"medications\":
+        [],\n  \"diagnoses\": [],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+        \"yesterday\",\n      \"interpretation\": \"2024-01-14 (one day before reference
+        date 2024-01-15)\",\n      \"confidence\": 0.95\n    },\n    {\n      \"text\":
+        \"in two weeks\",\n      \"interpretation\": \"Approximately 2024-01-29 (14
+        days from reference date)\",\n      \"confidence\": 0.8\n    }\n  ],\n  \"vital_signs\":
+        [],\n  \"procedures\": [],\n  \"protocol_triggers\": [],\n  \"follow_up\":
+        \"Return visit scheduled in two weeks\",\n  \"additional_context\": \"Patient
+        seen on 2024-01-14, next appointment approximately 2024-01-29. No clinical
+        details provided regarding purpose of visits.\"\n}\n\nWait, I should check
+        the visit_type logic more carefully. The patient \"was seen yesterday\" -
+        this implies the current note is being written on the reference date (2024-01-15)
+        about a visit that happened yesterday. The patient \"will return in two weeks\"
+        from now. So this appears to be documenting a past visit and scheduling a
+        future one, or this could be the provider speaking about the patient''s care
+        plan.\n\nActually, looking at it again: \"Patient was seen yesterday and will
+        return in two weeks.\" This is likely the clinician dictating about the patient''s
+        schedule. The visit_type should probably be \"follow-up\" because the patient
+        is returning, but actually, the current note might be about the visit yesterday?
+        No, the transcript doesn''t specify what kind of visit yesterday was.\n\nGiven
+        the ambiguity, I''ll keep confidence at 0.6-0.7 for visit_type.\n\nAlso, I
+        need to make sure I don''t include any markdown formatting since the user
+        said \"Return ONLY a JSON object\". So I should output raw JSON without ```json
+        markers.\n\nLet me verify all fields:\n- patient_name: null (correct)\n- patient_age:
+        null (correct)\n- visit_type: \"follow-up\" (reasonable inference that this
+        is a follow-up plan)\n- confidence: 0.6 (somewhat ambiguous if this is the
+        actual visit type or just scheduling)\n- extraction_notes: should mention
+        the ambiguity about visit timing and lack of clinical detail\n- medications:
+        [] (empty array, correct)\n- diagnoses: [] (empty array, correct)\n- temporal_expressions:
+        two entries as above\n- vital_signs: [] (empty array, correct)\n- procedures:
+        [] (empty array, correct)\n- protocol_triggers: [] (empty array, correct)\n-
+        follow_up: \"will return in two weeks\" (exact text or paraphrased?)\n- additional_context:
+        mention reference date calculations\n\nActually, looking at the follow_up
+        field description: \"follow-up instructions or null\". The text \"will return
+        in two weeks\" is the instruction/plan.\n\nOne final check: The user asked
+        for \"exact text from transcript\" in various fields. So for temporal_expressions[0].text,
+        it should be \"yesterday\". For [1].text, it should be \"in two weeks\".\n\nFor
+        follow_up, should I put the raw text or a description? The field description
+        says \"follow-up instructions or null\", so I can summarize it, but typically
+        I''d put the relevant instruction.\n\nLet me refine the confidence scores:\n-
+        visit_type: 0.6 (inferred, not explicit)\n- temporal \"yesterday\": 0.95 (very
+        clear relative to reference date)\n- temporal \"two weeks\": 0.8 (clear relative
+        time, but absolute date depends on whether it''s from now or from yesterday,
+        though clinically usually from the current documentation date)\n\nI think
+        this is good. ","reasoning_content":" The user wants me to extract structured
+        clinical data from a short transcript. Let me analyze the input:\n\nTranscript:
+        \"Patient was seen yesterday and will return in two weeks.\"\nReference Date:
+        2024-01-15\n\nKey observations:\n1. Patient name: Not mentioned - null\n2.
+        Patient age: Not mentioned - null\n3. Visit type: \"was seen yesterday\" suggests
+        a follow-up or recent visit, but it''s ambiguous. Could be follow-up since
+        they''re returning. \"will return in two weeks\" suggests this is planning
+        for future. Actually, the current context seems to be today (reference date
+        2024-01-15), and patient was seen yesterday (2024-01-14), and will return
+        in two weeks (2024-01-29). This sounds like a follow-up visit plan.\n4. Temporal
+        expressions:\n   - \"yesterday\" = 2024-01-14 (reference date 2024-01-15)\n   -
+        \"two weeks\" from reference date = 2024-01-29 or from yesterday? Likely from
+        now or from the visit, but ambiguous.\n5. No medications mentioned\n6. No
+        diagnoses mentioned\n7. No vital signs mentioned\n8. No procedures mentioned\n9.
+        No protocol triggers mentioned\n10. Follow up: \"will return in two weeks\"
+        - this is the follow up instruction\n\nVisit type classification:\n- follow-up:
+        Patient was seen and is returning - this fits\n- acute-complaint: Not indicated\n-
+        routine-check: Not specifically indicated\n- post-operative: Not mentioned\n-
+        well-child-check: Not indicated\n- urgent-same-day: Not indicated\n\nConfidence
+        should be moderate for visit_type since it''s inferred from context rather
+        than explicitly stated.\n\nTemporal expressions:\n- \"yesterday\" -> 2024-01-14
+        (high confidence)\n- \"in two weeks\" -> 2024-01-29 (from reference date)
+        or could mean 2024-01-28 (from yesterday). I''ll interpret as approximately
+        2 weeks from reference date.\n\nStructure requirements:\n- Must return ONLY
+        JSON\n- No hallucination\n- Include raw_text fields\n- Australian context
+        guidelines mentioned but not relevant here (no meds/procedures mentioned)\n\nLet
+        me construct the JSON:\n\n{\n  \"patient_name\": null,\n  \"patient_age\":
+        null,\n  \"visit_type\": \"follow-up\",\n  \"confidence\": 0.7,\n  \"extraction_notes\":
+        \"Visit type inferred from context of recent visit and planned return. No
+        specific patient identifiers present.\",\n  \"medications\": [],\n  \"diagnoses\":
+        [],\n  \"temporal_expressions\": [\n    {\n      \"text\": \"yesterday\",\n      \"interpretation\":
+        \"2024-01-14 (one day before reference date 2024-01-15)\",\n      \"confidence\":
+        0.95\n    },\n    {\n      \"text\": \"in two weeks\",\n      \"interpretation\":
+        \"Approximately 2024-01-29 (14 days from reference date)\",\n      \"confidence\":
+        0.8\n    }\n  ],\n  \"vital_signs\": [],\n  \"procedures\": [],\n  \"protocol_triggers\":
+        [],\n  \"follow_up\": \"Return visit scheduled in two weeks\",\n  \"additional_context\":
+        \"Patient seen on 2024-01-14, next appointment approximately 2024-01-29. No
+        clinical details provided regarding purpose of visits.\"\n}\n\nWait, I should
+        check the visit_type logic more carefully. The patient \"was seen yesterday\"
+        - this implies the current note is being written on the reference date (2024-01-15)
+        about a visit that happened yesterday. The patient \"will return in two weeks\"
+        from now. So this appears to be documenting a past visit and scheduling a
+        future one, or this could be the provider speaking about the patient''s care
+        plan.\n\nActually, looking at it again: \"Patient was seen yesterday and will
+        return in two weeks.\" This is likely the clinician dictating about the patient''s
+        schedule. The visit_type should probably be \"follow-up\" because the patient
+        is returning, but actually, the current note might be about the visit yesterday?
+        No, the transcript doesn''t specify what kind of visit yesterday was.\n\nGiven
+        the ambiguity, I''ll keep confidence at 0.6-0.7 for visit_type.\n\nAlso, I
+        need to make sure I don''t include any markdown formatting since the user
+        said \"Return ONLY a JSON object\". So I should output raw JSON without ```json
+        markers.\n\nLet me verify all fields:\n- patient_name: null (correct)\n- patient_age:
+        null (correct)\n- visit_type: \"follow-up\" (reasonable inference that this
+        is a follow-up plan)\n- confidence: 0.6 (somewhat ambiguous if this is the
+        actual visit type or just scheduling)\n- extraction_notes: should mention
+        the ambiguity about visit timing and lack of clinical detail\n- medications:
+        [] (empty array, correct)\n- diagnoses: [] (empty array, correct)\n- temporal_expressions:
+        two entries as above\n- vital_signs: [] (empty array, correct)\n- procedures:
+        [] (empty array, correct)\n- protocol_triggers: [] (empty array, correct)\n-
+        follow_up: \"will return in two weeks\" (exact text or paraphrased?)\n- additional_context:
+        mention reference date calculations\n\nActually, looking at the follow_up
+        field description: \"follow-up instructions or null\". The text \"will return
+        in two weeks\" is the instruction/plan.\n\nOne final check: The user asked
+        for \"exact text from transcript\" in various fields. So for temporal_expressions[0].text,
+        it should be \"yesterday\". For [1].text, it should be \"in two weeks\".\n\nFor
+        follow_up, should I put the raw text or a description? The field description
+        says \"follow-up instructions or null\", so I can summarize it, but typically
+        I''d put the relevant instruction.\n\nLet me refine the confidence scores:\n-
+        visit_type: 0.6 (inferred, not explicit)\n- temporal \"yesterday\": 0.95 (very
+        clear relative to reference date)\n- temporal \"two weeks\": 0.8 (clear relative
+        time, but absolute date depends on whether it''s from now or from yesterday,
+        though clinically usually from the current documentation date)\n\nI think
+        this is good. "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":584,"total_tokens":2162,"completion_tokens":1578,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:31:09 GMT
+      Set-Cookie:
+      - S=s%3As3L%2Fh%2FvPcuRkaax%2FtCb2JNnwqYySdXRcdP1lZHgAE48%3D.wAzil2nlN97d%2FTPo%2FEQdf3YVI%2Bwuzy0o%2BitwmE286x4;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":44,"renewsAt":"2026-02-22T10:41:43.331Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:31:09.331Z"}},"freeToolCalls":{"limit":2500,"requests":708,"renewsAt":"2026-02-22T23:05:44.344Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

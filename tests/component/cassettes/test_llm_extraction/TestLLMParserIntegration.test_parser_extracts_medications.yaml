@@ -1,0 +1,299 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a clinical data extraction
+      assistant.\nParse unstructured clinical dictation and extract structured information.\n\nExtract
+      the following from the clinical transcript below. Return ONLY a JSON object.\n\nTranscript:\n\n        Patient
+      started on Lisinopril 10mg daily for hypertension.\n        Also taking Metformin
+      500mg twice daily for diabetes.\n        \n\nReference Date: 2026-02-22\n\nReturn
+      this JSON structure:\n{\n  \"patient_name\": \"extracted name or null\",\n  \"patient_age\":
+      \"age or null\",\n  \"visit_type\": \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\",\n  \"confidence\":
+      0.0-1.0,\n  \"extraction_notes\": \"any ambiguities\",\n  \"medications\": [\n    {\n      \"name\":
+      \"medication name\",\n      \"dosage\": \"dosage or null\",\n      \"frequency\":
+      \"frequency or null\",\n      \"route\": \"route or null\",\n      \"status\":
+      \"started|stopped|continued|increased|decreased|unknown\",\n      \"confidence\":
+      0.0-1.0,\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"diagnoses\":
+      [\n    {\n      \"condition\": \"condition name\",\n      \"icd10_code\": \"ICD-10
+      code or null\",\n      \"confidence\": 0.0-1.0,\n      \"raw_text\": \"exact
+      text from transcript\"\n    }\n  ],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+      \"exact text from transcript\",\n      \"interpretation\": \"what this likely
+      means\",\n      \"confidence\": 0.0-1.0\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\":
+      \"blood-pressure|temperature|heart-rate|weight|height|respiratory-rate\",\n      \"value\":
+      \"value with units\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"procedures\":
+      [\n    {\n      \"name\": \"procedure name\",\n      \"date_description\": \"when
+      it occurred or null\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"protocol_triggers\":
+      [\"sepsis|stroke|MI|trauma\"],\n  \"follow_up\": \"follow-up instructions or
+      null\",\n  \"additional_context\": \"other relevant information\"\n}\n\nGuidelines:\n-
+      Do not hallucinate information not in the transcript\n- Mark unclear information
+      with lower confidence\n- Include exact raw text for verification\n- For Australian
+      context: recognise PBS medications, MBS terminology\n- Confidence: 0.9+ for
+      clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2530'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-6e2028f2a3b43af5d02f7fa4b631ed7d","object":"chat.completion","created":1771745401,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": null,\n  \"patient_age\": null,\n  \"visit_type\":
+        null,\n  \"confidence\": 0.75,\n  \"extraction_notes\": \"Patient demographics
+        not specified. Visit type unclear but involves medication management. Two
+        medications identified with clear dosing; diagnoses inferred from indication
+        statements.\",\n  \"medications\": [\n    {\n      \"name\": \"Lisinopril\",\n      \"dosage\":
+        \"10mg\",\n      \"frequency\": \"daily\",\n      \"route\": null,\n      \"status\":
+        \"started\",\n      \"confidence\": 0.95,\n      \"raw_text\": \"Lisinopril
+        10mg daily\"\n    },\n    {\n      \"name\": \"Metformin\",\n      \"dosage\":
+        \"500mg\",\n      \"frequency\": \"twice daily\",\n      \"route\": null,\n      \"status\":
+        \"continued\",\n      \"confidence\": 0.8,\n      \"raw_text\": \"Metformin
+        500mg twice daily\"\n    }\n  ],\n  \"diagnoses\": [\n    {\n      \"condition\":
+        \"Hypertension\",\n      \"icd10_code\": \"I10\",\n      \"confidence\": 0.9,\n      \"raw_text\":
+        \"hypertension\"\n    },\n    {\n      \"condition\": \"Diabetes\",\n      \"icd10_code\":
+        \"E11\",\n      \"confidence\": 0.75,\n      \"raw_text\": \"diabetes\"\n    }\n  ],\n  \"temporal_expressions\":
+        [],\n  \"vital_signs\": [],\n  \"procedures\": [],\n  \"protocol_triggers\":
+        [],\n  \"follow_up\": null,\n  \"additional_context\": null\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract structured clinical information from a transcript
+        and return it as JSON.\n\nTranscript:\n\"Patient started on Lisinopril 10mg
+        daily for hypertension.\nAlso taking Metformin 500mg twice daily for diabetes.\"\n\nReference
+        Date: 2026-02-22\n\nLet me analyze what I can extract:\n\n1. **patient_name**:
+        Not mentioned - null\n2. **patient_age**: Not mentioned - null\n3. **visit_type**:
+        Not explicitly stated, but \"started on\" suggests a prescription/follow-up
+        visit. Since it''s not clear, I''ll put null or make a best guess. Given the
+        context of starting medications, it could be \"follow-up\" or \"routine-check\".
+        I''ll go with null since it''s not explicitly stated.\n4. **confidence**:
+        Overall confidence - probably around 0.8 since medication info is clear but
+        visit context is missing\n5. **extraction_notes**: Should note that patient
+        demographics and visit type not specified, but medications and indications
+        are clear\n\n**Medications**:\n1. Lisinopril 10mg daily\n   - name: Lisinopril\n   -
+        dosage: 10mg\n   - frequency: daily\n   - route: null (not specified, assumed
+        oral)\n   - status: started (explicitly stated \"started on\")\n   - confidence:
+        0.95\n   - raw_text: \"Lisinopril 10mg daily\"\n\n2. Metformin 500mg twice
+        daily\n   - name: Metformin\n   - dosage: 500mg\n   - frequency: twice daily\n   -
+        route: null (not specified, assumed oral)\n   - status: continued (implied
+        by \"Also taking\" - suggests ongoing, not new, but could be started too...
+        actually looking at context: \"Also taking\" suggests this is current medication,
+        while Lisinopril is new. But \"Patient started on... Also taking\" could mean
+        both are new, or the Metformin is existing. Given the ambiguity, I''ll mark
+        as \"unknown\" or \"continued\". Actually, \"Also taking\" usually implies
+        in addition to the first medication, but doesn''t specify if it''s new or
+        continuing. Given \"Patient started on\" applies to Lisinopril, and Metformin
+        is mentioned separately with \"Also taking\", it''s likely Metformin was already
+        being taken. But to be safe, I''ll mark status as \"unknown\" or interpret
+        as \"continued\". \n   - Actually, looking carefully: \"Patient started on
+        Lisinopril... Also taking Metformin...\" - this suggests Metformin is current
+        medication. So status: \"continued\"\n   - confidence: 0.85 (slight ambiguity
+        about whether this is also new or continuing)\n   - raw_text: \"Metformin
+        500mg twice daily\"\n\n**Diagnoses**:\n1. Hypertension (indicated as reason
+        for Lisinopril)\n   - condition: Hypertension\n   - icd10_code: I10 (Essential
+        hypertension) - or null if not sure, but I10 is standard\n   - confidence:
+        0.9\n   - raw_text: \"hypertension\"\n\n2. Diabetes (indicated as reason for
+        Metformin)\n   - condition: Diabetes\n   - icd10_code: E11 (Type 2 diabetes
+        mellitus) - Metformin is typically for Type 2, but could be other types. Better
+        to be conservative and use E11 or leave null, or just put \"Diabetes\"\n   -
+        confidence: 0.8 (since type not specified)\n   - raw_text: \"diabetes\"\n\n**Temporal_expressions**:
+        None specific in the text (no dates or times mentioned except the reference
+        date which is metadata)\n\n**Vital_signs**: None mentioned\n\n**Procedures**:
+        None mentioned\n\n**Protocol_triggers**: None mentioned\n\n**Follow_up**:
+        None mentioned\n\n**Additional_context**: None\n\nWait, I should check if
+        \"daily\" and \"twice daily\" count as temporal expressions. They are frequencies
+        rather than temporal expressions pointing to specific times, but they could
+        be interpreted as such. However, they are better captured in the medication
+        frequency field.\n\nLet me reconsider the visit_type. \"Patient started on\"
+        suggests this is a visit where a new medication was prescribed. This could
+        be \"follow-up\" or \"routine-check\". Given the limited information, null
+        is safest, or I could say \"routine-check\" with low confidence. I''ll go
+        with null to avoid hallucination.\n\nConfidence scores:\n- Medications: High
+        confidence (0.9-0.95) because clearly stated\n- Diagnoses: High confidence
+        (0.8-0.9) because indicated as indications for meds\n- Overall: Maybe 0.85\n\nICD-10
+        codes:\n- Hypertension: I10\n- Diabetes: E11.9 (unspecified type) or just
+        E11. Since Metformin is used for Type 2, E11 is reasonable, but could be other
+        types. I''ll use E11.9 to be safe, or just provide E11.\n\nActually, looking
+        at the guidelines: \"Do not hallucinate information not in the transcript\".
+        So for ICD-10, I should either provide the code if I''m confident (Hypertension
+        = I10 is pretty safe) or leave null. For diabetes, since type isn''t specified,
+        I could leave null or provide E11 (since Metformin implies Type 2 usually,
+        but not always).\n\nLet me structure the JSON properly.\n\nOne thing: The
+        transcript mentions \"Patient started on\" - this implies the patient is the
+        subject. But no name or age is given.\n\nRaw text extraction must be exact.
+        So for Lisinopril, the raw text should probably be \"Lisinopril 10mg daily\"
+        or the full phrase \"Patient started on Lisinopril 10mg daily for hypertension\"
+        - but the example suggests specific parts. Looking at the schema, raw_text
+        is \"exact text from transcript\", so I should capture the relevant portion.\n\nActually,
+        for medications:\n- raw_text: \"Lisinopril 10mg daily\" (this is the specific
+        part describing the med)\nBut could also include the context: \"Patient started
+        on Lisinopril 10mg daily\"\n\nSimilarly for Metformin: \"Metformin 500mg twice
+        daily\" or \"Also taking Metformin 500mg twice daily\"\n\nI''ll use the specific
+        medication phrases.\n\nFor diagnoses:\n- raw_text: \"hypertension\" and \"diabetes\"\n\nCheck:
+        Are there any temporal expressions? The reference date is 2026-02-22, but
+        that''s metadata, not in the transcript. The transcript doesn''t contain temporal
+        expressions like \"today\", \"yesterday\", etc.\n\nSo temporal_expressions
+        should be an empty array [].\n\nVital signs: empty array []\nProcedures: empty
+        array []\nProtocol_triggers: empty array [] or omitted? The schema shows it
+        as an array, so empty array.\n\nFollow_up: null\nAdditional_context: null
+        or empty string? The schema shows string, so null or \"\". I''ll use null.\n\nOne
+        final check: The status for Metformin. \"Also taking\" suggests this is a
+        current medication the patient is on, while Lisinopril is new. So:\n- Lisinopril:
+        status \"started\"\n- Metformin: status \"continued\"\n\nThis seems most accurate.\n\nConfidence
+        for Metformin status might be slightly lower (0.8) since \"also taking\" is
+        slightly ambiguous (could mean \"also started taking\" but that''s less likely).\n\nRoute:
+        Not specified, so null (not \"oral\" since that would be inference, though
+        reasonable, guidelines say don''t hallucinate).\n\nDosage: \"10mg\" and \"500mg\"
+        - clear.\nFrequency: \"daily\" and \"twice daily\" - clear.\n\nJSON structure
+        check:\n- All keys present\n- Proper nesting\n- Confidence values as numbers
+        (floats)\n- Arrays for empty lists\n\nLet me write the JSON. ","reasoning_content":"
+        The user wants me to extract structured clinical information from a transcript
+        and return it as JSON.\n\nTranscript:\n\"Patient started on Lisinopril 10mg
+        daily for hypertension.\nAlso taking Metformin 500mg twice daily for diabetes.\"\n\nReference
+        Date: 2026-02-22\n\nLet me analyze what I can extract:\n\n1. **patient_name**:
+        Not mentioned - null\n2. **patient_age**: Not mentioned - null\n3. **visit_type**:
+        Not explicitly stated, but \"started on\" suggests a prescription/follow-up
+        visit. Since it''s not clear, I''ll put null or make a best guess. Given the
+        context of starting medications, it could be \"follow-up\" or \"routine-check\".
+        I''ll go with null since it''s not explicitly stated.\n4. **confidence**:
+        Overall confidence - probably around 0.8 since medication info is clear but
+        visit context is missing\n5. **extraction_notes**: Should note that patient
+        demographics and visit type not specified, but medications and indications
+        are clear\n\n**Medications**:\n1. Lisinopril 10mg daily\n   - name: Lisinopril\n   -
+        dosage: 10mg\n   - frequency: daily\n   - route: null (not specified, assumed
+        oral)\n   - status: started (explicitly stated \"started on\")\n   - confidence:
+        0.95\n   - raw_text: \"Lisinopril 10mg daily\"\n\n2. Metformin 500mg twice
+        daily\n   - name: Metformin\n   - dosage: 500mg\n   - frequency: twice daily\n   -
+        route: null (not specified, assumed oral)\n   - status: continued (implied
+        by \"Also taking\" - suggests ongoing, not new, but could be started too...
+        actually looking at context: \"Also taking\" suggests this is current medication,
+        while Lisinopril is new. But \"Patient started on... Also taking\" could mean
+        both are new, or the Metformin is existing. Given the ambiguity, I''ll mark
+        as \"unknown\" or \"continued\". Actually, \"Also taking\" usually implies
+        in addition to the first medication, but doesn''t specify if it''s new or
+        continuing. Given \"Patient started on\" applies to Lisinopril, and Metformin
+        is mentioned separately with \"Also taking\", it''s likely Metformin was already
+        being taken. But to be safe, I''ll mark status as \"unknown\" or interpret
+        as \"continued\". \n   - Actually, looking carefully: \"Patient started on
+        Lisinopril... Also taking Metformin...\" - this suggests Metformin is current
+        medication. So status: \"continued\"\n   - confidence: 0.85 (slight ambiguity
+        about whether this is also new or continuing)\n   - raw_text: \"Metformin
+        500mg twice daily\"\n\n**Diagnoses**:\n1. Hypertension (indicated as reason
+        for Lisinopril)\n   - condition: Hypertension\n   - icd10_code: I10 (Essential
+        hypertension) - or null if not sure, but I10 is standard\n   - confidence:
+        0.9\n   - raw_text: \"hypertension\"\n\n2. Diabetes (indicated as reason for
+        Metformin)\n   - condition: Diabetes\n   - icd10_code: E11 (Type 2 diabetes
+        mellitus) - Metformin is typically for Type 2, but could be other types. Better
+        to be conservative and use E11 or leave null, or just put \"Diabetes\"\n   -
+        confidence: 0.8 (since type not specified)\n   - raw_text: \"diabetes\"\n\n**Temporal_expressions**:
+        None specific in the text (no dates or times mentioned except the reference
+        date which is metadata)\n\n**Vital_signs**: None mentioned\n\n**Procedures**:
+        None mentioned\n\n**Protocol_triggers**: None mentioned\n\n**Follow_up**:
+        None mentioned\n\n**Additional_context**: None\n\nWait, I should check if
+        \"daily\" and \"twice daily\" count as temporal expressions. They are frequencies
+        rather than temporal expressions pointing to specific times, but they could
+        be interpreted as such. However, they are better captured in the medication
+        frequency field.\n\nLet me reconsider the visit_type. \"Patient started on\"
+        suggests this is a visit where a new medication was prescribed. This could
+        be \"follow-up\" or \"routine-check\". Given the limited information, null
+        is safest, or I could say \"routine-check\" with low confidence. I''ll go
+        with null to avoid hallucination.\n\nConfidence scores:\n- Medications: High
+        confidence (0.9-0.95) because clearly stated\n- Diagnoses: High confidence
+        (0.8-0.9) because indicated as indications for meds\n- Overall: Maybe 0.85\n\nICD-10
+        codes:\n- Hypertension: I10\n- Diabetes: E11.9 (unspecified type) or just
+        E11. Since Metformin is used for Type 2, E11 is reasonable, but could be other
+        types. I''ll use E11.9 to be safe, or just provide E11.\n\nActually, looking
+        at the guidelines: \"Do not hallucinate information not in the transcript\".
+        So for ICD-10, I should either provide the code if I''m confident (Hypertension
+        = I10 is pretty safe) or leave null. For diabetes, since type isn''t specified,
+        I could leave null or provide E11 (since Metformin implies Type 2 usually,
+        but not always).\n\nLet me structure the JSON properly.\n\nOne thing: The
+        transcript mentions \"Patient started on\" - this implies the patient is the
+        subject. But no name or age is given.\n\nRaw text extraction must be exact.
+        So for Lisinopril, the raw text should probably be \"Lisinopril 10mg daily\"
+        or the full phrase \"Patient started on Lisinopril 10mg daily for hypertension\"
+        - but the example suggests specific parts. Looking at the schema, raw_text
+        is \"exact text from transcript\", so I should capture the relevant portion.\n\nActually,
+        for medications:\n- raw_text: \"Lisinopril 10mg daily\" (this is the specific
+        part describing the med)\nBut could also include the context: \"Patient started
+        on Lisinopril 10mg daily\"\n\nSimilarly for Metformin: \"Metformin 500mg twice
+        daily\" or \"Also taking Metformin 500mg twice daily\"\n\nI''ll use the specific
+        medication phrases.\n\nFor diagnoses:\n- raw_text: \"hypertension\" and \"diabetes\"\n\nCheck:
+        Are there any temporal expressions? The reference date is 2026-02-22, but
+        that''s metadata, not in the transcript. The transcript doesn''t contain temporal
+        expressions like \"today\", \"yesterday\", etc.\n\nSo temporal_expressions
+        should be an empty array [].\n\nVital signs: empty array []\nProcedures: empty
+        array []\nProtocol_triggers: empty array [] or omitted? The schema shows it
+        as an array, so empty array.\n\nFollow_up: null\nAdditional_context: null
+        or empty string? The schema shows string, so null or \"\". I''ll use null.\n\nOne
+        final check: The status for Metformin. \"Also taking\" suggests this is a
+        current medication the patient is on, while Lisinopril is new. So:\n- Lisinopril:
+        status \"started\"\n- Metformin: status \"continued\"\n\nThis seems most accurate.\n\nConfidence
+        for Metformin status might be slightly lower (0.8) since \"also taking\" is
+        slightly ambiguous (could mean \"also started taking\" but that''s less likely).\n\nRoute:
+        Not specified, so null (not \"oral\" since that would be inference, though
+        reasonable, guidelines say don''t hallucinate).\n\nDosage: \"10mg\" and \"500mg\"
+        - clear.\nFrequency: \"daily\" and \"twice daily\" - clear.\n\nJSON structure
+        check:\n- All keys present\n- Proper nesting\n- Confidence values as numbers
+        (floats)\n- Arrays for empty lists\n\nLet me write the JSON. "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":603,"total_tokens":2603,"completion_tokens":2000,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:30:39 GMT
+      Set-Cookie:
+      - S=s%3Aufh8YcL1GpzPWFhgExem6U%2FSNKq2g0awak8STazioO0%3D.GZxiDOw8qPnVlCG%2FjJCDrquvJKFRW2bKi2jXV7AU8GM;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":44,"renewsAt":"2026-02-22T10:41:43.558Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:30:39.558Z"}},"freeToolCalls":{"limit":2500,"requests":707,"renewsAt":"2026-02-22T23:05:44.565Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

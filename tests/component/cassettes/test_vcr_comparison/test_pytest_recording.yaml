@@ -1,0 +1,42 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Host:
+      - httpbin.org
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://httpbin.org/get
+  response:
+    body:
+      string: "{\n  \"args\": {}, \n  \"headers\": {\n    \"Accept\": \"*/*\", \n
+        \   \"Accept-Encoding\": \"gzip, deflate\", \n    \"Host\": \"httpbin.org\",
+        \n    \"User-Agent\": \"python-httpx/0.28.1\", \n    \"X-Amzn-Trace-Id\":
+        \"Root=1-699aacd5-520bca96710b4fa33c11bffe\"\n  }, \n  \"origin\": \"122.150.154.36\",
+        \n  \"url\": \"https://httpbin.org/get\"\n}\n"
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '305'
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:14:29 GMT
+      Server:
+      - gunicorn/19.9.0
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,317 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a clinical data extraction
+      assistant.\nParse unstructured clinical dictation and extract structured information.\n\nExtract
+      the following from the clinical transcript below. Return ONLY a JSON object.\n\nTranscript:\n\n        Mr.
+      David Martinez presents today with chest pain that started last night.\n        Pain
+      is 7 out of 10, radiating to left arm. Started on aspirin 325mg.\n        Blood
+      pressure 140/90. Follow up in three days.\n        \n\nReference Date: 2026-02-22\n\nReturn
+      this JSON structure:\n{\n  \"patient_name\": \"extracted name or null\",\n  \"patient_age\":
+      \"age or null\",\n  \"visit_type\": \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\",\n  \"confidence\":
+      0.0-1.0,\n  \"extraction_notes\": \"any ambiguities\",\n  \"medications\": [\n    {\n      \"name\":
+      \"medication name\",\n      \"dosage\": \"dosage or null\",\n      \"frequency\":
+      \"frequency or null\",\n      \"route\": \"route or null\",\n      \"status\":
+      \"started|stopped|continued|increased|decreased|unknown\",\n      \"confidence\":
+      0.0-1.0,\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"diagnoses\":
+      [\n    {\n      \"condition\": \"condition name\",\n      \"icd10_code\": \"ICD-10
+      code or null\",\n      \"confidence\": 0.0-1.0,\n      \"raw_text\": \"exact
+      text from transcript\"\n    }\n  ],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+      \"exact text from transcript\",\n      \"interpretation\": \"what this likely
+      means\",\n      \"confidence\": 0.0-1.0\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\":
+      \"blood-pressure|temperature|heart-rate|weight|height|respiratory-rate\",\n      \"value\":
+      \"value with units\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"procedures\":
+      [\n    {\n      \"name\": \"procedure name\",\n      \"date_description\": \"when
+      it occurred or null\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"protocol_triggers\":
+      [\"sepsis|stroke|MI|trauma\"],\n  \"follow_up\": \"follow-up instructions or
+      null\",\n  \"additional_context\": \"other relevant information\"\n}\n\nGuidelines:\n-
+      Do not hallucinate information not in the transcript\n- Mark unclear information
+      with lower confidence\n- Include exact raw text for verification\n- For Australian
+      context: recognise PBS medications, MBS terminology\n- Confidence: 0.9+ for
+      clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2619'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-349f10550f43e1f719008f52d41dcd09","object":"chat.completion","created":1771745471,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": \"David Martinez\",\n  \"patient_age\": null,\n  \"visit_type\":
+        \"acute-complaint\",\n  \"confidence\": 0.9,\n  \"extraction_notes\": \"Patient
+        age not provided in transcript. Visit type determined from acute chest pain
+        presentation. No definitive diagnosis stated, only presenting symptoms. Temporal
+        expressions calculated relative to reference date 2026-02-22.\",\n  \"medications\":
+        [\n    {\n      \"name\": \"aspirin\",\n      \"dosage\": \"325mg\",\n      \"frequency\":
+        null,\n      \"route\": null,\n      \"status\": \"started\",\n      \"confidence\":
+        0.95,\n      \"raw_text\": \"Started on aspirin 325mg\"\n    }\n  ],\n  \"diagnoses\":
+        [\n    {\n      \"condition\": \"chest pain\",\n      \"icd10_code\": \"R07.9\",\n      \"confidence\":
+        0.7,\n      \"raw_text\": \"chest pain\"\n    }\n  ],\n  \"temporal_expressions\":
+        [\n    {\n      \"text\": \"today\",\n      \"interpretation\": \"2026-02-22
+        (date of presentation)\",\n      \"confidence\": 0.95\n    },\n    {\n      \"text\":
+        \"last night\",\n      \"interpretation\": \"2026-02-21 (evening/night prior
+        to presentation)\",\n      \"confidence\": 0.9\n    },\n    {\n      \"text\":
+        \"in three days\",\n      \"interpretation\": \"2026-02-25 (follow-up date)\",\n      \"confidence\":
+        0.9\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\": \"blood-pressure\",\n      \"value\":
+        \"140/90 mmHg\",\n      \"raw_text\": \"Blood pressure 140/90\"\n    }\n  ],\n  \"procedures\":
+        [],\n  \"protocol_triggers\": [],\n  \"follow_up\": \"Follow up in three days\",\n  \"additional_context\":
+        \"Chest pain severity rated 7 out of 10 with radiation to left arm. Clinical
+        presentation suggests possible cardiac etiology. Blood pressure elevated at
+        140/90.\"\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract structured clinical data from an unstructured
+        transcript. Let me analyze the transcript:\n\nTranscript:\n\"Mr. David Martinez
+        presents today with chest pain that started last night.\nPain is 7 out of
+        10, radiating to left arm. Started on aspirin 325mg.\nBlood pressure 140/90.
+        Follow up in three days.\"\n\nReference Date: 2026-02-22\n\nLet me extract
+        each field:\n\n1. patient_name: \"David Martinez\" (Mr. David Martinez)\n2.
+        patient_age: Not mentioned - null\n3. visit_type: \"acute-complaint\" (chest
+        pain, presenting today with acute symptoms)\n4. confidence: High for name,
+        visit type. Overall maybe 0.9\n5. extraction_notes: Age not provided; chest
+        pain suggests acute complaint but could be urgent-same-day; no explicit diagnosis
+        stated\n\nMedications:\n- aspirin 325mg\n  - name: \"aspirin\"\n  - dosage:
+        \"325mg\"\n  - frequency: null (not specified)\n  - route: null (not specified,
+        likely oral but not stated)\n  - status: \"started\" (explicitly stated \"Started
+        on\")\n  - confidence: 0.95\n  - raw_text: \"Started on aspirin 325mg\"\n\nDiagnoses:\n-
+        No explicit diagnosis stated, only symptoms. Chest pain is a symptom, not
+        a diagnosis. Could code as \"Chest pain\" but ICD-10 would be R07.9 (Chest
+        pain, unspecified) or similar. However, guidelines say don''t hallucinate.
+        The transcript doesn''t state a diagnosis like \"angina\" or \"myocardial
+        infarction\", only symptoms.\n- condition: \"chest pain\" (symptom)\n- icd10_code:
+        \"R07.9\" (Chest pain, unspecified) - but is this hallucinating? The text
+        mentions \"chest pain\" as presenting complaint. I''ll include it as a symptom/diagnosis
+        with lower confidence since it''s the presenting complaint.\n- Actually, looking
+        at the structure, it asks for \"diagnoses\" but in clinical extraction, presenting
+        complaints are often recorded here. I''ll include \"chest pain\" with appropriate
+        confidence.\n- raw_text: \"chest pain\"\n\nTemporal expressions:\n1. \"today\"
+        - Reference date is 2026-02-22, so today = 2026-02-22\n2. \"last night\" -
+        2026-02-21 (the night before 2026-02-22)\n3. \"in three days\" - 2026-02-25
+        (3 days after reference date)\n\nVital signs:\n- Blood pressure 140/90\n  -
+        type: \"blood-pressure\"\n  - value: \"140/90 mmHg\" (or just \"140/90\")\n  -
+        raw_text: \"Blood pressure 140/90\"\n\nProcedures: None mentioned - empty
+        array\n\nProtocol triggers: \n- Chest pain radiating to left arm could indicate
+        MI (myocardial infarction), but no explicit trigger mentioned. The text mentions
+        chest pain and aspirin (which is given for MI), but I should only include
+        if explicitly triggered or strongly implied? The guidelines say \"sepsis|stroke|MI|trauma\".
+        Given chest pain + aspirin + radiation to arm, this is likely an MI workup,
+        but I should check if it''s a \"trigger\" meaning explicit activation of protocol.
+        The text doesn''t say \"MI protocol activated\" or similar. I''ll leave empty
+        or include \"MI\" with note? Actually, looking at the structure, it seems
+        to be a list of triggered protocols. Since chest pain with radiation to arm
+        in a clinical context often triggers MI protocol, but the text doesn''t explicitly
+        state a protocol was triggered. I''ll leave as empty array to be safe, or
+        include MI with low confidence? I''ll leave empty since it wasn''t explicitly
+        stated.\n\nFollow up: \"Follow up in three days\" or \"in three days\"\n\nAdditional
+        context: Pain severity 7/10, radiating to left arm (possible cardiac involvement)\n\nLet
+        me verify JSON structure compliance:\n\npatient_name: \"David Martinez\"\npatient_age:
+        null\nvisit_type: \"acute-complaint\"\nconfidence: 0.9\nextraction_notes:
+        \"Patient age not stated; chest pain presentation suggests acute cardiac workup
+        but no definitive diagnosis stated; temporal expressions calculated relative
+        to reference date 2026-02-22\"\nmedications: [...]\ndiagnoses: [...]\ntemporal_expressions:
+        [...]\nvital_signs: [...]\nprocedures: []\nprotocol_triggers: []\nfollow_up:
+        \"Follow up in three days\"\nadditional_context: \"Chest pain rated 7/10 severity
+        with radiation to left arm. Patient started on aspirin therapy.\"\n\nWait,
+        for diagnoses - is chest pain a diagnosis? In clinical terms, it''s a symptom.
+        But for extraction purposes, it''s the condition being evaluated. I''ll include
+        it.\n\nICD-10 for chest pain: R07.9 is \"Chest pain, unspecified\". But I
+        should verify if providing ICD-10 codes is expected or if null is safer when
+        not explicitly stated. The guidelines say \"ICD-10 code or null\". Since it''s
+        a symptom extraction and not a definitive diagnosis like \"Acute MI\", I''ll
+        set icd10_code to null to avoid hallucination, or include R07.9 with lower
+        confidence? I''ll include it as R07.9 with confidence 0.7 since it''s the
+        standard code for unspecified chest pain and the text describes chest pain.\n\nActually,
+        looking at the medication \"aspirin 325mg\" - in Australia (PBS context mentioned
+        in guidelines), aspirin is commonly used. The dosage 325mg is mentioned.\n\nTemporal
+        expressions interpretation:\n- \"today\" = 2026-02-22 (reference date)\n-
+        \"last night\" = 2026-02-21 evening/night\n- \"in three days\" = 2026-02-25\n\nLet
+        me double-check the visit_type options: \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\"\n\"
+        presents today with chest pain\" - this is an acute presentation. Could be
+        \"urgent-same-day\" but \"acute-complaint\" seems most appropriate.\n\nConfidence
+        scoring:\n- Name: 0.95 (clearly stated)\n- Visit type: 0.9 (clear acute presentation)\n-
+        Medication: 0.95 (clear)\n- Diagnosis: 0.7 (symptom vs diagnosis ambiguity)\n-
+        Temporal: 0.9 for \"today\" and \"last night\", 0.9 for \"in three days\"\n\nFor
+        the temporal expression \"today\", interpretation should mention the reference
+        date.\n\nRaw text must be exact:\n- \"Mr. David Martinez\" or just \"David
+        Martinez\"? The raw_text should be exact. I''ll use \"David Martinez\" from
+        \"Mr. David Martinez\"\n- For medication: \"Started on aspirin 325mg\"\n-
+        For diagnosis: \"chest pain\"\n- For vitals: \"Blood pressure 140/90\"\n-
+        For temporal: \"today\", \"last night\", \"in three days\"\n\nProtocol triggers:
+        Given chest pain radiating to left arm, and aspirin initiation, this is classic
+        MI presentation. However, the field description suggests these are protocols
+        that were triggered. Since the text doesn''t explicitly state \"MI protocol
+        activated\" or similar, I should probably leave it empty. But clinically,
+        this would trigger MI workup. I''ll include \"MI\" with a note that it''s
+        inferred from presentation, or leave empty to be safe per \"do not hallucinate\".
+        I''ll leave empty.\n\nWait, the user might expect MI to be listed given the
+        clinical picture. But strict adherence to \"do not hallucinate\" means only
+        extract what''s there. The text doesn''t say \"rule out MI\" or \"MI protocol\".
+        I''ll leave empty.\n\nStructure check - JSON must be valid. All strings must
+        be escaped properly.\n\nFinal check on Australian context: Aspirin 325mg is
+        a standard dose (though in Australia, 100mg is common for cardiac, 300-325mg
+        for acute loading). The transcript doesn''t specify PBS or MBS items, so no
+        specific Australian codes needed beyond what''s extracted.\n\nOne final thing:
+        \"Mr. David Martinez\" - the patient_name should probably be \"David Martinez\"
+        not including the title, or should it include \"Mr.\"? Usually patient_name
+        is just the name. I''ll use \"David Martinez\".\n\nAge: Not mentioned, so
+        null.\n\nLet me assemble the JSON. ","reasoning_content":" The user wants
+        me to extract structured clinical data from an unstructured transcript. Let
+        me analyze the transcript:\n\nTranscript:\n\"Mr. David Martinez presents today
+        with chest pain that started last night.\nPain is 7 out of 10, radiating to
+        left arm. Started on aspirin 325mg.\nBlood pressure 140/90. Follow up in three
+        days.\"\n\nReference Date: 2026-02-22\n\nLet me extract each field:\n\n1.
+        patient_name: \"David Martinez\" (Mr. David Martinez)\n2. patient_age: Not
+        mentioned - null\n3. visit_type: \"acute-complaint\" (chest pain, presenting
+        today with acute symptoms)\n4. confidence: High for name, visit type. Overall
+        maybe 0.9\n5. extraction_notes: Age not provided; chest pain suggests acute
+        complaint but could be urgent-same-day; no explicit diagnosis stated\n\nMedications:\n-
+        aspirin 325mg\n  - name: \"aspirin\"\n  - dosage: \"325mg\"\n  - frequency:
+        null (not specified)\n  - route: null (not specified, likely oral but not
+        stated)\n  - status: \"started\" (explicitly stated \"Started on\")\n  - confidence:
+        0.95\n  - raw_text: \"Started on aspirin 325mg\"\n\nDiagnoses:\n- No explicit
+        diagnosis stated, only symptoms. Chest pain is a symptom, not a diagnosis.
+        Could code as \"Chest pain\" but ICD-10 would be R07.9 (Chest pain, unspecified)
+        or similar. However, guidelines say don''t hallucinate. The transcript doesn''t
+        state a diagnosis like \"angina\" or \"myocardial infarction\", only symptoms.\n-
+        condition: \"chest pain\" (symptom)\n- icd10_code: \"R07.9\" (Chest pain,
+        unspecified) - but is this hallucinating? The text mentions \"chest pain\"
+        as presenting complaint. I''ll include it as a symptom/diagnosis with lower
+        confidence since it''s the presenting complaint.\n- Actually, looking at the
+        structure, it asks for \"diagnoses\" but in clinical extraction, presenting
+        complaints are often recorded here. I''ll include \"chest pain\" with appropriate
+        confidence.\n- raw_text: \"chest pain\"\n\nTemporal expressions:\n1. \"today\"
+        - Reference date is 2026-02-22, so today = 2026-02-22\n2. \"last night\" -
+        2026-02-21 (the night before 2026-02-22)\n3. \"in three days\" - 2026-02-25
+        (3 days after reference date)\n\nVital signs:\n- Blood pressure 140/90\n  -
+        type: \"blood-pressure\"\n  - value: \"140/90 mmHg\" (or just \"140/90\")\n  -
+        raw_text: \"Blood pressure 140/90\"\n\nProcedures: None mentioned - empty
+        array\n\nProtocol triggers: \n- Chest pain radiating to left arm could indicate
+        MI (myocardial infarction), but no explicit trigger mentioned. The text mentions
+        chest pain and aspirin (which is given for MI), but I should only include
+        if explicitly triggered or strongly implied? The guidelines say \"sepsis|stroke|MI|trauma\".
+        Given chest pain + aspirin + radiation to arm, this is likely an MI workup,
+        but I should check if it''s a \"trigger\" meaning explicit activation of protocol.
+        The text doesn''t say \"MI protocol activated\" or similar. I''ll leave empty
+        or include \"MI\" with note? Actually, looking at the structure, it seems
+        to be a list of triggered protocols. Since chest pain with radiation to arm
+        in a clinical context often triggers MI protocol, but the text doesn''t explicitly
+        state a protocol was triggered. I''ll leave as empty array to be safe, or
+        include MI with low confidence? I''ll leave empty since it wasn''t explicitly
+        stated.\n\nFollow up: \"Follow up in three days\" or \"in three days\"\n\nAdditional
+        context: Pain severity 7/10, radiating to left arm (possible cardiac involvement)\n\nLet
+        me verify JSON structure compliance:\n\npatient_name: \"David Martinez\"\npatient_age:
+        null\nvisit_type: \"acute-complaint\"\nconfidence: 0.9\nextraction_notes:
+        \"Patient age not stated; chest pain presentation suggests acute cardiac workup
+        but no definitive diagnosis stated; temporal expressions calculated relative
+        to reference date 2026-02-22\"\nmedications: [...]\ndiagnoses: [...]\ntemporal_expressions:
+        [...]\nvital_signs: [...]\nprocedures: []\nprotocol_triggers: []\nfollow_up:
+        \"Follow up in three days\"\nadditional_context: \"Chest pain rated 7/10 severity
+        with radiation to left arm. Patient started on aspirin therapy.\"\n\nWait,
+        for diagnoses - is chest pain a diagnosis? In clinical terms, it''s a symptom.
+        But for extraction purposes, it''s the condition being evaluated. I''ll include
+        it.\n\nICD-10 for chest pain: R07.9 is \"Chest pain, unspecified\". But I
+        should verify if providing ICD-10 codes is expected or if null is safer when
+        not explicitly stated. The guidelines say \"ICD-10 code or null\". Since it''s
+        a symptom extraction and not a definitive diagnosis like \"Acute MI\", I''ll
+        set icd10_code to null to avoid hallucination, or include R07.9 with lower
+        confidence? I''ll include it as R07.9 with confidence 0.7 since it''s the
+        standard code for unspecified chest pain and the text describes chest pain.\n\nActually,
+        looking at the medication \"aspirin 325mg\" - in Australia (PBS context mentioned
+        in guidelines), aspirin is commonly used. The dosage 325mg is mentioned.\n\nTemporal
+        expressions interpretation:\n- \"today\" = 2026-02-22 (reference date)\n-
+        \"last night\" = 2026-02-21 evening/night\n- \"in three days\" = 2026-02-25\n\nLet
+        me double-check the visit_type options: \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\"\n\"
+        presents today with chest pain\" - this is an acute presentation. Could be
+        \"urgent-same-day\" but \"acute-complaint\" seems most appropriate.\n\nConfidence
+        scoring:\n- Name: 0.95 (clearly stated)\n- Visit type: 0.9 (clear acute presentation)\n-
+        Medication: 0.95 (clear)\n- Diagnosis: 0.7 (symptom vs diagnosis ambiguity)\n-
+        Temporal: 0.9 for \"today\" and \"last night\", 0.9 for \"in three days\"\n\nFor
+        the temporal expression \"today\", interpretation should mention the reference
+        date.\n\nRaw text must be exact:\n- \"Mr. David Martinez\" or just \"David
+        Martinez\"? The raw_text should be exact. I''ll use \"David Martinez\" from
+        \"Mr. David Martinez\"\n- For medication: \"Started on aspirin 325mg\"\n-
+        For diagnosis: \"chest pain\"\n- For vitals: \"Blood pressure 140/90\"\n-
+        For temporal: \"today\", \"last night\", \"in three days\"\n\nProtocol triggers:
+        Given chest pain radiating to left arm, and aspirin initiation, this is classic
+        MI presentation. However, the field description suggests these are protocols
+        that were triggered. Since the text doesn''t explicitly state \"MI protocol
+        activated\" or similar, I should probably leave it empty. But clinically,
+        this would trigger MI workup. I''ll include \"MI\" with a note that it''s
+        inferred from presentation, or leave empty to be safe per \"do not hallucinate\".
+        I''ll leave empty.\n\nWait, the user might expect MI to be listed given the
+        clinical picture. But strict adherence to \"do not hallucinate\" means only
+        extract what''s there. The text doesn''t say \"rule out MI\" or \"MI protocol\".
+        I''ll leave empty.\n\nStructure check - JSON must be valid. All strings must
+        be escaped properly.\n\nFinal check on Australian context: Aspirin 325mg is
+        a standard dose (though in Australia, 100mg is common for cardiac, 300-325mg
+        for acute loading). The transcript doesn''t specify PBS or MBS items, so no
+        specific Australian codes needed beyond what''s extracted.\n\nOne final thing:
+        \"Mr. David Martinez\" - the patient_name should probably be \"David Martinez\"
+        not including the title, or should it include \"Mr.\"? Usually patient_name
+        is just the name. I''ll use \"David Martinez\".\n\nAge: Not mentioned, so
+        null.\n\nLet me assemble the JSON. "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":626,"total_tokens":2832,"completion_tokens":2206,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:32:14 GMT
+      Set-Cookie:
+      - S=s%3A3eOfwqemBwrlxMaAYSr94ChHGPylJsTwkq2t9LGPT78%3D.SbIq8e1SQFB8HUElRxAAPpGAqO2C2qGYx7f3%2FZb%2B7bY;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":44,"renewsAt":"2026-02-22T10:41:43.272Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:32:14.273Z"}},"freeToolCalls":{"limit":2500,"requests":709,"renewsAt":"2026-02-22T23:05:44.281Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

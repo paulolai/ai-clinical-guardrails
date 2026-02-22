@@ -1,0 +1,422 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a clinical data extraction
+      assistant.\nParse unstructured clinical dictation and extract structured information.\n\nExtract
+      the following from the clinical transcript below. Return ONLY a JSON object.\n\nTranscript:\nMrs.
+      Sarah Johnson came in yesterday for her follow-up visit. She''s been taking
+      Lisinopril 10 milligrams daily and her blood pressure has improved significantly.
+      Started two weeks ago. Next appointment scheduled for in two weeks to check
+      her progress.\n\nReference Date: 2026-02-22\n\nReturn this JSON structure:\n{\n  \"patient_name\":
+      \"extracted name or null\",\n  \"patient_age\": \"age or null\",\n  \"visit_type\":
+      \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\",\n  \"confidence\":
+      0.0-1.0,\n  \"extraction_notes\": \"any ambiguities\",\n  \"medications\": [\n    {\n      \"name\":
+      \"medication name\",\n      \"dosage\": \"dosage or null\",\n      \"frequency\":
+      \"frequency or null\",\n      \"route\": \"route or null\",\n      \"status\":
+      \"started|stopped|continued|increased|decreased|unknown\",\n      \"confidence\":
+      0.0-1.0,\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"diagnoses\":
+      [\n    {\n      \"condition\": \"condition name\",\n      \"icd10_code\": \"ICD-10
+      code or null\",\n      \"confidence\": 0.0-1.0,\n      \"raw_text\": \"exact
+      text from transcript\"\n    }\n  ],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+      \"exact text from transcript\",\n      \"interpretation\": \"what this likely
+      means\",\n      \"confidence\": 0.0-1.0\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\":
+      \"blood-pressure|temperature|heart-rate|weight|height|respiratory-rate\",\n      \"value\":
+      \"value with units\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"procedures\":
+      [\n    {\n      \"name\": \"procedure name\",\n      \"date_description\": \"when
+      it occurred or null\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"protocol_triggers\":
+      [\"sepsis|stroke|MI|trauma\"],\n  \"follow_up\": \"follow-up instructions or
+      null\",\n  \"additional_context\": \"other relevant information\"\n}\n\nGuidelines:\n-
+      Do not hallucinate information not in the transcript\n- Mark unclear information
+      with lower confidence\n- Include exact raw text for verification\n- For Australian
+      context: recognise PBS medications, MBS terminology\n- Confidence: 0.9+ for
+      clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2640'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-bd304acd94d8597e7d4636d8f61691d6","object":"chat.completion","created":1771745535,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": \"Sarah Johnson\",\n  \"patient_age\": null,\n  \"visit_type\":
+        \"follow-up\",\n  \"confidence\": 0.95,\n  \"extraction_notes\": \"Temporal
+        expressions interpreted relative to reference date 2026-02-22. ''Started two
+        weeks ago'' likely refers to medication initiation but could refer to timing
+        of blood pressure improvement. No explicit diagnosis stated in transcript.\",\n  \"medications\":
+        [\n    {\n      \"name\": \"Lisinopril\",\n      \"dosage\": \"10 milligrams\",\n      \"frequency\":
+        \"daily\",\n      \"route\": null,\n      \"status\": \"started\",\n      \"confidence\":
+        0.85,\n      \"raw_text\": \"Lisinopril 10 milligrams daily\"\n    }\n  ],\n  \"diagnoses\":
+        [],\n  \"temporal_expressions\": [\n    {\n      \"text\": \"yesterday\",\n      \"interpretation\":
+        \"Visit date: 2026-02-21 (one day prior to reference date)\",\n      \"confidence\":
+        0.95\n    },\n    {\n      \"text\": \"two weeks ago\",\n      \"interpretation\":
+        \"Medication start date: approximately 2026-02-07 (14 days prior to visit)\",\n      \"confidence\":
+        0.8\n    },\n    {\n      \"text\": \"in two weeks\",\n      \"interpretation\":
+        \"Follow-up appointment: approximately 2026-03-07 (14 days after visit date)\",\n      \"confidence\":
+        0.8\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\": \"blood-pressure\",\n      \"value\":
+        null,\n      \"raw_text\": \"blood pressure has improved significantly\"\n    }\n  ],\n  \"procedures\":
+        [],\n  \"protocol_triggers\": [],\n  \"follow_up\": \"Next appointment scheduled
+        for in two weeks to check her progress\",\n  \"additional_context\": \"Patient
+        referred to as ''Mrs.'' indicating female. Lisinopril is a PBS-listed ACE
+        inhibitor commonly prescribed for hypertension in Australia. Blood pressure
+        improvement noted following two weeks of therapy.\"\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract structured clinical data from an unstructured
+        transcript. Let me analyze the transcript carefully:\n\nTranscript:\n\"Mrs.
+        Sarah Johnson came in yesterday for her follow-up visit. She''s been taking
+        Lisinopril 10 milligrams daily and her blood pressure has improved significantly.
+        Started two weeks ago. Next appointment scheduled for in two weeks to check
+        her progress.\"\n\nReference Date: 2026-02-22\n\nLet me extract each field:\n\n1.
+        patient_name: \"Sarah Johnson\" (Mrs. Sarah Johnson)\n2. patient_age: Not
+        mentioned - null\n3. visit_type: \"follow-up\" (explicitly stated \"follow-up
+        visit\")\n4. confidence: High, maybe 0.95 since most info is clear\n5. extraction_notes:
+        Some ambiguities around exact dates (relative dates used)\n6. medications:\n   -
+        Name: Lisinopril\n   - Dosage: 10 milligrams (or 10 mg)\n   - Frequency: daily\n   -
+        Route: null (not specified, usually oral for Lisinopril but not stated)\n   -
+        Status: started (from \"Started two weeks ago\" - this likely refers to the
+        medication)\n   - Confidence: 0.9\n   - Raw text: \"Lisinopril 10 milligrams
+        daily\" and \"Started two weeks ago\"\n   \n   Wait, I need to be careful.
+        \"Started two weeks ago\" could refer to the medication or the blood pressure
+        improvement. Given the context \"She''s been taking Lisinopril... Started
+        two weeks ago\", it most likely refers to the medication.\n\n7. diagnoses:\n   -
+        Condition: Hypertension (implied by blood pressure treatment and improvement,
+        though not explicitly stated as a diagnosis)\n   - Or should I only extract
+        explicitly stated conditions? The transcript mentions \"blood pressure has
+        improved\" which implies hypertension, but doesn''t explicitly state it as
+        a diagnosis.\n   - Actually, looking at the guidelines: \"Do not hallucinate
+        information not in the transcript\"\n   - The transcript mentions \"blood
+        pressure\" but doesn''t explicitly diagnose hypertension. However, treating
+        with Lisinopril and mentioning BP improvement strongly implies it.\n   - I''ll
+        include it with lower confidence since it''s implied but not explicitly stated
+        as \"diagnosis\" or \"condition\"\n   - Raw text: \"blood pressure has improved
+        significantly\"\n\n8. temporal_expressions:\n   - \"yesterday\" - relative
+        to reference date 2026-02-22, so 2026-02-21\n   - \"two weeks ago\" - 2026-02-08
+        (relative to reference)\n   - \"in two weeks\" - 2026-03-08 (relative to reference
+        date for next appointment)\n   \n   Wait, need to be careful about the reference
+        frame. The transcript says she \"came in yesterday\" - so the visit was yesterday
+        relative to when this was dictated. The reference date is 2026-02-22, so yesterday
+        would be 2026-02-21.\n   \n   \"Started two weeks ago\" - from the context
+        of the visit (yesterday), so 2 weeks before 2026-02-21 = 2026-02-07.\n   \n   \"Next
+        appointment scheduled for in two weeks\" - from the context, this is from
+        yesterday''s visit, so 2 weeks from 2026-02-21 = 2026-03-07.\n   \n   But
+        I should interpret these relative to the reference date provided.\n\n9. vital_signs:\n   -
+        Type: blood-pressure\n   - Value: Not explicitly given as a number, just \"improved
+        significantly\"\n   - Raw text: \"blood pressure has improved significantly\"\n   -
+        Actually, since no value is given, should I include it? The structure asks
+        for \"value with units\". Since no value is present, maybe null or don''t
+        include? But the type is mentioned. I''ll include it with value as null or
+        \"improved significantly\" as the raw text. Actually, looking at the schema,
+        value is required? No, looking again: \"value\": \"value with units\". Since
+        there''s no value, I should probably set it to null or omit it. But the field
+        seems to expect a value. I''ll set value to null since it''s not provided.\n\n10.
+        procedures: None mentioned\n11. protocol_triggers: None (no mention of sepsis,
+        stroke, MI, trauma)\n12. follow_up: \"Next appointment scheduled for in two
+        weeks to check her progress\" or just the date/timeframe\n13. additional_context:
+        She''s been on the medication for 2 weeks, BP improved, Mrs. Sarah Johnson
+        is the patient\n\nLet me reconsider the medications status. \"Started two
+        weeks ago\" - this is slightly ambiguous. It could mean:\n- The medication
+        was started two weeks ago\n- The blood pressure improvement started two weeks
+        ago\nGiven the sentence structure \"She''s been taking Lisinopril... Started
+        two weeks ago\", it most likely modifies the medication, but it could be dangling.
+        I''ll mark it as \"started\" with good confidence but note the ambiguity in
+        extraction_notes if needed.\n\nActually, looking at the extraction_notes field,
+        I should mention the ambiguity about what \"Started two weeks ago\" refers
+        to.\n\nFor diagnoses: The transcript doesn''t explicitly state a diagnosis
+        like \"hypertension\" or \"high blood pressure\". It only mentions \"blood
+        pressure\" in the context of improvement. I should probably leave diagnoses
+        empty or include \"Hypertension\" with low confidence since it''s strongly
+        implied by the medication (Lisinopril is an ACE inhibitor used for hypertension)
+        and context. But the guideline says \"Do not hallucinate\". However, clinical
+        extraction usually includes inferred diagnoses from context. But to be safe
+        and follow \"do not hallucinate\", I''ll only include explicitly stated conditions.
+        Since no condition is explicitly named (only \"blood pressure\" which is a
+        sign, not a diagnosis), I''ll leave it empty or null.\n\nWait, \"blood pressure\"
+        is a vital sign, not a diagnosis. So I should not put it in diagnoses.\n\nLet
+        me check the medication fields again. The status options are: \"started|stopped|continued|increased|decreased|unknown\".
+        \"Started\" fits.\n\nFor temporal_expressions:\n1. \"yesterday\" - interpretation:
+        2026-02-21 (the day before reference date 2026-02-22)\n2. \"two weeks ago\"
+        - interpretation: 2026-02-08 (14 days before reference date? Or relative to
+        yesterday?). Actually, if the visit was yesterday (Feb 21), and she started
+        the med 2 weeks before that, it would be Feb 7. But if \"two weeks ago\" is
+        relative to the reference date or dictation date, it''s Feb 8. I should interpret
+        relative to the visit date mentioned.\n3. \"in two weeks\" - interpretation:
+        2026-03-08 (14 days after reference date? Or relative to yesterday). If visit
+        was Feb 21, then in two weeks is March 7.\n\nActually, the reference date
+        is likely the date of the dictation/note. So:\n- \"yesterday\" = 2026-02-21\n-
+        \"two weeks ago\" = 2026-02-07 (from yesterday)\n- \"in two weeks\" = 2026-03-07
+        (from yesterday)\n\nBut I should present interpretations clearly.\n\nConfidence
+        scores:\n- Patient name: 0.95 (clear)\n- Visit type: 0.95 (clear)\n- Medication
+        name: 0.95\n- Medication dosage: 0.95\n- Medication frequency: 0.95\n- Medication
+        status: 0.8 (slight ambiguity about what \"started\" refers to)\n- Temporal
+        expressions: 0.9 for yesterday, 0.8 for the others (relative dates)\n\nOne
+        thing: Lisinopril is indeed a PBS medication in Australia, but I don''t need
+        to add special codes, just recognise it if needed. The guidelines mention
+        Australian context for PBS medications and MBS terminology, but I just need
+        to extract the name.\n\nStructure check:\n- patient_name: \"Sarah Johnson\"\n-
+        patient_age: null\n- visit_type: \"follow-up\"\n- confidence: 0.95\n- extraction_notes:
+        \"Ambiguity regarding whether ''Started two weeks ago'' refers to medication
+        initiation or symptom improvement; temporal expressions are relative to visit
+        date\"\n- medications: array with one object\n- diagnoses: [] (empty array
+        since none explicitly stated)\n- temporal_expressions: array with three objects\n-
+        vital_signs: array with one object (blood pressure mentioned but no value)\n-
+        procedures: [] (empty)\n- protocol_triggers: [] (empty)\n- follow_up: \"Next
+        appointment scheduled for in two weeks to check her progress\" or simplified\n-
+        additional_context: \"Patient is female (Mrs.), blood pressure improved since
+        starting medication\"\n\nWait, I should check if \"Mrs.\" implies gender for
+        additional_context, but not necessary.\n\nLet me format the JSON properly.\n\nOne
+        final check: The medication raw_text should be the exact text. So \"Lisinopril
+        10 milligrams daily\". The status \"started\" comes from \"Started two weeks
+        ago\" which is a separate sentence. Should I include both in raw_text? Or
+        just the medication mention? The schema says \"raw_text\": \"exact text from
+        transcript\" for each field. So for the medication object, the raw_text would
+        be \"Lisinopril 10 milligrams daily\". But the status \"started\" comes from
+        a different sentence. Hmm.\n\nActually, looking at the transcript: \"She''s
+        been taking Lisinopril 10 milligrams daily and her blood pressure has improved
+        significantly. Started two weeks ago.\"\n\nThe \"Started two weeks ago\" is
+        likely referring to the medication (or possibly the BP improvement). So for
+        the medication status, the raw_text could be \"Started two weeks ago\" or
+        I could combine them. But the field is within the medication object. I''ll
+        put \"Lisinopril 10 milligrams daily\" for the name/dosage/frequency part,
+        and note that status is inferred from \"Started two weeks ago\".\n\nActually,
+        I should probably include the context in extraction_notes rather than trying
+        to force it.\n\nLet me reconsider the diagnoses. Is \"blood pressure\" a diagnosis?
+        No, it''s a vital sign or observation. So diagnoses should be empty.\n\nVital
+        signs: The type is \"blood-pressure\", but the value is not provided as a
+        number. I could set value to \"improved significantly\" but that''s qualitative.
+        Or null. I''ll set value to null and put \"blood pressure has improved significantly\"
+        in raw_text.\n\nFinal JSON structure:\n\n{\n  \"patient_name\": \"Sarah Johnson\",\n  \"patient_age\":
+        null,\n  \"visit_type\": \"follow-up\",\n  \"confidence\": 0.95,\n  \"extraction_notes\":
+        \"Temporal expressions (''yesterday'', ''two weeks ago'', ''in two weeks'')
+        interpreted relative to reference date 2026-02-22. ''Started two weeks ago''
+        likely refers to medication initiation but could refer to blood pressure improvement
+        period.\",\n  \"medications\": [\n    {\n      \"name\": \"Lisinopril\",\n      \"dosage\":
+        \"10 milligrams\",\n      \"frequency\": \"daily\",\n      \"route\": null,\n      \"status\":
+        \"started\",\n      \"confidence\": 0.85,\n      \"raw_text\": \"Lisinopril
+        10 milligrams daily\"\n    }\n  ],\n  \"diagnoses\": [],\n  \"temporal_expressions\":
+        [\n    {\n      \"text\": \"yesterday\",\n      \"interpretation\": \"Visit
+        date: 2026-02-21 (one day prior to reference date)\",\n      \"confidence\":
+        0.95\n    },\n    {\n      \"text\": \"two weeks ago\",\n      \"interpretation\":
+        \"Approximately 2026-02-07 (14 days prior to visit date)\",\n      \"confidence\":
+        0.8\n    },\n    {\n      \"text\": \"in two weeks\",\n      \"interpretation\":
+        \"Next appointment: approximately 2026-03-07 (14 days after visit date)\",\n      \"confidence\":
+        0.8\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\": \"blood-pressure\",\n      \"value\":
+        null,\n      \"raw_text\": \"blood pressure has improved significantly\"\n    }\n  ],\n  \"procedures\":
+        [],\n  \"protocol_triggers\": [],\n  \"follow_up\": \"Next appointment scheduled
+        for in two weeks to check her progress\",\n  \"additional_context\": \"Patient
+        referred to as ''Mrs.'' indicating female gender. Blood pressure status described
+        as improved significantly since medication initiation.\"\n}\n\nI think this
+        looks good. All required fields are present. The confidence scores are appropriate.
+        No hallucination of diagnoses. Exact raw text captured. Australian context
+        considered (Lisinopril is indeed on PBS). ","reasoning_content":" The user
+        wants me to extract structured clinical data from an unstructured transcript.
+        Let me analyze the transcript carefully:\n\nTranscript:\n\"Mrs. Sarah Johnson
+        came in yesterday for her follow-up visit. She''s been taking Lisinopril 10
+        milligrams daily and her blood pressure has improved significantly. Started
+        two weeks ago. Next appointment scheduled for in two weeks to check her progress.\"\n\nReference
+        Date: 2026-02-22\n\nLet me extract each field:\n\n1. patient_name: \"Sarah
+        Johnson\" (Mrs. Sarah Johnson)\n2. patient_age: Not mentioned - null\n3. visit_type:
+        \"follow-up\" (explicitly stated \"follow-up visit\")\n4. confidence: High,
+        maybe 0.95 since most info is clear\n5. extraction_notes: Some ambiguities
+        around exact dates (relative dates used)\n6. medications:\n   - Name: Lisinopril\n   -
+        Dosage: 10 milligrams (or 10 mg)\n   - Frequency: daily\n   - Route: null
+        (not specified, usually oral for Lisinopril but not stated)\n   - Status:
+        started (from \"Started two weeks ago\" - this likely refers to the medication)\n   -
+        Confidence: 0.9\n   - Raw text: \"Lisinopril 10 milligrams daily\" and \"Started
+        two weeks ago\"\n   \n   Wait, I need to be careful. \"Started two weeks ago\"
+        could refer to the medication or the blood pressure improvement. Given the
+        context \"She''s been taking Lisinopril... Started two weeks ago\", it most
+        likely refers to the medication.\n\n7. diagnoses:\n   - Condition: Hypertension
+        (implied by blood pressure treatment and improvement, though not explicitly
+        stated as a diagnosis)\n   - Or should I only extract explicitly stated conditions?
+        The transcript mentions \"blood pressure has improved\" which implies hypertension,
+        but doesn''t explicitly state it as a diagnosis.\n   - Actually, looking at
+        the guidelines: \"Do not hallucinate information not in the transcript\"\n   -
+        The transcript mentions \"blood pressure\" but doesn''t explicitly diagnose
+        hypertension. However, treating with Lisinopril and mentioning BP improvement
+        strongly implies it.\n   - I''ll include it with lower confidence since it''s
+        implied but not explicitly stated as \"diagnosis\" or \"condition\"\n   -
+        Raw text: \"blood pressure has improved significantly\"\n\n8. temporal_expressions:\n   -
+        \"yesterday\" - relative to reference date 2026-02-22, so 2026-02-21\n   -
+        \"two weeks ago\" - 2026-02-08 (relative to reference)\n   - \"in two weeks\"
+        - 2026-03-08 (relative to reference date for next appointment)\n   \n   Wait,
+        need to be careful about the reference frame. The transcript says she \"came
+        in yesterday\" - so the visit was yesterday relative to when this was dictated.
+        The reference date is 2026-02-22, so yesterday would be 2026-02-21.\n   \n   \"Started
+        two weeks ago\" - from the context of the visit (yesterday), so 2 weeks before
+        2026-02-21 = 2026-02-07.\n   \n   \"Next appointment scheduled for in two
+        weeks\" - from the context, this is from yesterday''s visit, so 2 weeks from
+        2026-02-21 = 2026-03-07.\n   \n   But I should interpret these relative to
+        the reference date provided.\n\n9. vital_signs:\n   - Type: blood-pressure\n   -
+        Value: Not explicitly given as a number, just \"improved significantly\"\n   -
+        Raw text: \"blood pressure has improved significantly\"\n   - Actually, since
+        no value is given, should I include it? The structure asks for \"value with
+        units\". Since no value is present, maybe null or don''t include? But the
+        type is mentioned. I''ll include it with value as null or \"improved significantly\"
+        as the raw text. Actually, looking at the schema, value is required? No, looking
+        again: \"value\": \"value with units\". Since there''s no value, I should
+        probably set it to null or omit it. But the field seems to expect a value.
+        I''ll set value to null since it''s not provided.\n\n10. procedures: None
+        mentioned\n11. protocol_triggers: None (no mention of sepsis, stroke, MI,
+        trauma)\n12. follow_up: \"Next appointment scheduled for in two weeks to check
+        her progress\" or just the date/timeframe\n13. additional_context: She''s
+        been on the medication for 2 weeks, BP improved, Mrs. Sarah Johnson is the
+        patient\n\nLet me reconsider the medications status. \"Started two weeks ago\"
+        - this is slightly ambiguous. It could mean:\n- The medication was started
+        two weeks ago\n- The blood pressure improvement started two weeks ago\nGiven
+        the sentence structure \"She''s been taking Lisinopril... Started two weeks
+        ago\", it most likely modifies the medication, but it could be dangling. I''ll
+        mark it as \"started\" with good confidence but note the ambiguity in extraction_notes
+        if needed.\n\nActually, looking at the extraction_notes field, I should mention
+        the ambiguity about what \"Started two weeks ago\" refers to.\n\nFor diagnoses:
+        The transcript doesn''t explicitly state a diagnosis like \"hypertension\"
+        or \"high blood pressure\". It only mentions \"blood pressure\" in the context
+        of improvement. I should probably leave diagnoses empty or include \"Hypertension\"
+        with low confidence since it''s strongly implied by the medication (Lisinopril
+        is an ACE inhibitor used for hypertension) and context. But the guideline
+        says \"Do not hallucinate\". However, clinical extraction usually includes
+        inferred diagnoses from context. But to be safe and follow \"do not hallucinate\",
+        I''ll only include explicitly stated conditions. Since no condition is explicitly
+        named (only \"blood pressure\" which is a sign, not a diagnosis), I''ll leave
+        it empty or null.\n\nWait, \"blood pressure\" is a vital sign, not a diagnosis.
+        So I should not put it in diagnoses.\n\nLet me check the medication fields
+        again. The status options are: \"started|stopped|continued|increased|decreased|unknown\".
+        \"Started\" fits.\n\nFor temporal_expressions:\n1. \"yesterday\" - interpretation:
+        2026-02-21 (the day before reference date 2026-02-22)\n2. \"two weeks ago\"
+        - interpretation: 2026-02-08 (14 days before reference date? Or relative to
+        yesterday?). Actually, if the visit was yesterday (Feb 21), and she started
+        the med 2 weeks before that, it would be Feb 7. But if \"two weeks ago\" is
+        relative to the reference date or dictation date, it''s Feb 8. I should interpret
+        relative to the visit date mentioned.\n3. \"in two weeks\" - interpretation:
+        2026-03-08 (14 days after reference date? Or relative to yesterday). If visit
+        was Feb 21, then in two weeks is March 7.\n\nActually, the reference date
+        is likely the date of the dictation/note. So:\n- \"yesterday\" = 2026-02-21\n-
+        \"two weeks ago\" = 2026-02-07 (from yesterday)\n- \"in two weeks\" = 2026-03-07
+        (from yesterday)\n\nBut I should present interpretations clearly.\n\nConfidence
+        scores:\n- Patient name: 0.95 (clear)\n- Visit type: 0.95 (clear)\n- Medication
+        name: 0.95\n- Medication dosage: 0.95\n- Medication frequency: 0.95\n- Medication
+        status: 0.8 (slight ambiguity about what \"started\" refers to)\n- Temporal
+        expressions: 0.9 for yesterday, 0.8 for the others (relative dates)\n\nOne
+        thing: Lisinopril is indeed a PBS medication in Australia, but I don''t need
+        to add special codes, just recognise it if needed. The guidelines mention
+        Australian context for PBS medications and MBS terminology, but I just need
+        to extract the name.\n\nStructure check:\n- patient_name: \"Sarah Johnson\"\n-
+        patient_age: null\n- visit_type: \"follow-up\"\n- confidence: 0.95\n- extraction_notes:
+        \"Ambiguity regarding whether ''Started two weeks ago'' refers to medication
+        initiation or symptom improvement; temporal expressions are relative to visit
+        date\"\n- medications: array with one object\n- diagnoses: [] (empty array
+        since none explicitly stated)\n- temporal_expressions: array with three objects\n-
+        vital_signs: array with one object (blood pressure mentioned but no value)\n-
+        procedures: [] (empty)\n- protocol_triggers: [] (empty)\n- follow_up: \"Next
+        appointment scheduled for in two weeks to check her progress\" or simplified\n-
+        additional_context: \"Patient is female (Mrs.), blood pressure improved since
+        starting medication\"\n\nWait, I should check if \"Mrs.\" implies gender for
+        additional_context, but not necessary.\n\nLet me format the JSON properly.\n\nOne
+        final check: The medication raw_text should be the exact text. So \"Lisinopril
+        10 milligrams daily\". The status \"started\" comes from \"Started two weeks
+        ago\" which is a separate sentence. Should I include both in raw_text? Or
+        just the medication mention? The schema says \"raw_text\": \"exact text from
+        transcript\" for each field. So for the medication object, the raw_text would
+        be \"Lisinopril 10 milligrams daily\". But the status \"started\" comes from
+        a different sentence. Hmm.\n\nActually, looking at the transcript: \"She''s
+        been taking Lisinopril 10 milligrams daily and her blood pressure has improved
+        significantly. Started two weeks ago.\"\n\nThe \"Started two weeks ago\" is
+        likely referring to the medication (or possibly the BP improvement). So for
+        the medication status, the raw_text could be \"Started two weeks ago\" or
+        I could combine them. But the field is within the medication object. I''ll
+        put \"Lisinopril 10 milligrams daily\" for the name/dosage/frequency part,
+        and note that status is inferred from \"Started two weeks ago\".\n\nActually,
+        I should probably include the context in extraction_notes rather than trying
+        to force it.\n\nLet me reconsider the diagnoses. Is \"blood pressure\" a diagnosis?
+        No, it''s a vital sign or observation. So diagnoses should be empty.\n\nVital
+        signs: The type is \"blood-pressure\", but the value is not provided as a
+        number. I could set value to \"improved significantly\" but that''s qualitative.
+        Or null. I''ll set value to null and put \"blood pressure has improved significantly\"
+        in raw_text.\n\nFinal JSON structure:\n\n{\n  \"patient_name\": \"Sarah Johnson\",\n  \"patient_age\":
+        null,\n  \"visit_type\": \"follow-up\",\n  \"confidence\": 0.95,\n  \"extraction_notes\":
+        \"Temporal expressions (''yesterday'', ''two weeks ago'', ''in two weeks'')
+        interpreted relative to reference date 2026-02-22. ''Started two weeks ago''
+        likely refers to medication initiation but could refer to blood pressure improvement
+        period.\",\n  \"medications\": [\n    {\n      \"name\": \"Lisinopril\",\n      \"dosage\":
+        \"10 milligrams\",\n      \"frequency\": \"daily\",\n      \"route\": null,\n      \"status\":
+        \"started\",\n      \"confidence\": 0.85,\n      \"raw_text\": \"Lisinopril
+        10 milligrams daily\"\n    }\n  ],\n  \"diagnoses\": [],\n  \"temporal_expressions\":
+        [\n    {\n      \"text\": \"yesterday\",\n      \"interpretation\": \"Visit
+        date: 2026-02-21 (one day prior to reference date)\",\n      \"confidence\":
+        0.95\n    },\n    {\n      \"text\": \"two weeks ago\",\n      \"interpretation\":
+        \"Approximately 2026-02-07 (14 days prior to visit date)\",\n      \"confidence\":
+        0.8\n    },\n    {\n      \"text\": \"in two weeks\",\n      \"interpretation\":
+        \"Next appointment: approximately 2026-03-07 (14 days after visit date)\",\n      \"confidence\":
+        0.8\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\": \"blood-pressure\",\n      \"value\":
+        null,\n      \"raw_text\": \"blood pressure has improved significantly\"\n    }\n  ],\n  \"procedures\":
+        [],\n  \"protocol_triggers\": [],\n  \"follow_up\": \"Next appointment scheduled
+        for in two weeks to check her progress\",\n  \"additional_context\": \"Patient
+        referred to as ''Mrs.'' indicating female gender. Blood pressure status described
+        as improved significantly since medication initiation.\"\n}\n\nI think this
+        looks good. All required fields are present. The confidence scores are appropriate.
+        No hallucination of diagnoses. Exact raw text captured. Australian context
+        considered (Lisinopril is indeed on PBS). "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":624,"total_tokens":3738,"completion_tokens":3114,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:33:22 GMT
+      Set-Cookie:
+      - S=s%3AXvDAMJVYsHVuaXk06vvhE%2FuTMmh0CUCbjgz0MLm%2BkyQ%3D.U67PAZ4GSU3Ge4IHiQvdHNC%2B%2BF8lpTy%2BkzaZccWeO4Q;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":45,"renewsAt":"2026-02-22T10:41:43.532Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:33:22.532Z"}},"freeToolCalls":{"limit":2500,"requests":709,"renewsAt":"2026-02-22T23:05:44.552Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

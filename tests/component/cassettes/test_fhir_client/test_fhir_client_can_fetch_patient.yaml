@@ -13,41 +13,40 @@ interactions:
       User-Agent:
       - python-httpx/0.28.1
     method: GET
-    uri: http://hapi.fhir.org/baseR4/Patient/90128869
+    uri: http://hapi.fhir.org/baseR5/Patient/857109
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAA/1VRS27CMBTccwrLXbZgJ1RAojQSahctIIqqsCosHPKAVPnJeXxSxKon6hXai9V2
-        iFAXkZN5M/PGk1OLECqhzHdyBUFVAHUJnQmMIUN6p4dxpCGHW/Zg0HNqLAUUCj2pd/W1B1nGefZi
-        iLZhKDQRJc6LSCDUOLd7bW63bSuwHNe+d7v9jmX3bzl3OW80dQxNv8HV67SYP05G04/JeFgNqGKc
-        zXKEI16XlyhwV2rJBjKQZt3FLYr3GvfUSY5pkpUPC7pFLFzGDodD59Dt5HLDLMdx2HGLabKgvuGu
-        VHTDFUX8DCICGaiVajrd/X79fMMn8UJ/PHybDInHQt9jSuR7KMIE/mlnMi9AYhXoiTbHMI8qdUj1
-        RP6TykryNQljiVuPKUSjXlmIzOc2GYlsJ2RFLGfAPWbQmsS0nl28mFl7yXDtKBOprvG9aWkt0jip
-        dBtjIRPRNLSJ95AZHm3uRslSu5Cl8VGdqutr3RpSkUD9+01iHV8PdL42t9q8S1vnPwmnQ/1PAgAA
+        H4sIAAAAAAAA/1WPzU7DMBCE7zyFZY7Q2kmhIVHIhSIBFyoUBBLl4DRLapTYkbNtGlV9d2y3VcXF
+        P7Pf7OzuLgihBjq9NkvIhxZoQuhcoASF9NoVZemku9so4PFBaQCF1Xb2bX8bMJ3U6tljgSesWosO
+        39tSIHg95OF0xMNREOdBlIQ3CY/HYTi54jzh/OQ5DOHwy6j6/I108yCnb1wNH5paYu/DEbZ4Du9Q
+        4LpzlgoUGB937FbKjdNTe5NtU6vufkFXiG3CWN/3434y1qZiQRzHbLvCpl7QzLNLO7pnRSufQJRg
+        chtpqy96pUhaZLPXR5KyIkuZxbMURVHDP9fc6BYMDrmruLZY6HJg1uDZo/G8khKN2/rrtNSPaGQ9
+        uOFnGk7rVHIDylPUDULJt/Pbc/8HcP6AMMMBAAA=
     headers:
       Connection:
       - keep-alive
       Content-Encoding:
       - gzip
       Content-Location:
-      - https://hapi.fhir.org/baseR4/Patient/90128869/_history/2
+      - https://hapi.fhir.org/baseR5/Patient/857109/_history/1
       Content-Type:
       - application/fhir+json;charset=utf-8
       Date:
-      - Sun, 22 Feb 2026 06:53:08 GMT
+      - Sun, 22 Feb 2026 08:25:57 GMT
       ETag:
-      - W/"2"
+      - W/"1"
       Last-Modified:
-      - Sat, 21 Feb 2026 19:24:37 GMT
+      - Thu, 19 Feb 2026 17:24:09 GMT
       Server:
       - nginx/1.24.0 (Ubuntu)
       Transfer-Encoding:
       - chunked
       X-Powered-By:
       - HAPI FHIR 8.9.1-SNAPSHOT/f38da2820b/2026-02-12 REST Server (FHIR Server; FHIR
-        4.0.1/R4)
+        5.0.0/R5)
       X-Request-ID:
-      - of6wOCxHVJwUkhHn
+      - Zd2DwEQgSExwf7gR
     status:
       code: 200
       message: OK

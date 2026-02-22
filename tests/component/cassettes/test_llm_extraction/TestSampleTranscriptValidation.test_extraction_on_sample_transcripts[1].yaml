@@ -1,0 +1,286 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"You are a clinical data extraction
+      assistant.\nParse unstructured clinical dictation and extract structured information.\n\nExtract
+      the following from the clinical transcript below. Return ONLY a JSON object.\n\nTranscript:\nPatient
+      David Martinez presents today with chest pain that started last night. Pain
+      is 7 out of 10, radiating to left arm. Suspected acute coronary syndrome. EKG
+      shows ST elevation. Started on aspirin 325 milligrams and nitroglycerin sublingual.
+      Admitted for cardiac catheterization. Follow up in cardiology clinic in three
+      days post-discharge.\n\nReference Date: 2026-02-22\n\nReturn this JSON structure:\n{\n  \"patient_name\":
+      \"extracted name or null\",\n  \"patient_age\": \"age or null\",\n  \"visit_type\":
+      \"follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\",\n  \"confidence\":
+      0.0-1.0,\n  \"extraction_notes\": \"any ambiguities\",\n  \"medications\": [\n    {\n      \"name\":
+      \"medication name\",\n      \"dosage\": \"dosage or null\",\n      \"frequency\":
+      \"frequency or null\",\n      \"route\": \"route or null\",\n      \"status\":
+      \"started|stopped|continued|increased|decreased|unknown\",\n      \"confidence\":
+      0.0-1.0,\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"diagnoses\":
+      [\n    {\n      \"condition\": \"condition name\",\n      \"icd10_code\": \"ICD-10
+      code or null\",\n      \"confidence\": 0.0-1.0,\n      \"raw_text\": \"exact
+      text from transcript\"\n    }\n  ],\n  \"temporal_expressions\": [\n    {\n      \"text\":
+      \"exact text from transcript\",\n      \"interpretation\": \"what this likely
+      means\",\n      \"confidence\": 0.0-1.0\n    }\n  ],\n  \"vital_signs\": [\n    {\n      \"type\":
+      \"blood-pressure|temperature|heart-rate|weight|height|respiratory-rate\",\n      \"value\":
+      \"value with units\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"procedures\":
+      [\n    {\n      \"name\": \"procedure name\",\n      \"date_description\": \"when
+      it occurred or null\",\n      \"raw_text\": \"exact text from transcript\"\n    }\n  ],\n  \"protocol_triggers\":
+      [\"sepsis|stroke|MI|trauma\"],\n  \"follow_up\": \"follow-up instructions or
+      null\",\n  \"additional_context\": \"other relevant information\"\n}\n\nGuidelines:\n-
+      Do not hallucinate information not in the transcript\n- Mark unclear information
+      with lower confidence\n- Include exact raw text for verification\n- For Australian
+      context: recognise PBS medications, MBS terminology\n- Confidence: 0.9+ for
+      clear statements, 0.5-0.7 for ambiguous, <0.5 for uncertain"}],"model":"hf:nvidia/Kimi-K2.5-NVFP4","max_tokens":4000,"response_format":{"type":"json_object"},"temperature":0.1}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2733'
+      Content-Type:
+      - application/json
+      Host:
+      - api.synthetic.new
+      User-Agent:
+      - AsyncOpenAI/Python 2.21.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - async:asyncio
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.21.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.3
+      x-stainless-read-timeout:
+      - '120.0'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: https://api.synthetic.new/openai/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-5046a2fdd328db7d60604c0a0ce1098d","object":"chat.completion","created":1771745604,"model":"nvidia/Kimi-K2.5-NVFP4","choices":[{"index":0,"message":{"role":"assistant","content":"
+        {\n  \"patient_name\": \"David Martinez\",\n  \"patient_age\": null,\n  \"visit_type\":
+        \"acute-complaint\",\n  \"confidence\": 0.95,\n  \"extraction_notes\": \"Patient
+        age not specified in transcript. Discharge date not specified for follow-up
+        timing calculation.\",\n  \"medications\": [\n    {\n      \"name\": \"aspirin\",\n      \"dosage\":
+        \"325 milligrams\",\n      \"frequency\": null,\n      \"route\": null,\n      \"status\":
+        \"started\",\n      \"confidence\": 0.95,\n      \"raw_text\": \"Started on
+        aspirin 325 milligrams\"\n    },\n    {\n      \"name\": \"nitroglycerin\",\n      \"dosage\":
+        null,\n      \"frequency\": null,\n      \"route\": \"sublingual\",\n      \"status\":
+        \"started\",\n      \"confidence\": 0.95,\n      \"raw_text\": \"nitroglycerin
+        sublingual\"\n    }\n  ],\n  \"diagnoses\": [\n    {\n      \"condition\":
+        \"acute coronary syndrome\",\n      \"icd10_code\": null,\n      \"confidence\":
+        0.85,\n      \"raw_text\": \"Suspected acute coronary syndrome\"\n    },\n    {\n      \"condition\":
+        \"ST elevation myocardial infarction\",\n      \"icd10_code\": null,\n      \"confidence\":
+        0.9,\n      \"raw_text\": \"EKG shows ST elevation\"\n    }\n  ],\n  \"temporal_expressions\":
+        [\n    {\n      \"text\": \"last night\",\n      \"interpretation\": \"2026-02-21
+        (evening/night prior to reference date)\",\n      \"confidence\": 0.9\n    },\n    {\n      \"text\":
+        \"today\",\n      \"interpretation\": \"2026-02-22 (reference date)\",\n      \"confidence\":
+        0.95\n    },\n    {\n      \"text\": \"in three days post-discharge\",\n      \"interpretation\":
+        \"3 days after discharge date (discharge date unknown)\",\n      \"confidence\":
+        0.85\n    }\n  ],\n  \"vital_signs\": [],\n  \"procedures\": [\n    {\n      \"name\":
+        \"EKG\",\n      \"date_description\": \"today (2026-02-22)\",\n      \"raw_text\":
+        \"EKG shows ST elevation\"\n    },\n    {\n      \"name\": \"cardiac catheterization\",\n      \"date_description\":
+        \"today/admission (2026-02-22)\",\n      \"raw_text\": \"Admitted for cardiac
+        catheterization\"\n    }\n  ],\n  \"protocol_triggers\": [\"MI\"],\n  \"follow_up\":
+        \"Follow up in cardiology clinic in three days post-discharge\",\n  \"additional_context\":
+        \"Chest pain rated 7/10, radiating to left arm. Patient admitted for cardiac
+        catheterization following EKG findings of ST elevation.\"\n}","refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[],"reasoning":"
+        The user wants me to extract structured information from a clinical transcript
+        about a patient named David Martinez.\n\n Let me analyze the transcript:\n\n
+        1. Patient name: David Martinez (clear statement)\n 2. Patient age: Not mentioned
+        in the transcript\n 3. Visit type: \"presents today with chest pain\" - this
+        is an acute complaint/urgent visit. The patient is being admitted, so it''s
+        likely \"acute-complaint\"\n 4. Medications:\n    - \"aspirin 325 milligrams\"
+        - started, dosage 325 milligrams, route not explicitly stated (oral implied?),
+        status: started\n    - \"nitroglycerin sublingual\" - started, dosage not
+        specified, route: sublingual, status: started\n 5. Diagnoses:\n    - \"Suspected
+        acute coronary syndrome\" - confidence high, raw text exact\n    - \"ST elevation\"
+        - this is a finding, but implies STEMI. The EKG shows ST elevation.\n    -
+        Could code acute coronary syndrome as I24.9 or similar, but the user said
+        don''t hallucinate ICD-10 codes if not certain, so null or best guess? Guidelines
+        say \"ICD-10 code or null\" - I should put null since it''s not explicitly
+        provided.\n 6. Temporal expressions:\n    - \"started last night\" - relative
+        to reference date 2026-02-22, so likely 2026-02-21\n    - \"today\" - 2026-02-22
+        (reference date)\n    - \"in three days post-discharge\" - follow-up timing\n
+        7. Vital signs:\n    - \"Pain is 7 out of 10\" - this is pain score, not exactly
+        a vital sign in the list provided (blood-pressure, temperature, heart-rate,
+        weight, height, respiratory-rate). Pain score isn''t in the enum, so I should
+        probably not include it, or if the system is flexible, include it. But looking
+        at the strict schema, I''ll skip it unless I can map it to something else.
+        Actually, pain scale is often considered a vital sign in modern medicine,
+        but the schema doesn''t list it. I''ll skip to be safe or add it with type
+        \"pain-score\"? No, stick to the schema. Actually, looking at the enum, it''s
+        restrictive. I''ll omit the pain score since it''s not in the allowed types.\n
+        8. Procedures:\n    - \"Admitted for cardiac catheterization\" - procedure:
+        cardiac catheterization, date: when admitted (today/2026-02-22)\n    - \"EKG
+        shows ST elevation\" - EKG is a procedure/test\n 9. Protocol triggers:\n    -
+        \"Suspected acute coronary syndrome\" + \"ST elevation\" + \"chest pain radiating
+        to left arm\" = MI (Myocardial Infarction/Heart Attack)\n 10. Follow up:\n    -
+        \"Follow up in cardiology clinic in three days post-discharge\"\n 11. Additional
+        context:\n    - Pain radiates to left arm\n    - Patient admitted\n\n Confidence
+        scoring:\n - Name: 1.0 (clear)\n - Visit type: 0.9 (acute-complaint)\n - Medications:
+        \n   - Aspirin: 0.95 (clear)\n   - Nitroglycerin: 0.95 (clear, though dosage
+        not specified)\n - Diagnoses:\n   - Acute coronary syndrome: 0.9 (suspected,
+        so slightly less than 1.0)\n   - ST elevation (finding): 0.95\n - Temporal:
+        \n   - last night: 0.9 (relative to reference date)\n   - today: 0.95\n   -
+        three days post-discharge: 0.9\n\n Let me structure the JSON carefully.\n\n
+        Note: The user mentioned \"For Australian context\" but the patient name David
+        Martinez and the medical terminology (EKG instead of ECG, cardiology clinic)
+        suggests US context, but I should be aware of PBS (Pharmaceutical Benefits
+        Scheme) and MBS (Medicare Benefits Schedule) if relevant. However, the transcript
+        doesn''t explicitly mention Australian-specific codes, so I''ll focus on extraction.\n\n
+        Wait, the reference date is 2026-02-22.\n\n Temporal expressions:\n - \"last
+        night\" -> likely 2026-02-21\n - \"today\" -> 2026-02-22\n - \"in three days
+        post-discharge\" -> depends on discharge date, which isn''t specified, but
+        implies 3 days after discharge happens\n\n Procedures:\n - \"cardiac catheterization\"
+        \n - \"EKG\" (electrocardiogram)\n\n Protocol triggers: \"MI\" (ST elevation
+        suggests Myocardial Infarction)\n\n Visit type options: follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\n
+        This is clearly \"acute-complaint\" or \"urgent-same-day\". Given \"presents
+        today with chest pain\" and admission, \"acute-complaint\" seems best, or
+        possibly \"urgent-same-day\". I''ll go with \"acute-complaint\" as it''s an
+        acute presentation.\n\n Actually, looking at the options, \"urgent-same-day\"
+        might also fit, but \"acute-complaint\" describes the nature of the visit
+        better. The patient is being admitted, so it''s an acute presentation.\n\n
+        Let me double-check the medication route for aspirin. It says \"aspirin 325
+        milligrams\" - usually this is oral, but the route isn''t specified. I should
+        leave route as null or \"oral\" if implied? The guidelines say don''t hallucinate,
+        so null.\n\n For nitroglycerin, route is explicitly \"sublingual\".\n\n Diagnoses:\n
+        1. Acute coronary syndrome (suspected)\n 2. Could include ST elevation myocardial
+        infarction (STEMI) inferred from \"ST elevation\" + context, but \"Suspected
+        acute coronary syndrome\" is the explicit diagnosis.\n\n ICD-10 codes:\n -
+        Acute coronary syndrome: I24.9 (Acute ischemic heart disease, unspecified)
+        or I21.9 (Acute myocardial infarction, unspecified). But since it''s not explicitly
+        stated as MI, and ACS is broader, I''ll leave as null to be safe, or use I24.9
+        if I want to be helpful. The instruction says \"or null\", so I''ll use null
+        to avoid error.\n\n Temporal expressions interpretation:\n - \"last night\":
+        2026-02-21 evening/night (before reference date 2026-02-22)\n - \"today\":
+        2026-02-22\n - \"in three days post-discharge\": 3 days after discharge date
+        (discharge date unknown)\n\n Follow up: \"Follow up in cardiology clinic in
+        three days post-discharge\"\n\n Additional context: Pain radiates to left
+        arm, patient admitted for cardiac catheterization.\n\n Confidence: Overall
+        confidence 0.95\n\n Extraction notes: Patient age not provided; exact discharge
+        date not specified for follow-up calculation.\n\n Let me format the JSON.
+        ","reasoning_content":" The user wants me to extract structured information
+        from a clinical transcript about a patient named David Martinez.\n\n Let me
+        analyze the transcript:\n\n 1. Patient name: David Martinez (clear statement)\n
+        2. Patient age: Not mentioned in the transcript\n 3. Visit type: \"presents
+        today with chest pain\" - this is an acute complaint/urgent visit. The patient
+        is being admitted, so it''s likely \"acute-complaint\"\n 4. Medications:\n    -
+        \"aspirin 325 milligrams\" - started, dosage 325 milligrams, route not explicitly
+        stated (oral implied?), status: started\n    - \"nitroglycerin sublingual\"
+        - started, dosage not specified, route: sublingual, status: started\n 5. Diagnoses:\n    -
+        \"Suspected acute coronary syndrome\" - confidence high, raw text exact\n    -
+        \"ST elevation\" - this is a finding, but implies STEMI. The EKG shows ST
+        elevation.\n    - Could code acute coronary syndrome as I24.9 or similar,
+        but the user said don''t hallucinate ICD-10 codes if not certain, so null
+        or best guess? Guidelines say \"ICD-10 code or null\" - I should put null
+        since it''s not explicitly provided.\n 6. Temporal expressions:\n    - \"started
+        last night\" - relative to reference date 2026-02-22, so likely 2026-02-21\n    -
+        \"today\" - 2026-02-22 (reference date)\n    - \"in three days post-discharge\"
+        - follow-up timing\n 7. Vital signs:\n    - \"Pain is 7 out of 10\" - this
+        is pain score, not exactly a vital sign in the list provided (blood-pressure,
+        temperature, heart-rate, weight, height, respiratory-rate). Pain score isn''t
+        in the enum, so I should probably not include it, or if the system is flexible,
+        include it. But looking at the strict schema, I''ll skip it unless I can map
+        it to something else. Actually, pain scale is often considered a vital sign
+        in modern medicine, but the schema doesn''t list it. I''ll skip to be safe
+        or add it with type \"pain-score\"? No, stick to the schema. Actually, looking
+        at the enum, it''s restrictive. I''ll omit the pain score since it''s not
+        in the allowed types.\n 8. Procedures:\n    - \"Admitted for cardiac catheterization\"
+        - procedure: cardiac catheterization, date: when admitted (today/2026-02-22)\n    -
+        \"EKG shows ST elevation\" - EKG is a procedure/test\n 9. Protocol triggers:\n    -
+        \"Suspected acute coronary syndrome\" + \"ST elevation\" + \"chest pain radiating
+        to left arm\" = MI (Myocardial Infarction/Heart Attack)\n 10. Follow up:\n    -
+        \"Follow up in cardiology clinic in three days post-discharge\"\n 11. Additional
+        context:\n    - Pain radiates to left arm\n    - Patient admitted\n\n Confidence
+        scoring:\n - Name: 1.0 (clear)\n - Visit type: 0.9 (acute-complaint)\n - Medications:
+        \n   - Aspirin: 0.95 (clear)\n   - Nitroglycerin: 0.95 (clear, though dosage
+        not specified)\n - Diagnoses:\n   - Acute coronary syndrome: 0.9 (suspected,
+        so slightly less than 1.0)\n   - ST elevation (finding): 0.95\n - Temporal:
+        \n   - last night: 0.9 (relative to reference date)\n   - today: 0.95\n   -
+        three days post-discharge: 0.9\n\n Let me structure the JSON carefully.\n\n
+        Note: The user mentioned \"For Australian context\" but the patient name David
+        Martinez and the medical terminology (EKG instead of ECG, cardiology clinic)
+        suggests US context, but I should be aware of PBS (Pharmaceutical Benefits
+        Scheme) and MBS (Medicare Benefits Schedule) if relevant. However, the transcript
+        doesn''t explicitly mention Australian-specific codes, so I''ll focus on extraction.\n\n
+        Wait, the reference date is 2026-02-22.\n\n Temporal expressions:\n - \"last
+        night\" -> likely 2026-02-21\n - \"today\" -> 2026-02-22\n - \"in three days
+        post-discharge\" -> depends on discharge date, which isn''t specified, but
+        implies 3 days after discharge happens\n\n Procedures:\n - \"cardiac catheterization\"
+        \n - \"EKG\" (electrocardiogram)\n\n Protocol triggers: \"MI\" (ST elevation
+        suggests Myocardial Infarction)\n\n Visit type options: follow-up|acute-complaint|routine-check|post-operative|well-child-check|urgent-same-day|null\n
+        This is clearly \"acute-complaint\" or \"urgent-same-day\". Given \"presents
+        today with chest pain\" and admission, \"acute-complaint\" seems best, or
+        possibly \"urgent-same-day\". I''ll go with \"acute-complaint\" as it''s an
+        acute presentation.\n\n Actually, looking at the options, \"urgent-same-day\"
+        might also fit, but \"acute-complaint\" describes the nature of the visit
+        better. The patient is being admitted, so it''s an acute presentation.\n\n
+        Let me double-check the medication route for aspirin. It says \"aspirin 325
+        milligrams\" - usually this is oral, but the route isn''t specified. I should
+        leave route as null or \"oral\" if implied? The guidelines say don''t hallucinate,
+        so null.\n\n For nitroglycerin, route is explicitly \"sublingual\".\n\n Diagnoses:\n
+        1. Acute coronary syndrome (suspected)\n 2. Could include ST elevation myocardial
+        infarction (STEMI) inferred from \"ST elevation\" + context, but \"Suspected
+        acute coronary syndrome\" is the explicit diagnosis.\n\n ICD-10 codes:\n -
+        Acute coronary syndrome: I24.9 (Acute ischemic heart disease, unspecified)
+        or I21.9 (Acute myocardial infarction, unspecified). But since it''s not explicitly
+        stated as MI, and ACS is broader, I''ll leave as null to be safe, or use I24.9
+        if I want to be helpful. The instruction says \"or null\", so I''ll use null
+        to avoid error.\n\n Temporal expressions interpretation:\n - \"last night\":
+        2026-02-21 evening/night (before reference date 2026-02-22)\n - \"today\":
+        2026-02-22\n - \"in three days post-discharge\": 3 days after discharge date
+        (discharge date unknown)\n\n Follow up: \"Follow up in cardiology clinic in
+        three days post-discharge\"\n\n Additional context: Pain radiates to left
+        arm, patient admitted for cardiac catheterization.\n\n Confidence: Overall
+        confidence 0.95\n\n Extraction notes: Patient age not provided; exact discharge
+        date not specified for follow-up calculation.\n\n Let me format the JSON.
+        "},"logprobs":null,"finish_reason":"stop","stop_reason":null,"token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":650,"total_tokens":2707,"completion_tokens":2057,"prompt_tokens_details":null},"prompt_logprobs":null,"prompt_token_ids":null,"kv_transfer_params":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 22 Feb 2026 07:33:52 GMT
+      Set-Cookie:
+      - S=s%3AlV2bAfwyMXWGjHxF6Yh4pQ%2FKa%2FPzb9XGJ7QkMU42LmU%3D.%2F8ZJA7AhDiJDPuOopqbrmDXvG86GiM6nX5bBorx6d5c;
+        Domain=synthetic.new; Path=/; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - SAMEORIGIN
+      access-control-allow-methods:
+      - GET,POST,PUT,DELETE,OPTIONS
+      access-control-allow-origin:
+      - '*'
+      vary:
+      - rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+      - Access-Control-Request-Headers
+      x-clerk-auth-message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      x-clerk-auth-reason:
+      - token-invalid
+      x-clerk-auth-status:
+      - signed-out
+      x-middleware-rewrite:
+      - /api/openai/v1/chat/completions
+      x-synthetic-quotas:
+      - '{"subscription":{"limit":1350,"requests":46,"renewsAt":"2026-02-22T10:41:43.614Z"},"search":{"hourly":{"limit":250,"requests":0,"renewsAt":"2026-02-22T08:33:52.614Z"}},"freeToolCalls":{"limit":2500,"requests":709,"renewsAt":"2026-02-22T23:05:44.622Z"}}'
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -20,7 +20,8 @@ External API → Generated Models → Wrapper → Clean Domain Models → Busine
 
 ## Service Integrations
 
-- **FHIR** - Patient data and encounters
+- **FHIR** - Patient data and encounters (**FHIR R5** via `fhir.resources`).
+    - *Note:* If R4 support is required, see [FHIR R4 Support Strategy](../../docs/technical/FHIR_R4_SUPPORT_STRATEGY.md).
 - **Audit** - Immutable compliance logs
 
 ## Quick Reference

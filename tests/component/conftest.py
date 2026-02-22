@@ -11,4 +11,5 @@ def vcr_config():
             "authorization",
             "Authorization",
         ],
+        "allow_playback_repeats": True,
     }
