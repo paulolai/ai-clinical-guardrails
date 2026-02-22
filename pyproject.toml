@@ -26,6 +26,7 @@ dependencies = [
     "types-pyyaml>=6.0.0",
     "typer>=0.15.1",
     "uvicorn>=0.41.0",
+    "pydantic-settings>=2.13.1",
 ]
 
 [tool.ruff]
