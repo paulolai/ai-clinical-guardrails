@@ -5,6 +5,10 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  schedule:
+    # Run daily at 2 AM UTC to validate cassettes
+    - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   test:
@@ -47,3 +51,51 @@ jobs:
           path: |
             reports/
           retention-days: 30
+
+  # Daily re-recording validation to detect API drift
+  validate-cassettes:
+    name: Validate Component Test Cassettes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    env:
+      SYNTHETIC_API_KEY: ${{ secrets.SYNTHETIC_API_KEY }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install Dependencies
+        run: uv sync
+
+      - name: Re-record Component Tests
+        run: uv run pytest tests/component/ -v --record-mode=all --snapshot-update
+
+      - name: Check for Cassette Changes
+        run: |
+          if git diff --quiet tests/component/cassettes/; then
+            echo "✅ No cassette changes detected"
+          else
+            echo "⚠️ Cassette changes detected! API responses may have changed."
+            git diff --stat tests/component/cassettes/
+            exit 1
+          fi
+
+      - name: Check for Snapshot Changes
+        run: |
+          if git diff --quiet tests/component/__snapshots__/; then
+            echo "✅ No snapshot changes detected"
+          else
+            echo "⚠️ Snapshot changes detected! Response structures may have changed."
+            git diff --stat tests/component/__snapshots__/
+            exit 1
+          fi
