@@ -72,6 +72,25 @@ uv run python main.py
 
 ---
 
+## Building New Features: Mandatory Sequence
+
+**⚠️ CRITICAL:** When building any new feature, you MUST follow the **8-Step Lifecycle IN ORDER**:
+
+1. **Business Requirements** - Define the problem before any technical work
+2. **Requirements & Source Spec** - Identify upstream schemas
+3. **Generated Model Layer** - Create type-safe representations
+4. **Domain Wrapper Layer** - Isolate business logic from external complexity
+5. **Interface-Specific CLI** - Build debugging handles
+6. **Component Testing** - Prove integration against real systems
+7. **Business Logic** - Implement safety rules
+8. **System Verification** - Property-based testing
+
+**📖 Full Details:** [WORKFLOW_SPEC.md](docs/WORKFLOW_SPEC.md)
+
+**❌ NEVER skip Step 1.** Technical architecture cannot be designed without first understanding the business problem, stakeholders, and success metrics.
+
+---
+
 ## Getting Help
 
 - **Fixing a bug?** → [Debugging Guide](docs/DEBUGGING_GUIDE.md)

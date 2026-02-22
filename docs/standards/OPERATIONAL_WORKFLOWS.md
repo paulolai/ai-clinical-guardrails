@@ -7,26 +7,51 @@
 
 ## The 8-Step Lifecycle
 
-See [WORKFLOW_SPEC.md](../WORKFLOW_SPEC.md) for the complete canonical implementation guide.
+**⚠️ MUST be followed IN ORDER. See [WORKFLOW_SPEC.md](../WORKFLOW_SPEC.md) for complete details.**
 
-### Phase 1: Specifications (The Truth)
+### Step 1: Business Requirements (The Foundation)
+**Goal:** Define the "why" and "what" before the "how".
+- **Action:** Document the business problem, success criteria, stakeholders, and constraints.
+- **Key Questions:**
+  - What clinical/operational problem does this solve?
+  - What are the success metrics?
+  - Who are the stakeholders?
+  - What are regulatory/compliance constraints?
+- **Output:** Requirements document approved before ANY technical work begins.
+- **❌ NEVER skip this step.**
+
+### Step 2: Requirements & Source Spec (The Truth)
 *   **Source:** Always link to the official upstream schema (OpenAPI, JSON Schema).
 *   **Action:** Extract relevant definitions to `specs/` if the full spec is unmanageable.
 *   **Output:** Generated code in `src/integrations/<system>/generated.py`.
 
-### Phase 2: The Integration Layer (The Firewall)
+### Step 3: Generated Model Layer (The Types)
+*   **Tool:** `datamodel-code-generator`
+*   **Action:** Generate Pydantic models from official upstream schemas (FHIR, etc.)
+*   **Output:** `src/integrations/<system>/generated.py`
+
+### Step 4: Domain Wrapper Layer (The Firewall)
 *   **Pattern:** The **Wrapper Pattern**.
 *   **Rule:** Never leak generated "Raw Models" into the "Business Logic".
 *   **Implementation:** `FHIRClient` consumes `generated.Patient` (Complex) and returns `PatientProfile` (Clean).
 
-### Phase 3: The Engine (The Governor)
+### Step 5: Interface-Specific CLI (The Handles)
+*   **Goal:** Enable developer debugging of each system boundary.
+*   **Standard:** Tools named after the interface they serve.
+*   **Examples:** `cli/emr.py`, `cli/api.py`
+
+### Step 6: Component Testing (The Proof)
+*   **Component Tests:** Verify the `Wrapper` talks to the `Real Sandbox`.
+*   **Standard:** Use `pytest-asyncio` with real test data.
+
+### Step 7: Business Logic (The Engine)
 *   **Pattern:** Functional Core, Imperative Shell.
 *   **Style:** Pure functions using the **Result Pattern** (`Result[T, E]`).
 *   **Forbidden:** Throwing exceptions for business rule violations. Exceptions are for system failures only.
 
-### Phase 4: Verification (The Proof)
-*   **Component Tests:** Verify the `Wrapper` talks to the `Real Sandbox`.
-*   **Property Tests:** Verify the `Engine` handles `Randomized Inputs`.
+### Step 8: System Verification (The Invariants)
+*   **Tool:** Hypothesis for Property-Based Testing
+*   **Action:** Prove logic holds for all valid inputs.
 *   **Attestation:** Every run must produce an audit trail (`Trace` or `Report`).
 
 ---
