@@ -10,15 +10,5 @@ def vcr_config():
         "filter_headers": [
             "authorization",
             "Authorization",
-            "x-api-key",
-            "X-API-Key",
-        ],
-        "filter_post_data_parameters": [
-            "api_key",
-            "apikey",
-        ],
-        "filter_query_parameters": [
-            "api_key",
-            "apikey",
         ],
     }

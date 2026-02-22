@@ -1,12 +1,34 @@
 import logging
 from datetime import datetime
+from typing import Any
 
 import httpx
 
 from ...models import EMRContext, PatientProfile
-from .generated import Encounter, Patient
 
 logger = logging.getLogger(__name__)
+
+# Lazy imports to avoid loading all generated models at startup
+_ImportedPatient: type | None = None
+_ImportedEncounter: type | None = None
+
+
+def _get_patient_model() -> "type[Any]":
+    global _ImportedPatient
+    if _ImportedPatient is None:
+        from .generated import Patient
+
+        _ImportedPatient = Patient
+    return _ImportedPatient
+
+
+def _get_encounter_model() -> "type[Any]":
+    global _ImportedEncounter
+    if _ImportedEncounter is None:
+        from .generated import Encounter
+
+        _ImportedEncounter = Encounter
+    return _ImportedEncounter
 
 
 class FHIRClient:
@@ -18,15 +40,22 @@ class FHIRClient:
 
     def __init__(self, base_url: str = "http://hapi.fhir.org/baseR4"):
         self.base_url = base_url
-        self._client = httpx.AsyncClient(timeout=15.0)
+        self._client: httpx.AsyncClient | None = None
+
+    def _get_client(self) -> httpx.AsyncClient:
+        """Lazy initialization of httpx client for VCR compatibility."""
+        if self._client is None:
+            self._client = httpx.AsyncClient(timeout=15.0)
+        return self._client
 
     async def get_patient_profile(self, patient_id: str) -> PatientProfile:
         """Fetches and maps a patient using official generated classes."""
-        response = await self._client.get(f"{self.base_url}/Patient/{patient_id}")
+        response = await self._get_client().get(f"{self.base_url}/Patient/{patient_id}")
         response.raise_for_status()
 
-        # 1. Parse into OFFICIAL generated model
-        raw_patient = Patient.model_validate(response.json())
+        # 1. Parse into OFFICIAL generated model (lazy import)
+        patient_model = _get_patient_model()
+        raw_patient = patient_model.model_validate(response.json())
 
         # 2. Map to Domain Wrapper
         name_obj = raw_patient.name[0] if raw_patient.name else None
@@ -51,7 +80,7 @@ class FHIRClient:
 
     async def get_latest_encounter(self, patient_id: str) -> EMRContext:
         """Fetches latest encounter using official full-spec generated classes."""
-        response = await self._client.get(
+        response = await self._get_client().get(
             f"{self.base_url}/Encounter",
             params={"patient": patient_id, "_sort": "-date", "_count": 1},
         )
@@ -61,8 +90,9 @@ class FHIRClient:
         if not data.get("entry"):
             raise ValueError(f"No encounters found for patient {patient_id}")
 
-        # Parse into FULL spec generated model
-        raw_encounter = Encounter.model_validate(data["entry"][0]["resource"])
+        # Parse into FULL spec generated model (lazy import)
+        encounter_model = _get_encounter_model()
+        raw_encounter = encounter_model.model_validate(data["entry"][0]["resource"])
 
         # Admission/Discharge mapping with RootModel safety
         admission_date: datetime | None = None
@@ -89,4 +119,5 @@ class FHIRClient:
         )
 
     async def close(self) -> None:
-        await self._client.aclose()
+        if self._client is not None:
+            await self._client.aclose()
