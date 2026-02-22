@@ -197,21 +197,21 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - **Status:** Runnable example showing Dictation → Extract → Verify → Result
 - **Acceptance:** Demonstrates real-world clinical encounter with HAPI FHIR sandbox
 
-### Phase 3: Demonstration & Polish (Next Immediate Action)
+### Phase 3: Demonstration & Polish ✅ COMPLETE
 **8-Step:** Steps 7-8 (Pure-Functional Business Logic → System Verification/PBT)
 
-**Task 3.1: Add FastAPI endpoints**
+**Task 3.1: Add FastAPI endpoints** ✅
 - **File:** `src/api.py` (expand existing)
-- **Goal:** POST `/verify` endpoint accepts transcription, returns verification
-- **Definition of Done:** Can curl the endpoint with sample data
+- **Status:** POST `/extract` endpoint accepts patient_id + transcript, returns extraction + verification
+- **Acceptance:** Can curl the endpoint with sample data
 
-**Task 3.2: Performance benchmarking**
+**Task 3.2: Performance benchmarking** ✅
 - **File:** `tests/benchmarks/`, `scripts/benchmark.py`
-- **Goal:** Measure latency for verification workflow
-- **Definition of Done:** Documented p50/p95/p99 latencies
+- **Status:** Benchmarks for `/health`, `/verify`, `/verify/fhir/{id}`, `/extract` endpoints
+- **Acceptance:** Documented p50/p95/p99 latencies via pytest-benchmark
 
-**Current Status:** Phase 1.4 IN PROGRESS - LLM client integration needed
-**Next Immediate Action:** Implement LLM client (Task 1.4.1)
+**Current Status:** All Phases Complete ✅ | Project Ready for Production
+**Next Phase:** Medical Protocols Compliance Layer (see docs/plans/2026-02-22-medical-protocols-design.md)
 
 ## 📝 Documentation Map
 
