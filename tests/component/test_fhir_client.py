@@ -6,6 +6,7 @@ from src.models import PatientProfile
 
 
 @pytest.mark.asyncio
+@pytest.mark.vcr
 async def test_fhir_client_can_fetch_patient() -> None:
     """Component Test: Verifies integration with HAPI FHIR Sandbox."""
     client = FHIRClient()
@@ -23,6 +24,7 @@ async def test_fhir_client_can_fetch_patient() -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.vcr
 async def test_fhir_client_handles_missing_patient() -> None:
     client = FHIRClient()
     try:

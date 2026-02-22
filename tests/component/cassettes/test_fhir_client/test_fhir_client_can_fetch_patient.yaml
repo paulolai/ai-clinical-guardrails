@@ -1,0 +1,54 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Host:
+      - hapi.fhir.org
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://hapi.fhir.org/baseR4/Patient/90128869
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAA/1VRS27CMBTccwrLXbZgJ1RAojQSahctIIqqsCosHPKAVPnJeXxSxKon6hXai9V2
+        iFAXkZN5M/PGk1OLECqhzHdyBUFVAHUJnQmMIUN6p4dxpCGHW/Zg0HNqLAUUCj2pd/W1B1nGefZi
+        iLZhKDQRJc6LSCDUOLd7bW63bSuwHNe+d7v9jmX3bzl3OW80dQxNv8HV67SYP05G04/JeFgNqGKc
+        zXKEI16XlyhwV2rJBjKQZt3FLYr3GvfUSY5pkpUPC7pFLFzGDodD59Dt5HLDLMdx2HGLabKgvuGu
+        VHTDFUX8DCICGaiVajrd/X79fMMn8UJ/PHybDInHQt9jSuR7KMIE/mlnMi9AYhXoiTbHMI8qdUj1
+        RP6TykryNQljiVuPKUSjXlmIzOc2GYlsJ2RFLGfAPWbQmsS0nl28mFl7yXDtKBOprvG9aWkt0jip
+        dBtjIRPRNLSJ95AZHm3uRslSu5Cl8VGdqutr3RpSkUD9+01iHV8PdL42t9q8S1vnPwmnQ/1PAgAA
+    headers:
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Location:
+      - https://hapi.fhir.org/baseR4/Patient/90128869/_history/2
+      Content-Type:
+      - application/fhir+json;charset=utf-8
+      Date:
+      - Sun, 22 Feb 2026 06:10:01 GMT
+      ETag:
+      - W/"2"
+      Last-Modified:
+      - Sat, 21 Feb 2026 19:24:37 GMT
+      Server:
+      - nginx/1.24.0 (Ubuntu)
+      Transfer-Encoding:
+      - chunked
+      X-Powered-By:
+      - HAPI FHIR 8.9.1-SNAPSHOT/f38da2820b/2026-02-12 REST Server (FHIR Server; FHIR
+        4.0.1/R4)
+      X-Request-ID:
+      - qIOdesTys7wMdz9Q
+    status:
+      code: 200
+      message: OK
+version: 1
