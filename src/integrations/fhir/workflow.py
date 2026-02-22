@@ -223,6 +223,7 @@ class VerificationWorkflow:
             summary_text=summary_text,
             extracted_dates=extracted_dates,
             extracted_diagnoses=extracted_diagnoses,
+            extracted_medications=extraction.medications,
             suggested_billing_codes=[],  # Could be populated from extraction
             contains_pii=False,  # Could be detected from extraction
         )

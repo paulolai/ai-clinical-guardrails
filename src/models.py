@@ -5,6 +5,8 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
+from src.extraction.models import ExtractedMedication  # noqa: TC001
+
 T = TypeVar("T")
 E = TypeVar("E")
 
@@ -65,6 +67,7 @@ class AIGeneratedOutput(BaseModel):
     summary_text: str
     extracted_dates: list[date] = Field(default_factory=list)
     extracted_diagnoses: list[str] = Field(default_factory=list)
+    extracted_medications: list["ExtractedMedication"] = Field(default_factory=list)
     suggested_billing_codes: list[str] = Field(default_factory=list)
     contains_pii: bool = False
 
