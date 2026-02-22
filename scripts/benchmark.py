@@ -35,12 +35,13 @@ import argparse
 import statistics
 import time
 from datetime import date, datetime
+from typing import Any
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
 from src.api import app
-from src.models import EMRContext, PatientProfile
+from src.models import EMRContext, PatientProfile, Result, VerificationResult
 
 client = TestClient(app)
 
@@ -214,7 +215,7 @@ def benchmark_extract(iterations: int) -> dict[str, float]:
     )
 
     # Create mock verification result
-    mock_result = Result.success(
+    mock_result: "Result[VerificationResult, Any]" = Result.success(
         VerificationResult(
             is_safe_to_file=True,
             score=0.95,
