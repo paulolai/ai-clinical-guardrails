@@ -64,7 +64,28 @@ My primary contribution was not the implementation, but the **Taste** to guide i
 ## The "Correction" Loop (A War Story)
 Staff engineering isn't about getting it right the first time; it's about spotting the *wrong* path early.
 
-<!-- TODO: Add a concrete example of an architectural course correction here once a significant one occurs during development. -->
+### The LLM vs. Regex Decision: A Correction Loop Example
+
+**The Wrong Path:** Early in the project, AI agents proposed extracting structured medical data (medications, diagnoses, dates) from clinical transcripts using regex patterns. The approach seemed straightforward: write patterns like `r"(\d+)\s*mg\s+(\w+)"` to extract dosages and drug names.
+
+**The Problem:** As an engineer with domain knowledge, I recognized this approach was fundamentally flawed:
+- Clinical dictation is messy, conversational, and highly variable
+- Regex can't handle context: "Patient was on Lisinopril but we switched to Enalapril" - which is active?
+- Abbreviations and spelling variations: "Lisinopril" vs "lisinopril" vs "Prinivil"
+- Temporal expressions: "yesterday", "two weeks ago", "next Tuesday" - regex can't resolve these relative to encounter dates
+- **Risk:** Missed medications or incorrect dates in a safety-critical system
+
+**The Correction:** I steered the implementation toward an LLM-based extraction layer:
+1. Use LLM to parse the unstructured clinical text
+2. Extract structured data with confidence scores
+3. Layer deterministic validation (the Verification Engine) on top
+4. Never trust the extraction alone - always validate against EMR source of truth
+
+**Why This Matters:** The regex approach would have worked for 80% of cases and failed catastrophically for 20%. In healthcare, that's unacceptable. The LLM approach handles the "messy reality" of clinical speech while the deterministic verification layer provides the safety guarantees.
+
+**The Engineering Lesson:** AI agents (like junior engineers) reach for familiar tools (regex) without understanding domain complexity. The Staff+ engineer's job is to recognize when the "simple" solution is actually the risky one, and steer toward the "complex" solution that actually works.
+
+**Evidence:** See `docs/technical/EXTRACTION_LAYER_DESIGN.md` for the full rationale on why LLM-based extraction was chosen over rule-based approaches, and how the confidence scoring + verification layer provides defense in depth.
 
 ## Extending Zero-Trust to Clinical Safety
 The Medical Protocols layer extends the "Zero-Trust" methodology from technical safety (dates, PII) to clinical safety (drug interactions, allergies):
