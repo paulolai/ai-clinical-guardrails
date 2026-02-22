@@ -210,6 +210,31 @@ We use Property-Based Testing to prove the engine catches every sloppy mistake t
 - **Status:** Benchmarks for `/health`, `/verify`, `/verify/fhir/{id}`, `/extract` endpoints
 - **Acceptance:** Documented p50/p95/p99 latencies via pytest-benchmark
 
+### Phase 4: Clinical Note Review ✅ COMPLETE
+**8-Step:** Steps 1-8 (Business Requirements → System Verification)
+
+**Purpose:** Unified review interface reducing clinician documentation time from 20 min to <5 min
+
+**Task 4.1: Extend Domain Models** ✅
+- **Files:** `src/models.py`
+- **Status:** Added ClinicalNote and UnifiedReview models
+- **Acceptance:** Models validate correctly with Pydantic
+
+**Task 4.2: Create Review Service** ✅
+- **File:** `src/review/service.py`
+- **Status:** ReviewService orchestrates FHIR fetch → Compliance verify → UnifiedReview
+- **Acceptance:** Component tests pass against HAPI FHIR sandbox
+
+**Task 4.3: Add Review API Endpoint** ✅
+- **File:** `src/api.py`
+- **Status:** POST `/review/create` endpoint accepts patient_id + transcript, returns unified review
+- **Acceptance:** Can curl endpoint and receive formatted review
+
+**Task 4.4: Create CLI Tool** ✅
+- **File:** `cli/review.py`
+- **Status:** CLI for creating and viewing reviews with formatted output
+- **Acceptance:** Can run `uv run python cli/review.py create --patient-id 90128869 --transcript "..."`
+
 **Current Status:** All Phases Complete ✅ | Project Ready for Production
 **Next Phase:** Medical Protocols Compliance Layer (see docs/plans/2026-02-22-medical-protocols-design.md)
 

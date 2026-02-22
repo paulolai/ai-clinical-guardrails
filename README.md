@@ -63,6 +63,17 @@ uv run python cli/emr.py inspect 90128869
 uv run python cli/api.py verify-integrated --id 90128869 --text "Seen today." --dates "2025-02-20"
 ```
 
+**Clinical Note Review Interface:**
+```bash
+# Create unified review for AI-generated note (API must be running)
+uv run python cli/review.py create \
+  --patient-id 90128869 \
+  --transcript "Patient has hypertension, started on lisinopril"
+
+# View formatted review with EMR context and verification results
+uv run python cli/review.py view --note-id <note-id>
+```
+
 ### 4. Run the API Server
 ```bash
 uv run python main.py
