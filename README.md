@@ -21,6 +21,7 @@ It serves as a reference implementation for a modern, high-assurance AI stack us
 - **Zero-Trust Data Policy:** LLMs are never trusted with calendar logic or data extraction. Every output is verified against the EMR source of truth via deterministic Pydantic schemas.
 - **Contract-First Integration:** Models validated against the **Full Official HL7 FHIR R5** standard.
 - **Interface-Specific Tooling:** Dedicated CLI handles for each system interface (EMR vs. API).
+- **Offline-First PWA:** Clinical transcription interface with local AI processing (Mac Studio deployment).
 - **Invariant-Based Testing:** Uses Property-Based Testing (Hypothesis) to mathematically prove the guardrails can catch data hallucinations.
 
 ---
@@ -73,6 +74,32 @@ uv run python cli/review.py create \
 # View formatted review with EMR context and verification results
 uv run python cli/review.py view --note-id <note-id>
 ```
+
+---
+
+## 🚧 Work In Progress: Clinical Transcription PWA
+
+We're building a **Progressive Web Application** for clinical voice transcription that runs entirely on-premise:
+
+**Key Features:**
+- 🎤 **Voice Recording** - Browser-based dictation with offline support
+- 🤖 **Local AI Processing** - Whisper + Llama 3.1 70B on Mac Studio (128GB RAM)
+- 🔒 **100% On-Premise** - Zero external dependencies, real patient data compliant
+- 📱 **Offline-First** - Record offline, sync when connected
+- ✅ **Integrated Verification** - Seamless integration with existing guardrails
+
+**Architecture:**
+- **Frontend:** HTMX (server-rendered) + Service Worker
+- **Backend:** FastAPI (extends existing API)
+- **AI:** Local Whisper + Local LLM (no cloud APIs)
+- **Auth:** Self-hosted Keycloak
+- **Deployment:** Docker Compose on Mac Studio
+
+**Status:** [Design Complete](docs/plans/2025-02-23-clinical-transcription-pwa-design.md) | Implementation Phase: Pending
+
+**Target Users:** 5-clinician medical practice (Australian GP/Specialist)
+
+**Compliance:** Privacy Act 1988, AHPRA requirements, My Health Record ready
 
 ### 4. Run the API Server
 ```bash

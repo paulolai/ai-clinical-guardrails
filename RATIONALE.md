@@ -147,3 +147,57 @@ AI is a "Yes, And" machine. It will happily give you clever decorators, complex 
 
 **"How do you handle regulated environments?"**
 → Zero-Trust verification and why deterministic systems beat probabilistic ones in healthcare/finance
+
+---
+
+## 🎙️ The Transcription Interface Decision: Pragmatism Over Hype
+
+An upcoming feature demonstrates how "Taste" applies to technology selection: a Clinical Transcription PWA that lets clinicians dictate notes directly into the system.
+
+### The Temptation: React/Svelte
+The "obvious" choice for a modern web interface would be React or Svelte—trendy, marketable, with massive ecosystems. I evaluated all three:
+
+| Framework | Pros | Cons |
+|-----------|------|------|
+| **React** | Industry standard, hiring pool | Complex, over-engineered for this use case |
+| **Svelte** | Modern, compiles away | Small hiring pool, "too cutting edge" for healthtech maintenance |
+| **HTMX** | Simple, Python-native, fast | Less "impressive" on resume |
+
+### The Decision: HTMX
+
+**Why:** This is a production system for a 5-clinician practice that I'll be maintaining solo. The technology choice must optimize for:
+
+1. **Maintainability at 2am** - When production breaks, I don't want to debug React hooks or Svelte reactivity
+2. **Hiring continuity** - If I get hit by a bus, another Python developer can pick up HTMX faster than modern JS frameworks
+3. **Compliance simplicity** - Server-rendered HTML is easier to audit than client-side JS bundles
+4. **Existing expertise** - We already have FastAPI + Jinja2; HTMX is a natural extension
+
+**The Trade-off:** I sacrifice "resume impressiveness" for "system reliability." This is the Staff+ decision: choosing the boring technology that will survive over the shiny technology that looks good.
+
+### The On-Premise Decision
+
+**The constraint:** Real patient data, Australian compliance, friend's medical practice.
+
+**The solution:** Everything runs on a Mac Studio 128GB RAM:
+- Local Whisper (transcription)
+- Local Llama 3.1 70B (extraction + verification)
+- Local Keycloak (auth)
+- Local PostgreSQL (data)
+
+**Why not cloud:**
+- Zero data leaves the building (compliance win)
+- No ongoing API costs
+- Works during internet outages
+- No third-party dependencies to trust
+
+**The cost:** ~$8,000 one-time vs. potentially thousands per month in API calls for 5 clinicians.
+
+### The Engineering Lesson
+
+Staff+ engineering isn't about picking the most impressive technology. It's about picking the technology that:
+1. Fits the team (solo maintainer)
+2. Fits the constraints (compliance, uptime)
+3. Fits the timeline (6 months to production)
+4. Survives the "hit by a bus" scenario
+
+**See:** [Clinical Transcription PWA Design](docs/plans/2025-02-23-clinical-transcription-pwa-design.md) for full architecture
