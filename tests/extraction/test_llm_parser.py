@@ -129,9 +129,9 @@ class TestLLMTranscriptParser:
         # Should have temporal expressions from both rule-based and LLM
         assert len(result.temporal_expressions) > 0
 
-    def test_medication_status_parsing(self) -> None:
+    def test_medication_status_parsing(self, mock_llm_client: MagicMock) -> None:
         """Test medication status string parsing."""
-        parser = LLMTranscriptParser()
+        parser = LLMTranscriptParser(llm_client=mock_llm_client)
 
         assert parser._parse_medication_status("started") == MedicationStatus.STARTED
         assert parser._parse_medication_status("stopped") == MedicationStatus.DISCONTINUED
@@ -140,9 +140,9 @@ class TestLLMTranscriptParser:
         assert parser._parse_medication_status("decreased") == MedicationStatus.DECREASED
         assert parser._parse_medication_status("unknown") == MedicationStatus.UNKNOWN
 
-    def test_visit_type_normalization(self) -> None:
+    def test_visit_type_normalization(self, mock_llm_client: MagicMock) -> None:
         """Test visit type string normalization."""
-        parser = LLMTranscriptParser()
+        parser = LLMTranscriptParser(llm_client=mock_llm_client)
 
         assert parser._normalise_visit_type("follow up") == "follow-up"
         assert parser._normalise_visit_type("routine check") == "routine_check"
@@ -229,7 +229,8 @@ class TestLLMParserBoundaryCases:
     )
     def test_medication_status_handles_unexpected_values(self, status_text: str) -> None:
         """Property: Unknown medication statuses should map to UNKNOWN."""
-        parser = LLMTranscriptParser()
+        mock_client = MagicMock()
+        parser = LLMTranscriptParser(llm_client=mock_client)
 
         result = parser._parse_medication_status(status_text)
 
@@ -245,7 +246,8 @@ class TestLLMParserBoundaryCases:
     )
     def test_visit_type_normalization_boundaries(self, visit_type: str | None) -> None:
         """Property: Visit type normalization should handle any input gracefully."""
-        parser = LLMTranscriptParser()
+        mock_client = MagicMock()
+        parser = LLMTranscriptParser(llm_client=mock_client)
 
         result = parser._normalise_visit_type(visit_type)
 

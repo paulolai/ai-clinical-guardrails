@@ -104,12 +104,10 @@ class TestVerificationBenchmarks:
 class TestExtractionBenchmarks:
     """Benchmarks for extraction endpoint."""
 
-    @patch("src.api.verification_workflow.verify_patient_documentation")
-    @patch("src.api.verification_workflow.get_last_extraction")
+    @patch("src.api.get_verification_workflow")
     def test_extract_endpoint_latency(
         self,
-        mock_get_extraction: Any,
-        mock_verify: Any,
+        mock_get_workflow: Any,
         benchmark: Any,
     ) -> None:
         """Benchmark extraction + verification endpoint latency."""
@@ -123,17 +121,16 @@ class TestExtractionBenchmarks:
         )
         from src.models import Result, VerificationResult
 
-        # Mock the verification result
-        mock_verify.return_value = Result.success(
+        # Create mock workflow instance
+        mock_workflow = mock_get_workflow.return_value
+        mock_workflow.verify_patient_documentation.return_value = Result.success(
             VerificationResult(
                 is_safe_to_file=True,
                 score=0.95,
                 alerts=[],
             )
         )
-
-        # Mock the extraction result
-        mock_get_extraction.return_value = StructuredExtraction(
+        mock_workflow.get_last_extraction.return_value = StructuredExtraction(
             patient_name="Bench Mark",
             medications=[
                 ExtractedMedication(
@@ -211,12 +208,12 @@ class TestBenchmarkRequirements:
         )
         from src.models import Result, VerificationResult
 
-        with (
-            patch("src.api.verification_workflow.verify_patient_documentation") as mock_verify,
-            patch("src.api.verification_workflow.get_last_extraction") as mock_get_extraction,
-        ):
-            mock_verify.return_value = Result.success(VerificationResult(is_safe_to_file=True, score=0.95, alerts=[]))
-            mock_get_extraction.return_value = StructuredExtraction(
+        with patch("src.api.get_verification_workflow") as mock_get_workflow:
+            mock_workflow = mock_get_workflow.return_value
+            mock_workflow.verify_patient_documentation.return_value = Result.success(
+                VerificationResult(is_safe_to_file=True, score=0.95, alerts=[])
+            )
+            mock_workflow.get_last_extraction.return_value = StructuredExtraction(
                 patient_name="Test",
                 medications=[
                     ExtractedMedication(

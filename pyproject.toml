@@ -70,9 +70,5 @@ testpaths = ["tests"]
 markers = [
     "component: marks tests as component/integration tests (may require external services)",
 ]
-# VCR configuration
-vcr-record-mode = "none"
-vcr-cassette-dir = "tests/component/cassettes"
-vcr-match-on = ["method", "scheme", "host", "port", "path", "query", "body"]
 # Syrupy configuration
 addopts = "--snapshot-warn-unused"

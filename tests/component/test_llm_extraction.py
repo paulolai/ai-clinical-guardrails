@@ -18,10 +18,11 @@ import pytest_asyncio
 
 from src.extraction import LLMTranscriptParser, SyntheticLLMClient
 
-# Mark all tests in this module as component tests
+# Mark all tests in this module as component tests with VCR recording
 pytestmark = [
     pytest.mark.component,
     pytest.mark.asyncio,
+    pytest.mark.vcr,
 ]
 
 
