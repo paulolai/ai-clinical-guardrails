@@ -1,0 +1,53 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Host:
+      - hapi.fhir.org
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://hapi.fhir.org/baseR5/Patient/857109
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAA/1WPzU7DMBCE7zyFZY7Q2kmhIVHIhSIBFyoUBBLl4DRLapTYkbNtGlV9d2y3VcXF
+        P7Pf7OzuLgihBjq9NkvIhxZoQuhcoASF9NoVZemku9so4PFBaQCF1Xb2bX8bMJ3U6tljgSesWosO
+        39tSIHg95OF0xMNREOdBlIQ3CY/HYTi54jzh/OQ5DOHwy6j6/I108yCnb1wNH5paYu/DEbZ4Du9Q
+        4LpzlgoUGB937FbKjdNTe5NtU6vufkFXiG3CWN/3434y1qZiQRzHbLvCpl7QzLNLO7pnRSufQJRg
+        chtpqy96pUhaZLPXR5KyIkuZxbMURVHDP9fc6BYMDrmruLZY6HJg1uDZo/G8khKN2/rrtNSPaGQ9
+        uOFnGk7rVHIDylPUDULJt/Pbc/8HcP6AMMMBAAA=
+    headers:
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Location:
+      - https://hapi.fhir.org/baseR5/Patient/857109/_history/1
+      Content-Type:
+      - application/fhir+json;charset=utf-8
+      Date:
+      - Sun, 22 Feb 2026 12:41:59 GMT
+      ETag:
+      - W/"1"
+      Last-Modified:
+      - Thu, 19 Feb 2026 17:24:09 GMT
+      Server:
+      - nginx/1.24.0 (Ubuntu)
+      Transfer-Encoding:
+      - chunked
+      X-Powered-By:
+      - HAPI FHIR 8.9.1-SNAPSHOT/f38da2820b/2026-02-12 REST Server (FHIR Server; FHIR
+        5.0.0/R5)
+      X-Request-ID:
+      - LJX3LCA7NMGAHi2N
+    status:
+      code: 200
+      message: OK
+version: 1
