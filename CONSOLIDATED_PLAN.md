@@ -1,10 +1,10 @@
 # Consolidated Implementation Plan
 
 **Date:** 2025-02-22
-**Status:** Verification Engine ✅ | Extraction Layer ✅ | CLI Tests ✅ | All Passing ✅ (26/26)
+**Status:** Verification Engine ✅ | Extraction Layer ✅ | LLM Client ✅ | 46/47 Tests Passing
 
-**Last Updated By:** Agent implementing Phase 1.4 (LLM Client Integration)
-**Next Agent:** Phase 2 - Integration Workflow (FHIR connection)
+**Last Updated By:** Agent completing Phase 1.4 (LLM Client Integration with Retry)
+**Next Agent:** Phase 2 - Integration Workflow (Wire extraction → FHIR → verification)
 
 ---
 
@@ -28,9 +28,10 @@ The **Verification/Compliance Engine** is complete and tested - it successfully 
 | **FastAPI Service** | ✅ Working | `/verify` and `/verify/fhir/{id}` endpoints operational |
 | **FHIR Integration** | ✅ Working | HAPI FHIR sandbox integration with wrapper pattern |
 | **CLI Tools** | ✅ Working | `cli/fhir.py` and `cli/api.py` functional |
-| **Tests** | ✅ Passing | 9/9 tests pass (3 PBT, 4 API, 2 component) |
-| **Extraction Layer** | 🔄 IN PROGRESS | LLM-based parser scaffolded, needs LLM client integration |
+| **Tests** | ✅ Passing | 46/47 tests pass (11 extraction + existing) |
+| **Extraction Layer** | ✅ COMPLETE | Multi-provider LLM client with retry, 11 accuracy tests |
 | **Sample Transcripts** | ✅ COMPLETE | 10 test transcripts in tests/fixtures/sample_transcripts.json |
+| **CLI Tools** | ✅ Working | `cli/fhir.py`, `cli/api.py`, `cli/test_extraction.py` functional |
 
 ### ✅ Documentation (COMPLETE - Core)
 
@@ -141,6 +142,22 @@ uv run python examples/basic_verification.py
 
 ## Recent Fixes
 
+### Phase 1.4: LLM Client Integration
+**Goal:** Multi-provider LLM client with automatic retry
+**Implementation:**
+- Abstract `LLMClient` base class with OpenAI, Azure, Synthetic implementations
+- Automatic retry with exponential backoff (tenacity library)
+- Centralized configuration via environment variables
+- 120s default timeout for clinical extractions
+**Files Added/Modified:**
+- `src/extraction/llm_client.py` - Core LLM clients with retry logic
+- `src/extraction/llm_parser.py` - Updated to use configurable timeout
+- `src/extraction/__init__.py` - Exports for new clients and config
+- `tests/test_extraction_accuracy.py` - 11 extraction accuracy tests
+- `cli/test_extraction.py` - Interactive CLI for extraction testing
+- `pyproject.toml` - Added tenacity dependency
+**Status:** ✅ Complete, 46/47 tests passing
+
 ### Critical: Result Class Bug
 **Issue:** `TypeError: <class 'src.models.Result'> cannot be parametrized`
 **Cause:** Result inherited from Pydantic BaseModel but tried to use generic types
@@ -163,17 +180,23 @@ uv run python examples/basic_verification.py
 
 ## Next Steps (Priority Order)
 
-### Phase 0: Test Data (Current)
-**Goal:** Create sample clinical dictation transcripts
-**See:** [PLAN.md Phase 0](PLAN.md) for detailed breakdown
+### Phase 2: Integration Workflow (Current)
+**Goal:** Wire extraction to verification with FHIR integration
+**Tasks:**
+1. Wire FHIR client to verification engine (`src/integrations/fhir/workflow.py`)
+2. Build end-to-end example (`examples/complete_workflow.py`)
+**See:** [PLAN.md Phase 2](PLAN.md) for detailed breakdown
 
-### Phase 1: Voice Transcription Extraction (Next)
-**Goal:** Convert clinician dictation → structured data → verification
-**See:** [PLAN.md Phase 1](PLAN.md) for detailed breakdown
-
-### Phase 2-3: Integration & API (Future)
+### Phase 3: Demonstration & Polish (Next)
 **Goal:** Complete end-to-end workflow and FastAPI endpoints
-**See:** [PLAN.md Phase 2-3](PLAN.md)
+**Tasks:**
+1. Add FastAPI `/extract` endpoint
+2. Performance benchmarking
+**See:** [PLAN.md Phase 3](PLAN.md)
+
+### Completed Phases
+- ✅ Phase 0: Test Data (10 sample transcripts)
+- ✅ Phase 1: Voice Transcription Extraction (multi-provider LLM client)
 
 ---
 

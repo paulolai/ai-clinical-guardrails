@@ -8,7 +8,7 @@ import json
 from datetime import date
 from typing import Any
 
-from src.extraction.llm_client import SyntheticLLMClient
+from src.extraction.llm_client import LLMClient, SyntheticLLMClient
 from src.extraction.models import (
     ExtractedDiagnosis,
     ExtractedMedication,
@@ -99,7 +99,7 @@ class LLMTranscriptParser:
 
     def __init__(
         self,
-        llm_client: SyntheticLLMClient | Any | None = None,
+        llm_client: LLMClient | Any | None = None,
         reference_date: date | None = None,
     ):
         """Initialize LLM parser.
@@ -150,19 +150,20 @@ class LLMTranscriptParser:
             confidence=structured.get("overall_confidence", 0.5),
         )
 
-    async def _call_llm(self, prompt: str) -> str:
-        """Call LLM with prompt.
+    async def _call_llm(self, prompt: str, timeout: float = 120.0) -> str:
+        """Call LLM with prompt and retry logic.
 
         Args:
             prompt: The formatted extraction prompt
+            timeout: Request timeout in seconds (default 120s for clinical extraction)
 
         Returns:
             JSON string response from LLM
 
         Raises:
-            Exception: If LLM call fails
+            Exception: If LLM call fails after all retries
         """
-        return await self.llm_client.complete(prompt)
+        return await self.llm_client.complete(prompt, timeout=timeout)
 
     def _parse_llm_response(self, response: str) -> dict[str, Any]:
         """Parse LLM JSON response."""

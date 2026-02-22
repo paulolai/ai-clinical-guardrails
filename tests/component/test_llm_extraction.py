@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import pytest_asyncio
 
 from src.extraction import LLMTranscriptParser, SyntheticLLMClient
 
@@ -96,7 +97,7 @@ class TestLLMParserIntegration:
         """Get API key from environment."""
         return os.environ.get("SYNTHETIC_API_KEY")
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def parser(self, api_key: str | None) -> AsyncGenerator[LLMTranscriptParser, None]:
         """Create parser with real client if key available, mock otherwise."""
         if api_key:
@@ -180,7 +181,7 @@ class TestSampleTranscriptValidation:
         """Get API key from environment."""
         return os.environ.get("SYNTHETIC_API_KEY")
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def parser(self, api_key: str | None) -> AsyncGenerator[LLMTranscriptParser, None]:
         """Create parser with real client."""
         if not api_key:
