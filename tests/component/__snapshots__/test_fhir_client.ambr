@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_fhir_client_can_fetch_patient
+  dict({
+    'allergies': list([
+    ]),
+    'diagnoses': list([
+    ]),
+    'dob': datetime.date(1980, 1, 3),
+    'first_name': 'NuÃ±ez',
+    'last_name': 'Karla',
+    'patient_id': '90128869',
+  })
+# ---

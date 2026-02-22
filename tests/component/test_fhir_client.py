@@ -1,5 +1,6 @@
 import httpx
 import pytest
+from syrupy.filters import props
 
 from src.integrations.fhir.client import FHIRClient
 from src.models import PatientProfile
@@ -7,7 +8,7 @@ from src.models import PatientProfile
 
 @pytest.mark.asyncio
 @pytest.mark.vcr
-async def test_fhir_client_can_fetch_patient() -> None:
+async def test_fhir_client_can_fetch_patient(snapshot) -> None:
     """Component Test: Verifies integration with HAPI FHIR Sandbox."""
     client = FHIRClient()
     # Using a verified ID found in the sandbox
@@ -15,6 +16,9 @@ async def test_fhir_client_can_fetch_patient() -> None:
 
     try:
         profile = await client.get_patient_profile(patient_id)
+
+        # Snapshot the profile data (excluding dynamic fields)
+        assert profile.model_dump() == snapshot(exclude=props("last_updated"))
 
         assert isinstance(profile, PatientProfile)
         assert profile.patient_id == patient_id
