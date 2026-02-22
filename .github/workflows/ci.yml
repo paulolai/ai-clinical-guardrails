@@ -10,6 +10,8 @@ jobs:
   test:
     name: Test and Lint
     runs-on: ubuntu-latest
+    env:
+      SYNTHETIC_API_KEY: ${{ secrets.SYNTHETIC_API_KEY }}
 
     steps:
       - name: Checkout Code
