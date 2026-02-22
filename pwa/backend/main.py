@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from pwa.backend.config import settings
-from pwa.backend.routes import recordings
+from pwa.backend.routes import pages, recordings
 
 app = FastAPI(title=settings.app_name, debug=settings.debug)
 
@@ -14,8 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="pwa/frontend/static"), name="static")
+
 # Include routes
 app.include_router(recordings.router)
+app.include_router(pages.router)
 
 
 @app.get("/api/v1/health")

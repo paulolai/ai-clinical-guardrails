@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Transcription PWA</title>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- PWA Manifest (to be added later) -->
+    <!-- <link rel="manifest" href="/static/manifest.json"> -->
+</head>
+<body>
+    <header>
+        <h1>Clinical Transcription</h1>
+        <nav>
+            <a href="/">Patients</a>
+            <a href="/queue">Queue</a>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        {% block content %}
+        <p>Welcome to the Clinical Transcription PWA.</p>
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>Offline-capable • Local AI • Secure</p>
+    </footer>
+
+    <!-- Service Worker (to be added later) -->
+    <!-- <script src="/static/js/sw-register.js"></script> -->
+</body>
+</html>
