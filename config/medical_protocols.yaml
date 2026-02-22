@@ -1,0 +1,33 @@
+version: "1.0"
+
+settings:
+  hot_reload: false
+  cache_compiled_patterns: true
+
+checkers:
+  drug_interactions:
+    enabled: true
+    description: "Critical drug interaction detection"
+  allergy_checks:
+    enabled: true
+    description: "Patient allergy cross-reference"
+
+rules:
+  drug_interactions:
+    - name: "Warfarin NSAID"
+      pattern:
+        trigger:
+          medications: ["warfarin", "coumadin"]
+        conflicts:
+          medications: ["ibuprofen", "naproxen", "aspirin"]
+      severity: "CRITICAL"
+      message: "Warfarin + NSAID increases bleeding risk"
+
+  allergy_checks:
+    - name: "Penicillin Allergy"
+      pattern:
+        patient_allergies: ["penicillin"]
+        conflicts:
+          medications: ["amoxicillin", "ampicillin"]
+      severity: "CRITICAL"
+      message: "Patient allergic to penicillin prescribed penicillin-class antibiotic"

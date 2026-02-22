@@ -16,6 +16,7 @@ repos:
           - httpx>=0.28.1
           - hypothesis>=6.151.9
           - tenacity>=9.0.0
+          - types-pyyaml>=6.0.0
         exclude: (^src/integrations/fhir/generated\.py$|^examples/|^cli/|^tests/|generated\.py$)
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
