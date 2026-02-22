@@ -233,3 +233,39 @@ class TestSampleTranscriptValidation:
         if complexity == "low":
             # Low complexity should have good extraction
             assert result.confidence >= 0.5
+
+
+class TestLLMParserDirectIntegration:
+    """Direct integration tests for LLMTranscriptParser with real client."""
+
+    @pytest.fixture
+    def api_key(self) -> str | None:
+        """Get API key from environment."""
+        return os.environ.get("SYNTHETIC_API_KEY")
+
+    @pytest_asyncio.fixture
+    async def parser(self, api_key: str | None) -> AsyncGenerator[LLMTranscriptParser, None]:
+        """Create parser with real client."""
+        if not api_key:
+            pytest.skip("SYNTHETIC_API_KEY not set")
+
+        client = SyntheticLLMClient(api_key=api_key)
+        parser = LLMTranscriptParser(
+            llm_client=client,
+            reference_date=date(2024, 1, 15),
+        )
+        yield parser
+        await client.close()
+
+    async def test_parse_with_real_synthetic_client(self, parser: LLMTranscriptParser) -> None:
+        """Integration test with VCR recording.
+
+        Uses recorded cassettes when available, makes real API calls
+        when SYNTHETIC_API_KEY is set and cassette needs updating.
+        """
+        from src.extraction.models import StructuredExtraction
+
+        result = await parser.parse("Mrs. Johnson came in yesterday for follow-up. Started on Lisinopril 10mg daily.")
+
+        assert isinstance(result, StructuredExtraction)
+        assert result.patient_name is not None or result.confidence < 0.5

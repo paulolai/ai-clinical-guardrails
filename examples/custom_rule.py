@@ -4,6 +4,7 @@
 import asyncio
 import re
 from datetime import date
+from typing import TYPE_CHECKING
 
 from src.engine import ComplianceEngine
 from src.models import (
@@ -16,17 +17,23 @@ from src.models import (
     VerificationResult,
 )
 
+if TYPE_CHECKING:
+    from src.protocols.models import ProtocolConfig
+
 
 class CustomComplianceEngine(ComplianceEngine):
     """Extended engine with custom rules."""
 
     @staticmethod
     def verify(
-        patient: PatientProfile, context: EMRContext, ai_output: AIGeneratedOutput
+        patient: PatientProfile,
+        context: EMRContext,
+        ai_output: AIGeneratedOutput,
+        protocol_config: "ProtocolConfig | None" = None,
     ) -> Result[VerificationResult, list[ComplianceAlert]]:
         """Verify with custom rules."""
         # Get base verification
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine.verify(patient, context, ai_output, protocol_config)
 
         if not result.is_success:
             return result

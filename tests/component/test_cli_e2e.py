@@ -1,6 +1,6 @@
 """E2E tests for CLI extraction tool.
 
-Tests the full CLI flow with real API calls.
+Tests the full CLI flow with real API calls (recorded with VCR).
 """
 
 import os
@@ -14,8 +14,13 @@ from cli.extract import app
 
 runner = CliRunner()
 
+# Enable VCR recording for all CLI tests
+pytestmark = [
+    pytest.mark.component,
+    pytest.mark.vcr,
+]
 
-@pytest.mark.component
+
 class TestCLIExtractE2E:
     """End-to-end tests for CLI extraction with real API."""
 

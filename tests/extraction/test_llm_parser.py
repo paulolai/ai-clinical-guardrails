@@ -149,32 +149,6 @@ class TestLLMTranscriptParser:
         assert parser._normalise_visit_type("urgent") == "urgent_same_day"
         assert parser._normalise_visit_type(None) is None
 
-    @pytest.mark.component
-    @pytest.mark.asyncio
-    async def test_parse_with_real_synthetic_client(self) -> None:
-        """Integration test - only runs with real API key.
-
-        Set SYNTHETIC_API_KEY env var to run this test.
-        """
-        import os
-
-        api_key = os.environ.get("SYNTHETIC_API_KEY")
-        if not api_key:
-            pytest.skip("SYNTHETIC_API_KEY not set")
-
-        from src.extraction.llm_client import SyntheticLLMClient
-
-        client = SyntheticLLMClient(api_key=api_key)
-        parser = LLMTranscriptParser(
-            llm_client=client,
-            reference_date=date(2024, 1, 15),
-        )
-
-        result = await parser.parse("Mrs. Johnson came in yesterday for follow-up. Started on Lisinopril 10mg daily.")
-
-        assert isinstance(result, StructuredExtraction)
-        assert result.patient_name is not None or result.confidence < 0.5
-
 
 # Property-based boundary and edge case tests
 class TestLLMParserBoundaryCases:

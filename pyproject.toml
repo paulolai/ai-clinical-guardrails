@@ -79,5 +79,6 @@ addopts = "--snapshot-warn-unused"
 [dependency-groups]
 dev = [
     "pytest-benchmark>=5.2.3",
+    "pytest-xdist>=3.8.0",
     "types-pyyaml>=6.0.0",
 ]
