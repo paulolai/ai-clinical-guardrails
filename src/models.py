@@ -5,7 +5,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
-from src.extraction.models import ExtractedMedication  # noqa: TC001
+from src.extraction.models import ExtractedMedication, StructuredExtraction  # noqa: TC001
 
 T = TypeVar("T")
 E = TypeVar("E")
@@ -76,3 +76,26 @@ class VerificationResult(BaseModel):
     is_safe_to_file: bool
     score: float = Field(..., ge=0.0, le=1.0)
     alerts: list[ComplianceAlert] = Field(default_factory=list)
+
+
+class ClinicalNote(BaseModel):
+    """AI-generated clinical note for review."""
+
+    note_id: str = Field(..., description="Unique identifier for this note")
+    patient_id: str = Field(..., description="FHIR Patient ID")
+    encounter_id: str = Field(..., description="FHIR Encounter ID")
+    generated_at: datetime = Field(..., description="When the AI generated this note")
+    sections: dict[str, str] = Field(
+        default_factory=dict, description="Note sections (chief_complaint, assessment, plan, etc.)"
+    )
+    extraction: StructuredExtraction = Field(..., description="Structured data extracted from the note")
+
+
+class UnifiedReview(BaseModel):
+    """Combined view for clinician review."""
+
+    note: ClinicalNote = Field(..., description="The AI-generated note")
+    emr_context: EMRContext = Field(..., description="Patient data from EMR at verification time")
+    verification: VerificationResult = Field(..., description="Compliance verification results")
+    review_url: str = Field(..., description="URL for accessing this review")
+    created_at: datetime = Field(default_factory=datetime.now, description="When this review was generated")
