@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="queue-container">
+    <h2>Recording Queue</h2>
+
+    <div id="connection-status" class="connection-indicator online">
+        <span class="status-dot"></span>
+        <span class="status-text">Online</span>
+    </div>
+
+    <div id="ios-warning-container"></div>
+
+    <div class="queue-actions">
+        <button id="refresh-queue" class="btn btn-secondary" onclick="QueueUI.refresh()">
+            Refresh
+        </button>
+        <button id="sync-now" class="btn btn-primary" onclick="QueueUI.syncNow()">
+            Sync Now
+        </button>
+    </div>
+
+    <div id="queue-list" class="queue-list">
+        <p class="empty-state">Loading queue...</p>
+    </div>
+
+    <div id="recording-detail" class="recording-detail hidden">
+        <h3>Recording Details</h3>
+        <div id="detail-content"></div>
+        <button class="btn btn-secondary" onclick="QueueUI.hideDetail()">Close</button>
+    </div>
+</div>
+
+<script src="/static/js/queue.js"></script>
+<script>
+    // Initialize queue UI when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        QueueUI.init();
+    });
+</script>
+{% endblock %}

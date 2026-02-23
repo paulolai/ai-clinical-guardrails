@@ -21,3 +21,9 @@ async def home(request: Request) -> HTMLResponse:
 async def record_page(request: Request, patient_id: str) -> HTMLResponse:
     """Recording page for a specific patient."""
     return templates.TemplateResponse("record.html", {"request": request, "patient_id": patient_id})
+
+
+@router.get("/queue", response_class=HTMLResponse)
+async def queue_page(request: Request) -> HTMLResponse:
+    """Queue page showing pending/completed recordings."""
+    return templates.TemplateResponse("queue.html", {"request": request})
