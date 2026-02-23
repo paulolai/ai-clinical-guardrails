@@ -19,7 +19,8 @@ A feature is only complete when:
 1. Run unit tests: `uv run pytest tests/ -m "not component" -x`
 2. Run linter: `uv run ruff check .`
 3. Update relevant AGENTS.md if patterns changed
-4. Document significant learnings in `docs/learnings/`
+4. **Regenerate ADRs:** If `docs/ARCHITECTURE_DECISIONS.md` changed, run `python3 scripts/generate_adr_summary.py`
+5. Document significant learnings in `docs/learnings/`
 
 ## Commit Message Standards
 

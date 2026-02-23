@@ -41,6 +41,7 @@ We operate on the principle that **External Data** (User Input, EMR APIs, AI Pre
 
 | Standard | Purpose | Location |
 |----------|---------|----------|
+| **Architecture Rules** | Constraints & Decisions | [ADR-extracts.md](ADR-extracts.md) |
 | **Operational Workflows** | How to build features | [docs/standards/OPERATIONAL_WORKFLOWS.md](docs/standards/OPERATIONAL_WORKFLOWS.md) |
 | **Critical Patterns** | Code patterns to use | [docs/standards/CRITICAL_PATTERNS.md](docs/standards/CRITICAL_PATTERNS.md) |
 | **Testing Standards** | How to test safely | [docs/standards/TESTING_STANDARDS.md](docs/standards/TESTING_STANDARDS.md) |
