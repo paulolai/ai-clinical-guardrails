@@ -5,10 +5,10 @@ from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = "sqlite+aiosqlite:///./data/clinical.db"
+from pwa.backend.config import settings
 
 engine = create_async_engine(
-    DATABASE_URL,
+    settings.database_url,
     echo=False,
     future=True,
 )

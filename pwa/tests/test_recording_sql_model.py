@@ -12,8 +12,8 @@ from pwa.backend.models.recording import Recording, RecordingStatus
 from pwa.backend.models.recording_sql import RecordingModel
 
 
-@pytest.mark.asyncio
-async def test_recording_model_table_exists():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_recording_model_table_exists() -> None:
     """Test that RecordingModel creates the recordings table."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -24,8 +24,8 @@ async def test_recording_model_table_exists():
         assert table == "recordings"
 
 
-@pytest.mark.asyncio
-async def test_recording_model_has_all_columns():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_recording_model_has_all_columns() -> None:
     """Test that RecordingModel has all required columns."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -54,8 +54,8 @@ async def test_recording_model_has_all_columns():
         assert expected_columns.issubset(columns)
 
 
-@pytest.mark.asyncio
-async def test_recording_model_indexes_exist():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_recording_model_indexes_exist() -> None:
     """Test that indexes are created for patient_id, clinician_id, status, created_at."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -73,8 +73,8 @@ async def test_recording_model_indexes_exist():
         assert expected_indexes.issubset(indexes)
 
 
-@pytest.mark.asyncio
-async def test_recording_model_json_field():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_recording_model_json_field() -> None:
     """Test that verification_results JSON field stores and retrieves dict data."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -100,8 +100,8 @@ async def test_recording_model_json_field():
         assert recording.verification_results == test_data
 
 
-@pytest.mark.asyncio
-async def test_pydantic_to_sqlalchemy_mapping():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_pydantic_to_sqlalchemy_mapping() -> None:
     """Test that Pydantic Recording can be converted to SQLAlchemy RecordingModel."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -138,8 +138,8 @@ async def test_pydantic_to_sqlalchemy_mapping():
     assert sqlalchemy_recording.verification_results == {"confidence": 0.9}
 
 
-@pytest.mark.asyncio
-async def test_sqlalchemy_to_pydantic_mapping():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_sqlalchemy_to_pydantic_mapping() -> None:
     """Test that SQLAlchemy RecordingModel can be converted to Pydantic Recording."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -168,8 +168,8 @@ async def test_sqlalchemy_to_pydantic_mapping():
         assert pydantic_recording.verification_results == {"confidence": 0.95}
 
 
-@pytest.mark.asyncio
-async def test_recording_model_timestamps():
+@pytest.mark.asyncio  # type: ignore[untyped-decorator]
+async def test_recording_model_timestamps() -> None:
     """Test that created_at and updated_at are set automatically."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

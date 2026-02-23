@@ -1,47 +1,67 @@
 # pwa/backend/services/recording_service.py
 from uuid import UUID
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from pwa.backend.models.recording import Recording, RecordingStatus
+from pwa.backend.models.recording_sql import RecordingModel
 
 
 class RecordingService:
-    """Service for managing recordings."""
+    """Service for managing recordings with async SQLAlchemy database persistence."""
 
-    # In-memory storage for now (will be replaced with DB)
-    _recordings: dict[UUID, Recording] = {}
+    def __init__(self, db: AsyncSession):
+        self.db = db
 
-    def create_recording(
+    async def create_recording(
         self, patient_id: str, clinician_id: str, duration_seconds: int, audio_file_path: str | None = None
     ) -> Recording:
         """Create a new recording."""
-        recording = Recording(
+        recording_model = RecordingModel(
             patient_id=patient_id,
             clinician_id=clinician_id,
             duration_seconds=duration_seconds,
             audio_file_path=audio_file_path,
-            status=RecordingStatus.PENDING,
+            status=RecordingStatus.PENDING.value,
         )
-        self._recordings[recording.id] = recording
-        return recording
+        self.db.add(recording_model)
+        await self.db.commit()
+        await self.db.refresh(recording_model)
+        return Recording.model_validate(recording_model)
 
-    def get_recording(self, recording_id: UUID) -> Recording | None:
+    async def get_recording(self, recording_id: UUID) -> Recording | None:
         """Get a recording by ID."""
-        return self._recordings.get(recording_id)
+        result = await self.db.execute(select(RecordingModel).where(RecordingModel.id == recording_id))
+        recording_model = result.scalar_one_or_none()
+        if recording_model is None:
+            return None
+        return Recording.model_validate(recording_model)
 
-    def get_recordings_for_clinician(self, clinician_id: str, status: RecordingStatus | None = None) -> list[Recording]:
+    async def get_recordings_for_clinician(
+        self, clinician_id: str, status: RecordingStatus | None = None
+    ) -> list[Recording]:
         """Get all recordings for a clinician, optionally filtered by status."""
-        recordings = [r for r in self._recordings.values() if r.clinician_id == clinician_id]
+        query = select(RecordingModel).where(RecordingModel.clinician_id == clinician_id)
         if status:
-            recordings = [r for r in recordings if r.status == status]
-        return recordings
+            query = query.where(RecordingModel.status == status.value)
+        result = await self.db.execute(query)
+        recording_models = result.scalars().all()
+        return [Recording.model_validate(r) for r in recording_models]
 
-    def update_recording_status(
+    async def update_recording_status(
         self, recording_id: UUID, status: RecordingStatus, error_message: str | None = None
     ) -> Recording | None:
         """Update the status of a recording."""
-        recording = self._recordings.get(recording_id)
-        if recording:
-            recording.status = status
-            if error_message:
-                recording.error_message = error_message
-        return recording
+        result = await self.db.execute(select(RecordingModel).where(RecordingModel.id == recording_id))
+        recording_model = result.scalar_one_or_none()
+        if recording_model is None:
+            return None
+
+        recording_model.status = status.value
+        if error_message:
+            recording_model.error_message = error_message
+
+        await self.db.commit()
+        await self.db.refresh(recording_model)
+        return Recording.model_validate(recording_model)

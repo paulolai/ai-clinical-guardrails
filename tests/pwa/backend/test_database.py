@@ -3,7 +3,7 @@
 import pytest
 from sqlalchemy import text
 
-from pwa.backend.database import engine, get_db, init_db
+from pwa.backend.database import close_db, engine, get_db, init_db
 
 
 @pytest.mark.asyncio
@@ -23,6 +23,10 @@ async def test_database_connection():
         foreign_keys = result.scalar()
         assert foreign_keys == 1, f"Expected foreign_keys=ON, got {foreign_keys}"
 
+        result = await conn.execute(text("PRAGMA busy_timeout"))
+        busy_timeout = result.scalar()
+        assert busy_timeout == 5000, f"Expected busy_timeout=5000, got {busy_timeout}"
+
 
 @pytest.mark.asyncio
 async def test_get_db_dependency():
@@ -40,3 +44,11 @@ async def test_init_db():
     await init_db()
     # Just verify it doesn't throw
     assert True
+
+
+@pytest.mark.asyncio
+async def test_close_db():
+    """Test close_db properly disposes the engine."""
+    # Test that close_db runs without errors
+    await close_db()
+    # Engine disposal is successful if no exception is raised
