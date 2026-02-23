@@ -1,6 +1,6 @@
 # Clinical Transcription PWA - Phase 2 Kickoff
 
-**Date:** 2025-02-23
+**Date:** 2026-02-23
 **Status:** 🚀 Ready to Start
 **Depends on:** Phase 1 Complete ✅
 **Branch:** `main` (stable) → `phase-2-offline-capabilities` (new)
@@ -182,7 +182,7 @@ uv run python pwa/backend/main.py
 ### 3. Start Implementation
 
 See detailed task breakdown in:
-**[2025-02-23-clinical-transcription-pwa-implementation.md](./2025-02-23-clinical-transcription-pwa-implementation.md)**
+**[2026-02-23-clinical-transcription-pwa-implementation.md](./2026-02-23-clinical-transcription-pwa-implementation.md)**
 
 (Tasks 8+ cover Phase 2)
 
@@ -214,9 +214,9 @@ See detailed task breakdown in:
 
 ## Resources
 
-- **Design Doc:** [2025-02-23-clinical-transcription-pwa-design.md](./2025-02-23-clinical-transcription-pwa-design.md)
-- **Phase 1 Summary:** [2025-02-23-pwa-phase1-implementation-summary.md](./2025-02-23-pwa-phase1-implementation-summary.md)
-- **Implementation Plan:** [2025-02-23-clinical-transcription-pwa-implementation.md](./2025-02-23-clinical-transcription-pwa-implementation.md)
+- **Design Doc:** [2026-02-23-clinical-transcription-pwa-design.md](./2026-02-23-clinical-transcription-pwa-design.md)
+- **Phase 1 Summary:** [2026-02-23-pwa-phase1-implementation-summary.md](./2026-02-23-pwa-phase1-implementation-summary.md)
+- **Implementation Plan:** [2026-02-23-clinical-transcription-pwa-implementation.md](./2026-02-23-clinical-transcription-pwa-implementation.md)
 
 ---
 

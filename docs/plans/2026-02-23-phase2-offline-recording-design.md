@@ -1,6 +1,6 @@
 # Phase 2: Offline Recording Design
 
-**Date:** 2025-02-23
+**Date:** 2026-02-23
 **Status:** ✅ Approved
 **Revision:** 1.1 (Critical feedback incorporated)
 
@@ -117,7 +117,7 @@ class Recording(BaseModel):
     audio_blob: Blob,              // The actual audio
     draft_transcript: "...",       // Browser transcription
     duration_seconds: 120,
-    created_at: "2025-02-23T10:30:00Z",
+    created_at: "2026-02-23T10:30:00Z",
     sync_status: "pending_upload", // pending_upload | uploading | uploaded | failed
     retry_count: 0
 }
@@ -293,8 +293,8 @@ Offline: Recording... + "Recording saved locally"
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2025-02-23 | Initial design |
-| 1.1 | 2025-02-23 | Critical feedback incorporated: Split Phase 2, mark draft transcription ONLINE ONLY, add iOS foreground sync requirements, simplify LLM approach |
+| 1.0 | 2026-02-23 | Initial design |
+| 1.1 | 2026-02-23 | Critical feedback incorporated: Split Phase 2, mark draft transcription ONLINE ONLY, add iOS foreground sync requirements, simplify LLM approach |
 
 ---
 

@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12, FastAPI, HTMX, Jinja2, PostgreSQL, Keycloak, Whisper, Llama.cpp/vLLM, Docker Compose
 
-**Reference Design:** [2025-02-23-clinical-transcription-pwa-design.md](./2025-02-23-clinical-transcription-pwa-design.md)
+**Reference Design:** [2026-02-23-clinical-transcription-pwa-design.md](./2026-02-23-clinical-transcription-pwa-design.md)
 
 ---
 
@@ -1089,4 +1089,4 @@ The detailed plan continues through:
 
 ---
 
-**Plan saved to:** `docs/plans/2025-02-23-clinical-transcription-pwa-implementation.md`
+**Plan saved to:** `docs/plans/2026-02-23-clinical-transcription-pwa-implementation.md`
