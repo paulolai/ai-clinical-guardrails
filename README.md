@@ -140,6 +140,12 @@ uv run pytest tests/ --cov=src --cov-report=html
 
 ---
 
+## 🔧 Development
+
+This project uses **[obra/superpowers](https://github.com/obra/superpowers)** - a collection of development skills and best practices that guide AI-assisted development workflows.
+
+---
+
 ## 📚 Documentation
 
 | Document | Purpose |
