@@ -2,29 +2,36 @@
 
 **Date:** 2025-02-23
 **Status:** ✅ Approved
-**Depends on:** Phase 1 Complete
+**Revision:** 1.1 (Critical feedback incorporated)
 
 ---
 
 ## 1. Overview & Goals
 
-**Scope**: Enable offline audio recording with automatic sync when connectivity returns. Server handles all transcription and LLM processing.
+**⚠️ REVISED SCOPE - Phase 2a (PWA Only)**
+
+Phase 2 has been split into two parts to manage complexity:
+- **Phase 2a (This Sprint)**: Offline recording and sync ONLY. AI backend is mocked.
+- **Phase 2b (Next Sprint)**: Add Whisper + LLM integration.
+
+**Why split?** Offline PWA state management and AI R&D are two massive unrelated engineering hurdles. Attempting both simultaneously risks ending with a buggy PWA and a half-baked AI pipeline.
+
+**Scope for Phase 2a**: Enable offline audio recording with automatic sync when connectivity returns. Server provides mock transcription for now.
 
 **Key Behaviors**:
 - Clinician records → Audio stored in IndexedDB immediately
-- Web Speech API provides draft transcription for immediate feedback
 - If online: Auto-upload starts with progress indicator
 - If offline: Recording queued with subtle "pending upload" badge
-- When connectivity returns: Background sync triggers automatically
-- Server: Whisper transcribes → LLM extracts/verifies → Results returned
+- When connectivity returns: **Foreground sync required** (background sync unavailable on iOS Safari)
+- Server: Mock transcription response (Phase 2b adds real Whisper)
 
 **Success Criteria**:
 - [ ] Record audio without internet
 - [ ] Audio persists across browser sessions
-- [ ] Auto-sync when online (no user action)
+- [ ] Foreground sync when online (user must keep app open)
 - [ ] Queue shows upload/processing status
 - [ ] Retry logic for failed uploads
-- [ ] Draft transcription for immediate feedback
+- [ ] iOS/Safari compatibility with clear sync instructions
 - [ ] Export audio for clinical safety
 
 ---
@@ -69,11 +76,16 @@
 
 ### Data Flow
 
-1. **RECORD**: User clicks "Record" → MediaRecorder captures audio + Web Speech API transcribes → Store in IndexedDB
-2. **SYNC CHECK**: Service Worker detects connectivity → Queue upload tasks
+1. **RECORD**: User clicks "Record" → MediaRecorder captures audio → Store in IndexedDB
+2. **SYNC CHECK**: Service Worker detects connectivity → Queue upload tasks (background sync where supported)
 3. **UPLOAD**: Read from IndexedDB → POST to server → Mark as uploaded → Clear local storage
-4. **PROCESS** (Server): Whisper transcribes → LLM extracts/verifies → Store results
-5. **POLL FOR RESULTS**: HTMX polls for status → Show final transcript
+4. **PROCESS** (Server): Mock transcription (Phase 2b adds Whisper) → Store results
+5. **POLL FOR RESULTS**: HTMX polls for status → Show transcript
+
+**iOS/Safari Note**: Background Sync API not supported. Sync requires:
+- User keeps app/tab open
+- HTMX polling detects connectivity
+- Visual indicator: "Keep app open to sync"
 
 ---
 
@@ -115,15 +127,24 @@ class Recording(BaseModel):
 
 ## 4. Service Worker Strategy
 
-**Why Service Worker**: Intercepts network requests, queues when offline, background sync when online.
+**⚠️ iOS LIMITATION**: Safari (iOS) does not support the Background Sync API. A significant portion of mobile clinicians use iPhones/iPads.
+
+**Why Service Worker**: Intercepts network requests, queues when offline, enables background sync where supported.
 
 **Responsibilities**:
 1. Cache static assets for offline viewing
 2. Intercept upload requests → Queue in IndexedDB if offline
-3. Trigger background sync when connectivity returns
-4. Optional: Notify when processing complete
+3. Trigger background sync when connectivity returns (Chrome/Android only)
+4. Fallback to HTMX polling for iOS/Safari
 
-**Implementation**: Workbox library for reliability, fallback to HTMX polling for unsupported browsers.
+**iOS Sync Strategy**:
+- Background sync unavailable on Safari
+- **Foreground sync required**: User must keep app open
+- HTMX polling every 30 seconds when online
+- Visual warning: "⚠️ Keep app open to sync (iOS limitation)"
+- Poll while tab is active, pause when backgrounded
+
+**Implementation**: Workbox library for Chrome/Android, HTMX polling fallback for iOS/Safari.
 
 ---
 
@@ -161,18 +182,29 @@ class Recording(BaseModel):
 
 ---
 
-## 6. Draft Transcription
+## 6. Draft Transcription (ONLINE ONLY ⚠️)
 
-**Purpose**: Immediate feedback to catch mic/audio issues
+**⚠️ CRITICAL**: Web Speech API requires internet connection on most browsers (streams audio to Google/Apple servers). It will NOT work offline.
+
+**Purpose**: Immediate feedback to catch mic/audio issues **when online**
 
 **Implementation**:
-- Web Speech API (built-in browser capability)
-- Display as light gray "Draft..." text
+- Web Speech API (streams to cloud)
+- Display as light gray "Draft..." text **only when online**
+- **When offline**: No draft transcription, show "Recording saved locally" only
 - Read-only, not editable
 - Replaced by Whisper transcript when ready
-- Clear visual distinction between draft and final
 
-**Why not editable**: Avoids confusion when final (accurate) Whisper transcript arrives.
+**Why ONLINE ONLY**:
+- Web Speech API requires active internet on Chrome, Safari Desktop, Firefox
+- Only Pixel phones with on-device dictation work offline
+- Client-side WASM model is Phase 3 scope
+
+**UI Behavior**:
+```
+Online:  Recording... + "Draft: [live transcription]"
+Offline: Recording... + "Recording saved locally"
+```
 
 ---
 
@@ -224,22 +256,45 @@ class Recording(BaseModel):
 
 ## 10. Technical Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Offline Storage | IndexedDB (localForage library) |
-| Service Worker | Workbox |
-| Draft Transcription | Web Speech API |
-| Testing | Playwright + pytest |
-| Sync Detection | Network Information API + polling fallback |
+| Component | Technology | Notes |
+|-----------|-----------|-------|
+| Offline Storage | IndexedDB (localForage) | Client-side audio persistence |
+| Service Worker | Workbox | Chrome/Android background sync |
+| Sync Fallback | HTMX polling | iOS/Safari foreground sync |
+| Draft Transcription | Web Speech API | ONLINE ONLY - catches mic issues |
+| Testing | Playwright + pytest | Automated E2E |
+| Sync Detection | Network Information API + polling | iOS requires polling |
+| Audio Format | WAV | Phase 3: Opus/FLAC compression |
 
 ---
 
 ## 11. Out of Scope (Phase 3)
 
+### Phase 2a (Current) - PWA Only
+- AI/Transcription is **mocked** - server returns dummy transcripts
+- Focus: Reliable offline recording and sync
+
+### Phase 2b (Next Sprint) - AI Integration
+- Whisper container for transcription
+- **Simplified LLM**: Pick ONE model (Llama 3.1 8B or 70B)
+- **NO evaluation suite** - pick based on community benchmarks, test locally
+- LLM extraction and verification
+
+### Phase 3 (Future)
 - Client-side Whisper (WebAssembly)
 - Offline LLM processing
+- Audio compression (Opus/FLAC) for bandwidth
 - Real-time sync across devices
 - End-to-end encryption of local storage
+
+---
+
+## 12. Revision History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-02-23 | Initial design |
+| 1.1 | 2025-02-23 | Critical feedback incorporated: Split Phase 2, mark draft transcription ONLINE ONLY, add iOS foreground sync requirements, simplify LLM approach |
 
 ---
 
