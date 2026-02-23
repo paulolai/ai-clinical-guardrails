@@ -3,7 +3,7 @@
 **Status:** Ready for Implementation
 **Previous Agent:** Completed design phase
 **Next Agent:** Implementation
-**Date:** 2025-02-23
+**Date:** 2026-02-23
 
 ---
 
@@ -20,7 +20,7 @@ A Progressive Web App that lets clinicians:
 **Out of Scope for Phase 2a:**
 - Whisper transcription (mock only)
 - LLM extraction (not started)
-- PostgreSQL persistence (use in-memory for now)
+- PostgreSQL persistence (SQLite persistence is now available from Phase 1.5)
 
 ---
 
@@ -62,7 +62,7 @@ Why? Offline PWA state management is hard. Browser quirks, storage quotas, iOS l
 
 ### The Plan
 
-**Location:** `docs/plans/2025-02-23-phase2a-offline-recording-implementation.md`
+**Location:** `docs/plans/2026-02-23-phase2a-offline-recording-implementation.md`
 
 This file has:
 - 9 detailed tasks
@@ -93,7 +93,7 @@ This file has:
 ### Prerequisites
 
 ```bash
-# Verify Phase 1 works (9 tests passing)
+# Verify Phase 1 works (27 tests passing)
 uv run pytest pwa/tests/ -v
 
 # Run server
@@ -103,7 +103,7 @@ uv run python pwa/backend/main.py
 
 ### Step-by-Step
 
-1. **Read the full plan:** `docs/plans/2025-02-23-phase2a-offline-recording-implementation.md`
+1. **Read the full plan:** `docs/plans/2026-02-23-phase2a-offline-recording-implementation.md`
 
 2. **Start with Task 1** (IndexedDB) - it's the foundation
 
@@ -201,13 +201,13 @@ At the end of Phase 2a, you should be able to:
 ## Questions?
 
 ### Design Questions
-See: `docs/plans/2025-02-23-phase2-offline-recording-design.md` (Revision 1.1)
+See: `docs/plans/2026-02-23-phase2-offline-recording-design.md` (Revision 1.1)
 
 ### Implementation Questions
-See: `docs/plans/2025-02-23-phase2a-offline-recording-implementation.md`
+See: `docs/plans/2026-02-23-phase2a-offline-recording-implementation.md`
 
 ### Phase 1 Context
-See: `docs/plans/2025-02-23-pwa-phase1-implementation-summary.md`
+See: `docs/plans/2026-02-23-pwa-phase1-implementation-summary.md`
 
 ---
 
