@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from pwa.backend.database import get_db
+from pwa.backend.models.recording import RecordingStatus
 from pwa.backend.services.extraction_service import LLMService
 from pwa.backend.services.recording_service import RecordingService
 
@@ -40,4 +41,7 @@ async def process_extraction(recording_id: UUID) -> None:
             logger.info("[Extraction] Completed for %s", recording_id)
 
         except Exception as e:
-            logger.error("[Extraction] Error for %s: %s", recording_id, e)
+            logger.exception(f"[Extraction] Error for {recording_id}: {e}")
+            await service.update_recording_status(
+                recording_id, RecordingStatus.ERROR, error_message=f"Extraction failed: {str(e)}"
+            )
