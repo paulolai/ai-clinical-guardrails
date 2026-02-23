@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Whisper transcription service."""
 
+import logging
+import os
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -9,10 +11,14 @@ import whisper
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Whisper Transcription Service")
 
 # Load model at startup (choose: tiny, base, small, medium, large)
-MODEL_NAME = "base"
+MODEL_NAME = os.getenv("WHISPER_MODEL", "base")
 model: Any = None
 
 
@@ -37,6 +43,7 @@ async def transcribe_audio(
     if model is None:
         return JSONResponse({"error": "Model not loaded"}, status_code=503)
 
+    tmp_path: str | None = None
     try:
         # Save uploaded file to temp
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
@@ -47,9 +54,6 @@ async def transcribe_audio(
         # Transcribe
         result = model.transcribe(tmp_path)
 
-        # Cleanup
-        Path(tmp_path).unlink()
-
         return JSONResponse(
             {
                 "text": result["text"],
@@ -59,8 +63,16 @@ async def transcribe_audio(
             }
         )
 
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+    except Exception:
+        logger.exception("Transcription failed")
+        return JSONResponse({"error": "Transcription failed"}, status_code=500)
+    finally:
+        # Cleanup temp file
+        if tmp_path is not None:
+            try:
+                Path(tmp_path).unlink()
+            except OSError:
+                logger.warning(f"Failed to cleanup temp file: {tmp_path}")
 
 
 if __name__ == "__main__":
