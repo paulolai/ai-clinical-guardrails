@@ -54,6 +54,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db() -> None:
     """Initialize database - create all tables."""
+    # Import models to register them with Base.metadata
+    from pwa.backend.models.recording_sql import RecordingModel  # noqa: F401
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
