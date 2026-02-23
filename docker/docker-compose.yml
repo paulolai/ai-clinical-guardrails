@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  whisper:
+    build:
+      context: ./whisper
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./models:/root/.cache/whisper  # Persist models
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # We'll add LLM service in Task 3
+  # llm:
+  #   build:
+  #     context: ./llm
+  #   ports:
+  #     - "8003:8003"
