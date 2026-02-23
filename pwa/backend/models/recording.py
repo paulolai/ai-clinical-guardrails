@@ -53,6 +53,16 @@ class Recording(BaseModel):
     local_storage_key: str | None = None  # IndexedDB key (client-generated UUID)
     upload_attempts: int = 0  # Retry counter
 
+    # NEW: Extraction (Phase 2b)
+    fhir_bundle: dict[str, Any] | None = None
+    llm_model: str | None = None
+    extraction_started_at: datetime | None = None
+    extraction_completed_at: datetime | None = None
+
+    # NEW: Verification (Phase 2b)
+    verification_score: float | None = None
+    verified_at: datetime | None = None
+
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
