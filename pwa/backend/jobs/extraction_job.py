@@ -9,6 +9,7 @@ from pwa.backend.database import get_db
 from pwa.backend.models.recording import RecordingStatus
 from pwa.backend.services.extraction_service import LLMService
 from pwa.backend.services.recording_service import RecordingService
+from pwa.backend.services.verification_service import VerificationService
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +34,27 @@ async def process_extraction(recording_id: UUID) -> None:
             logger.info("[Extraction] Starting extraction for %s", recording_id)
             result = await llm.extract(recording.final_transcript, recording.patient_id)
 
-            # Update with results
+            logger.info("[Extraction] Completed for %s", recording_id)
+
+            # Verify
+            logger.info("[Verification] Starting verification for %s", recording_id)
+            verifier = VerificationService()
+            verification = verifier.verify(result)
+
+            # Update with everything including verification
             await service.update_recording(
-                recording_id, fhir_bundle=result, llm_model=result["model"], extraction_completed_at=datetime.now(UTC)
+                recording_id,
+                fhir_bundle=result,
+                llm_model=result["model"],
+                verification_results=verification,
+                verification_score=verification["score"],
+                verified_at=datetime.now(UTC),
+                extraction_completed_at=datetime.now(UTC),
+                status=RecordingStatus.COMPLETED if verification["passed"] else RecordingStatus.ERROR,
             )
 
-            logger.info("[Extraction] Completed for %s", recording_id)
+            if not verification["passed"]:
+                logger.warning("[Verification] FAILED for %s: %s", recording_id, verification["issues"])
 
         except Exception as e:
             logger.exception(f"[Extraction] Error for {recording_id}: {e}")

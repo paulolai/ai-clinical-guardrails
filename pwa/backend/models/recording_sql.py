@@ -76,6 +76,10 @@ class RecordingModel(Base):  # type: ignore
     extraction_started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     extraction_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+    # Phase 2b: Verification
+    verification_score: Mapped[float | None] = mapped_column(nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
     # Indexes for efficient querying
     __table_args__ = (
         Index("ix_recordings_patient_id", "patient_id"),

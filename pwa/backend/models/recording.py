@@ -64,6 +64,10 @@ class Recording(BaseModel):
     extraction_started_at: datetime | None = None
     extraction_completed_at: datetime | None = None
 
+    # NEW: Verification (Phase 2b)
+    verification_score: float | None = None
+    verified_at: datetime | None = None
+
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={

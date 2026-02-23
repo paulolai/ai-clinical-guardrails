@@ -102,6 +102,10 @@ class RecordingService:
         fhir_bundle: dict[str, Any] | None = None,
         llm_model: str | None = None,
         extraction_completed_at: datetime | None = None,
+        verification_results: dict[str, Any] | None = None,
+        verification_score: float | None = None,
+        verified_at: datetime | None = None,
+        status: RecordingStatus | None = None,
     ) -> Recording | None:
         """Update recording with extraction results."""
         result = await self.db.execute(select(RecordingModel).where(RecordingModel.id == recording_id))
@@ -117,6 +121,14 @@ class RecordingService:
             recording_model.llm_model = llm_model
         if extraction_completed_at is not None:
             recording_model.extraction_completed_at = extraction_completed_at
+        if verification_results is not None:
+            recording_model.verification_results = verification_results
+        if verification_score is not None:
+            recording_model.verification_score = verification_score
+        if verified_at is not None:
+            recording_model.verified_at = verified_at
+        if status is not None:
+            recording_model.status = status.value
 
         recording_model.updated_at = datetime.now(UTC)
 
