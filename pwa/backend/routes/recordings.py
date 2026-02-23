@@ -3,7 +3,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from pwa.backend.database import get_db
 from pwa.backend.models.recording import RecordingStatus
 from pwa.backend.services.recording_service import RecordingService
 
@@ -25,21 +27,17 @@ class RecordingResponse(BaseModel):
     created_at: str
 
 
-# Dependency
-def get_recording_service() -> RecordingService:
-    return RecordingService()
-
-
 @router.post("", response_model=RecordingResponse, status_code=201)
 async def create_recording(
     request: CreateRecordingRequest,
-    service: RecordingService = Depends(get_recording_service),  # noqa: B008
+    db: AsyncSession = Depends(get_db),  # noqa: B008
 ) -> RecordingResponse:
     """Create a new recording."""
     # TODO: Get clinician_id from auth token
     clinician_id = "current-clinician"  # Placeholder
 
-    recording = service.create_recording(
+    service = RecordingService(db)
+    recording = await service.create_recording(
         patient_id=request.patient_id,
         clinician_id=clinician_id,
         duration_seconds=request.duration_seconds,
@@ -59,10 +57,11 @@ async def create_recording(
 @router.get("/{recording_id}", response_model=RecordingResponse)
 async def get_recording(
     recording_id: UUID,
-    service: RecordingService = Depends(get_recording_service),  # noqa: B008
+    db: AsyncSession = Depends(get_db),  # noqa: B008
 ) -> RecordingResponse:
     """Get a recording by ID."""
-    recording = service.get_recording(recording_id)
+    service = RecordingService(db)
+    recording = await service.get_recording(recording_id)
     if not recording:
         raise HTTPException(status_code=404, detail="Recording not found")
 
@@ -79,13 +78,14 @@ async def get_recording(
 @router.get("", response_model=list[RecordingResponse])
 async def list_recordings(
     status: RecordingStatus | None = None,
-    service: RecordingService = Depends(get_recording_service),  # noqa: B008
+    db: AsyncSession = Depends(get_db),  # noqa: B008
 ) -> list[RecordingResponse]:
     """List recordings for the current clinician."""
     # TODO: Get clinician_id from auth token
     clinician_id = "current-clinician"
 
-    recordings = service.get_recordings_for_clinician(clinician_id, status)
+    service = RecordingService(db)
+    recordings = await service.get_recordings_for_clinician(clinician_id, status)
 
     return [
         RecordingResponse(
