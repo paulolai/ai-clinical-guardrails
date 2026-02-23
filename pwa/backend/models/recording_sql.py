@@ -45,6 +45,7 @@ class RecordingModel(Base):  # type: ignore
     )
     updated_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
     )
     uploaded_at: Mapped[datetime | None] = mapped_column(nullable=True)
     processed_at: Mapped[datetime | None] = mapped_column(nullable=True)
