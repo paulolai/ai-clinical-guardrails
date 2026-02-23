@@ -302,6 +302,33 @@ We use **Typer** for building CLI utilities and **Rich** for terminal formatting
 #### Rule
 *   **Use Rich for Status Verdicts:** All CLI outputs indicating safety status must use Rich's `console.print` with appropriate semantic colors (Green for Safe, Red for Blocked).
 *   **Define Types Explicitly:** Use `typer.Option` and `typer.Argument` with explicit type hints and help text.
+
+---
+
+## V. Infrastructure & Persistence
+
+### 13. Use SQLite for Local Clinic Deployments
+**Status:** Accepted
+
+#### The Decision
+We use **SQLite (with WAL Mode)** as the primary persistence layer for local clinic deployments, instead of PostgreSQL.
+
+#### Why?
+*   **Operational Simplicity:** Local clinics (single Mac Studio) are not cloud environments. Managing Docker containers, volumes, and port mappings for Postgres is a major support burden for non-technical staff.
+*   **Performance:** For <50 concurrent users, SQLite in WAL mode is faster (zero network latency) and handles concurrency easily.
+*   **Disaster Recovery:** "Backup" is just copying a file (`clinical.db`). "Restore" is pasting it back. This fits the "replace the Mac" DR strategy of small clinics.
+
+#### Configuration
+*   **Driver:** `aiosqlite` (Async)
+*   **Mode:** `PRAGMA journal_mode=WAL` (Critical for concurrency)
+*   **Safety:** `PRAGMA synchronous=NORMAL`
+
+#### Alternative Rejected: PostgreSQL (Docker)
+**Rejected:** While industry standard for SaaS, it is over-engineering for a single-server appliance. The operational complexity (networking, volumes, memory overhead) outweighs the benefits for this specific scale.
+
+#### Rule
+*   **Always Enable WAL:** The application must explicitly configure `journal_mode=WAL` on startup.
+*   **Use Batch Migrations:** Alembic must use `render_as_batch=True` to handle SQLite's limited schema alteration support.
 # ADR 010: Modular FHIR Model Generation
 
 **Status:** Proposed
