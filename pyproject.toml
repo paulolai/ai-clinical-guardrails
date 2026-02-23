@@ -17,6 +17,7 @@ dependencies = [
     "openai>=1.0.0",
     "pre-commit>=3.8.0",
     "pydantic>=2.12.5",
+    "python-multipart>=0.0.9",
     "pydantic-settings>=2.13.1",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
@@ -68,7 +69,11 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
-exclude = ["src/integrations/fhir/generated.py", "alembic/versions"]
+exclude = [
+    "src/integrations/fhir/generated.py",
+    "alembic/versions",
+    "pwa/tests/.*",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
@@ -82,7 +87,9 @@ addopts = "--snapshot-warn-unused"
 
 [dependency-groups]
 dev = [
+    "playwright>=1.58.0",
     "pytest-benchmark>=5.2.3",
+    "pytest-playwright>=0.7.2",
     "pytest-xdist>=3.8.0",
     "types-pyyaml>=6.0.0",
 ]

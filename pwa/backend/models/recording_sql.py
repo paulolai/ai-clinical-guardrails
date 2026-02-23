@@ -57,6 +57,14 @@ class RecordingModel(Base):  # type: ignore
         nullable=True,
     )
 
+    # NEW: Transcription (Phase 2a)
+    draft_transcript: Mapped[str | None] = mapped_column(String, nullable=True)
+    final_transcript: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # NEW: Upload tracking (Phase 2a)
+    local_storage_key: Mapped[str | None] = mapped_column(String, nullable=True)
+    upload_attempts: Mapped[int] = mapped_column(default=0)
+
     # Indexes for efficient querying
     __table_args__ = (
         Index("ix_recordings_patient_id", "patient_id"),

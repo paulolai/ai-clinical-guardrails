@@ -1,7 +1,7 @@
 # pwa/backend/routes/recordings.py
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,6 +24,18 @@ class RecordingResponse(BaseModel):
     clinician_id: str
     duration_seconds: int
     status: str
+    created_at: str
+
+
+class UploadRecordingResponse(BaseModel):
+    """Response for uploaded recording."""
+
+    id: str
+    patient_id: str
+    clinician_id: str
+    duration_seconds: int
+    status: str
+    local_storage_key: str | None = None
     created_at: str
 
 
@@ -50,6 +62,49 @@ async def create_recording(
         clinician_id=recording.clinician_id,
         duration_seconds=recording.duration_seconds or 0,
         status=recording.status.value,
+        created_at=recording.created_at.isoformat(),
+    )
+
+
+@router.post("/upload", response_model=UploadRecordingResponse, status_code=201)
+async def upload_recording(
+    audio: UploadFile = File(...),  # noqa: B008
+    patient_id: str = Form(...),  # noqa: B008
+    duration_seconds: int = Form(...),  # noqa: B008
+    local_storage_key: str | None = Form(None),  # noqa: B008
+    draft_transcript: str | None = Form(None),  # noqa: B008
+    db: AsyncSession = Depends(get_db),  # noqa: B008
+) -> UploadRecordingResponse:
+    """Upload a recording with audio file."""
+    # TODO: Get clinician_id from auth token
+    clinician_id = "current-clinician"
+
+    # Read audio content
+    audio_content = await audio.read()
+    audio_file_size = len(audio_content)
+
+    # TODO: Save audio file to disk (Phase 2a - basic implementation)
+    # For now, just store the size
+    audio_file_path = f"/tmp/recordings/{local_storage_key or 'unknown'}.wav"
+
+    service = RecordingService(db)
+    recording = await service.create_recording(
+        patient_id=patient_id,
+        clinician_id=clinician_id,
+        duration_seconds=duration_seconds,
+        audio_file_path=audio_file_path,
+        audio_file_size=audio_file_size,
+        local_storage_key=local_storage_key,
+        draft_transcript=draft_transcript,
+    )
+
+    return UploadRecordingResponse(
+        id=str(recording.id),
+        patient_id=recording.patient_id,
+        clinician_id=recording.clinician_id,
+        duration_seconds=recording.duration_seconds or 0,
+        status=recording.status.value,
+        local_storage_key=recording.local_storage_key,
         created_at=recording.created_at.isoformat(),
     )
 

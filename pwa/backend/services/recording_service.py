@@ -15,7 +15,14 @@ class RecordingService:
         self.db = db
 
     async def create_recording(
-        self, patient_id: str, clinician_id: str, duration_seconds: int, audio_file_path: str | None = None
+        self,
+        patient_id: str,
+        clinician_id: str,
+        duration_seconds: int,
+        audio_file_path: str | None = None,
+        audio_file_size: int | None = None,
+        local_storage_key: str | None = None,
+        draft_transcript: str | None = None,
     ) -> Recording:
         """Create a new recording."""
         recording_model = RecordingModel(
@@ -23,6 +30,9 @@ class RecordingService:
             clinician_id=clinician_id,
             duration_seconds=duration_seconds,
             audio_file_path=audio_file_path,
+            audio_file_size=audio_file_size,
+            local_storage_key=local_storage_key,
+            draft_transcript=draft_transcript,
             status=RecordingStatus.PENDING.value,
         )
         self.db.add(recording_model)
