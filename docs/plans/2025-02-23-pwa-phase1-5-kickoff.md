@@ -146,10 +146,12 @@ class RecordingService:
 - [ ] Rewrite tests to use real DB
 - [ ] Migration tests
 
-**Day 10: Polish**
+**Day 10: Polish & Tooling**
 - [ ] Error handling
 - [ ] Documentation
 - [ ] Verify no breaking changes
+- [ ] Create `seed_db.py` script for test data
+- [ ] Update `.github/workflows/ci.yml` with Postgres service container
 
 ---
 
@@ -185,11 +187,36 @@ CREATE TABLE recordings (
     verification_results JSONB
 );
 
+-- Note: Use PostgreSQL-specific JSONB type in SQLAlchemy:
+-- from sqlalchemy.dialects.postgresql import JSONB
+-- verification_results = Column(JSONB)
+
 CREATE INDEX idx_recordings_patient_id ON recordings(patient_id);
 CREATE INDEX idx_recordings_clinician_id ON recordings(clinician_id);
 CREATE INDEX idx_recordings_status ON recordings(status);
 CREATE INDEX idx_recordings_created_at ON recordings(created_at);
 ```
+
+### SQLite Fallback (Optional)
+
+For local development without Docker, you can use SQLite:
+
+```python
+# database.py
+from sqlalchemy import create_engine
+import os
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
+
+if DATABASE_URL.startswith("sqlite"):
+    # SQLite doesn't support JSONB, use JSON
+    engine = create_async_engine(DATABASE_URL, echo=True)
+else:
+    # PostgreSQL with JSONB
+    engine = create_async_engine(DATABASE_URL, echo=True)
+```
+
+**Note:** SQLite lacks native JSONB support. If you choose this route, use conditional logic for JSON columns or stick with "Docker Required" for clinical apps.
 
 ### Pydantic ↔ SQLAlchemy Mapping
 
@@ -256,6 +283,71 @@ def test_migration_applies():
 
 ---
 
+## Data Seeding
+
+Since Phase 1 used in-memory data, you'll need a way to populate the database for development:
+
+### seed_db.py
+
+```python
+# scripts/seed_db.py
+import asyncio
+from pwa.backend.database import init_db
+from pwa.backend.services.recording_service import RecordingService
+
+async def seed():
+    await init_db()
+    service = RecordingService()
+
+    # Create test recordings
+    await service.create_recording(
+        patient_id="patient-123",
+        clinician_id="clinician-456",
+        duration_seconds=120
+    )
+    print("Database seeded with test data")
+
+if __name__ == "__main__":
+    asyncio.run(seed())
+```
+
+---
+
+## CI/CD Updates
+
+### GitHub Actions Workflow
+
+Update `.github/workflows/ci.yml` to include PostgreSQL service:
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: pwa_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:test@localhost:5432/pwa_test
+        run: uv run pytest pwa/tests/ -v
+```
+
+---
+
 ## Verification
 
 ### Before Phase 1.5
@@ -304,6 +396,9 @@ uv run python pwa/backend/main.py
 - [ ] Data persists across server restarts
 - [ ] No breaking changes to API
 - [ ] Documentation updated
+- [ ] `seed_db.py` script created
+- [ ] GitHub Actions CI with Postgres service
+- [ ] JSONB dialect used for verification_results
 
 ---
 
@@ -325,6 +420,24 @@ uv run python pwa/backend/main.py
    - SQLAlchemy 2.0 Async Guide
    - Alembic Tutorial
    - FastAPI + SQLAlchemy docs
+
+---
+
+## Review Feedback Incorporated
+
+This plan has been reviewed and improved based on feedback:
+
+### ✅ Approved Aspects
+- Direct response to "Foundation is a Mirage" finding
+- SQLAlchemy 2.0 (Async) + Alembic + asyncpg stack
+- "No mocked database" testing strategy
+- Surgical scope (replace storage, preserve API)
+
+### 💡 Suggestions Implemented
+1. **JSONB Dialect** - Using `from sqlalchemy.dialects.postgresql import JSONB` for efficient querying
+2. **SQLite Fallback** - Optional SQLite support for local dev (with conditional JSON handling)
+3. **Data Seeding** - Added `seed_db.py` script requirement
+4. **CI/CD** - Added GitHub Actions Postgres service container requirement
 
 ---
 
