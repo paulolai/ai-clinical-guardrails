@@ -1,9 +1,20 @@
 """Tests for database module."""
 
+from pathlib import Path
+
 import pytest
 from sqlalchemy import text
 
 from pwa.backend.database import close_db, engine, get_db, init_db
+
+
+@pytest.fixture(autouse=True, scope="module")
+def ensure_data_dir():
+    """Ensure data directory exists for database tests."""
+    data_dir = Path("./data")
+    data_dir.mkdir(parents=True, exist_ok=True)
+    yield
+    # Cleanup is not needed - directory can remain
 
 
 @pytest.mark.asyncio
