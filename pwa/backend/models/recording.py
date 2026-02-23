@@ -45,6 +45,14 @@ class Recording(BaseModel):
     transcript: str | None = None
     verification_results: dict[str, Any] | None = None
 
+    # NEW: Transcription (Phase 2a)
+    draft_transcript: str | None = None  # Browser Speech API result
+    final_transcript: str | None = None  # Whisper result
+
+    # NEW: Upload tracking (Phase 2a)
+    local_storage_key: str | None = None  # IndexedDB key (client-generated UUID)
+    upload_attempts: int = 0  # Retry counter
+
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
