@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "aiosqlite>=0.22.1",
+    "alembic>=1.13.0",
     "datamodel-code-generator>=0.54.0",
     "fastapi>=0.129.0",
     "fhir-resources>=8.0.0",
@@ -34,7 +35,7 @@ dependencies = [
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-exclude = ["src/integrations/fhir/generated.py"]
+exclude = ["src/integrations/fhir/generated.py", "alembic/versions/*.py"]
 
 [tool.ruff.lint]
 select = [
@@ -67,7 +68,7 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
-exclude = ["src/integrations/fhir/generated.py"]
+exclude = ["src/integrations/fhir/generated.py", "alembic/versions"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
