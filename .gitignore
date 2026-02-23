@@ -85,3 +85,4 @@ reports/
 *.db-shm
 *.db-wal
 *.sqlite
+.worktrees/
