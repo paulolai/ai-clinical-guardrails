@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, Index, String
+from sqlalchemy import JSON, DateTime, Index, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from pwa.backend.database import Base
@@ -64,6 +64,11 @@ class RecordingModel(Base):  # type: ignore
     # NEW: Upload tracking (Phase 2a)
     local_storage_key: Mapped[str | None] = mapped_column(String, nullable=True)
     upload_attempts: Mapped[int] = mapped_column(default=0)
+
+    # NEW: Transcription (Phase 2b)
+    whisper_model: Mapped[str] = mapped_column(String(50), default="base")
+    transcription_started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    transcription_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Indexes for efficient querying
     __table_args__ = (

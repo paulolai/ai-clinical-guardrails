@@ -1,11 +1,12 @@
 # pwa/backend/routes/recordings.py
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pwa.backend.database import get_db
+from pwa.backend.jobs.transcription_job import process_transcription
 from pwa.backend.models.recording import RecordingStatus
 from pwa.backend.services.recording_service import RecordingService
 
@@ -73,6 +74,7 @@ async def upload_recording(
     duration_seconds: int = Form(...),  # noqa: B008
     local_storage_key: str | None = Form(None),  # noqa: B008
     draft_transcript: str | None = Form(None),  # noqa: B008
+    background_tasks: BackgroundTasks = None,  # type: ignore[assignment] # noqa: B008
     db: AsyncSession = Depends(get_db),  # noqa: B008
 ) -> UploadRecordingResponse:
     """Upload a recording with audio file."""
@@ -97,6 +99,10 @@ async def upload_recording(
         local_storage_key=local_storage_key,
         draft_transcript=draft_transcript,
     )
+
+    # Trigger transcription job
+    if background_tasks:
+        background_tasks.add_task(process_transcription, recording.id)
 
     return UploadRecordingResponse(
         id=str(recording.id),

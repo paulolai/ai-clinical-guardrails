@@ -1,4 +1,5 @@
 # pwa/backend/services/recording_service.py
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import select
@@ -60,7 +61,14 @@ class RecordingService:
         return [Recording.model_validate(r) for r in recording_models]
 
     async def update_recording_status(
-        self, recording_id: UUID, status: RecordingStatus, error_message: str | None = None
+        self,
+        recording_id: UUID,
+        status: RecordingStatus,
+        error_message: str | None = None,
+        final_transcript: str | None = None,
+        whisper_model: str | None = None,
+        transcription_started_at: datetime | None = None,
+        transcription_completed_at: datetime | None = None,
     ) -> Recording | None:
         """Update the status of a recording."""
         result = await self.db.execute(select(RecordingModel).where(RecordingModel.id == recording_id))
@@ -71,6 +79,16 @@ class RecordingService:
         recording_model.status = status.value
         if error_message:
             recording_model.error_message = error_message
+        if final_transcript is not None:
+            recording_model.final_transcript = final_transcript
+        if whisper_model is not None:
+            recording_model.whisper_model = whisper_model
+        if transcription_started_at is not None:
+            recording_model.transcription_started_at = transcription_started_at
+        if transcription_completed_at is not None:
+            recording_model.transcription_completed_at = transcription_completed_at
+
+        recording_model.updated_at = datetime.now(UTC)
 
         await self.db.commit()
         await self.db.refresh(recording_model)
