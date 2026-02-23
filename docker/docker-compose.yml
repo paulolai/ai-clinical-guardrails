@@ -18,9 +18,27 @@ services:
       timeout: 10s
       retries: 3
 
-  # We'll add LLM service in Task 3
-  # llm:
-  #   build:
-  #     context: ./llm
-  #   ports:
-  #     - "8003:8003"
+  llm:
+    build:
+      context: ./llm
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./models:/root/.cache/huggingface  # Persist models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
