@@ -70,6 +70,12 @@ class RecordingModel(Base):  # type: ignore
     transcription_started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     transcription_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+    # NEW: Extraction (Phase 2b)
+    fhir_bundle: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    llm_model: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    extraction_started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    extraction_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
     # Indexes for efficient querying
     __table_args__ = (
         Index("ix_recordings_patient_id", "patient_id"),

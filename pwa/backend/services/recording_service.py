@@ -1,5 +1,6 @@
 # pwa/backend/services/recording_service.py
 from datetime import UTC, datetime, timedelta
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
@@ -87,6 +88,35 @@ class RecordingService:
             recording_model.transcription_started_at = transcription_started_at
         if transcription_completed_at is not None:
             recording_model.transcription_completed_at = transcription_completed_at
+
+        recording_model.updated_at = datetime.now(UTC)
+
+        await self.db.commit()
+        await self.db.refresh(recording_model)
+        return Recording.model_validate(recording_model)
+
+    async def update_recording(
+        self,
+        recording_id: UUID,
+        extraction_started_at: datetime | None = None,
+        fhir_bundle: dict[str, Any] | None = None,
+        llm_model: str | None = None,
+        extraction_completed_at: datetime | None = None,
+    ) -> Recording | None:
+        """Update recording with extraction results."""
+        result = await self.db.execute(select(RecordingModel).where(RecordingModel.id == recording_id))
+        recording_model = result.scalar_one_or_none()
+        if recording_model is None:
+            return None
+
+        if extraction_started_at is not None:
+            recording_model.extraction_started_at = extraction_started_at
+        if fhir_bundle is not None:
+            recording_model.fhir_bundle = fhir_bundle
+        if llm_model is not None:
+            recording_model.llm_model = llm_model
+        if extraction_completed_at is not None:
+            recording_model.extraction_completed_at = extraction_completed_at
 
         recording_model.updated_at = datetime.now(UTC)
 

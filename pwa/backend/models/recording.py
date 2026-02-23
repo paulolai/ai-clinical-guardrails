@@ -58,6 +58,12 @@ class Recording(BaseModel):
     transcription_started_at: datetime | None = None
     transcription_completed_at: datetime | None = None
 
+    # NEW: Extraction (Phase 2b)
+    fhir_bundle: dict[str, Any] | None = None
+    llm_model: str | None = None
+    extraction_started_at: datetime | None = None
+    extraction_completed_at: datetime | None = None
+
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={

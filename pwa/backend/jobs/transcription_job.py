@@ -7,6 +7,7 @@ from pathlib import Path
 from uuid import UUID
 
 from pwa.backend.database import get_db
+from pwa.backend.jobs.extraction_job import process_extraction
 from pwa.backend.models.recording import RecordingStatus
 from pwa.backend.services.recording_service import RecordingService
 from pwa.backend.services.transcription_service import TranscriptionError, WhisperService
@@ -57,6 +58,10 @@ async def process_transcription(recording_id: UUID) -> None:
             )
 
             logger.info("Transcription completed for %s", recording_id)
+
+            # Trigger extraction
+            logger.info("[Transcription] Triggering extraction for %s", recording_id)
+            await process_extraction(recording_id)
 
         except TranscriptionError as e:
             logger.error("Transcription failed for %s: %s", recording_id, e)
