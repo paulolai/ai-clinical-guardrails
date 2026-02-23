@@ -1,8 +1,18 @@
 # Clinical Transcription PWA - Phase 1 Implementation Summary
 
 **Date:** 2025-02-23
-**Status:** ✅ Phase 1 Complete (Foundation)
-**Next Phase:** Phase 2 - Offline Capabilities & AI Integration
+**Status:** ✅ Phase 1 Complete (Prototype)
+**Next Phase:** Phase 1.5 - Persistence Layer & Phase 2 - Offline Capabilities
+
+---
+
+## Critical Limitations (Read Before Proceeding)
+
+**⚠️ This is a PROTOTYPE, not a production foundation.**
+
+1.  **Data Loss Risk:** The backend uses **in-memory Python dictionaries**. Restarting the server wipes all patient data. You cannot build reliable offline sync logic against a volatile backend.
+2.  **No Offline Support:** The `recorder.js` implementation currently relies on immediate upload. It has placeholders (`TODO`) for IndexedDB storage.
+3.  **No iOS Background Sync:** The current design assumes Service Worker Background Sync, which does not exist on iOS (Safari).
 
 ---
 
