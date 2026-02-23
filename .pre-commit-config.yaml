@@ -28,3 +28,12 @@ repos:
       - id: check-added-large-files
         args: ['--maxkb=1000']
       - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: generate-adr-summary
+        name: Generate ADR Summary
+        entry: python3 scripts/generate_adr_summary.py
+        language: system
+        files: ^docs/ARCHITECTURE_DECISIONS\.md$
+        pass_filenames: false
