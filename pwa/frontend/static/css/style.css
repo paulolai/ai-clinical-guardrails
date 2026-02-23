@@ -95,3 +95,185 @@ footer {
     font-style: italic;
     color: #666;
 }
+
+/* Queue UI Styles */
+.queue-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.connection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.connection-indicator.online {
+    background: #d4edda;
+    color: #155724;
+}
+
+.connection-indicator.offline {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.connection-indicator.syncing {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.queue-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.queue-list {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.queue-item:last-child {
+    border-bottom: none;
+}
+
+.queue-item:hover {
+    background: #f5f5f5;
+}
+
+.queue-item.status-failed {
+    background: #fff5f5;
+}
+
+.queue-item.status-uploaded {
+    background: #f5fff5;
+}
+
+.status-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.recording-info {
+    flex: 1;
+}
+
+.recording-id {
+    font-weight: 500;
+    color: #333;
+}
+
+.recording-meta {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.recording-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    padding: 4px 8px;
+    font-size: 12px;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    background: #f0f0f0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.recording-detail {
+    margin-top: 24px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+.recording-detail.hidden {
+    display: none;
+}
+
+/* iOS Warning */
+.ios-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.warning-icon {
+    font-size: 18px;
+}
+
+/* Detail panel styles */
+.detail-row {
+    margin-bottom: 8px;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.detail-value {
+    color: #333;
+}
+
+.error-message {
+    color: #721c24;
+    font-size: 12px;
+}
+
+/* Recording button styles */
+.record-btn.recording {
+    background: #dc3545;
+    animation: pulse 1s infinite;
+}
+
+.record-btn.recording:hover {
+    background: #c82333;
+}
