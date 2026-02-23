@@ -5,13 +5,27 @@ import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
+
+from pwa.backend.config import settings
 
 
-def backup(src_path: str = "data/clinical.db", backup_dir: str = "backups") -> str:
+def _get_db_path() -> str:
+    """Extract database file path from database_url config."""
+    parsed = urlparse(settings.database_url)
+    # Handle sqlite:///path and sqlite+aiosqlite:///path formats
+    if parsed.path:
+        # Remove leading slash for relative paths
+        path = parsed.path.lstrip("/")
+        return path
+    return "./data/clinical.db"
+
+
+def backup(src_path: str = "", backup_dir: str = "backups") -> str:
     """Perform a hot backup using the SQLite Backup API.
 
     Args:
-        src_path: Path to source database
+        src_path: Path to source database (defaults to configured database_url)
         backup_dir: Directory to store backups
 
     Returns:
@@ -21,6 +35,8 @@ def backup(src_path: str = "data/clinical.db", backup_dir: str = "backups") -> s
         FileNotFoundError: If source database doesn't exist
         sqlite3.Error: If backup operation fails
     """
+    if not src_path:
+        src_path = _get_db_path()
     src = Path(src_path)
     if not src.exists():
         raise FileNotFoundError(f"Source database not found: {src}")
