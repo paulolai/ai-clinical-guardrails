@@ -80,3 +80,18 @@ footer {
 .status-pending { color: #f39c12; }
 .status-completed { color: #27ae60; }
 .status-error { color: #e74c3c; }
+
+/* Hidden class */
+.hidden {
+    display: none !important;
+}
+
+/* Draft transcript */
+.draft-transcript {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-style: italic;
+    color: #666;
+}
