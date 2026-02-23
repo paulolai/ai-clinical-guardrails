@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="recording-interface">
+    <h2>Record for Patient: {{ patient_id }}</h2>
+
+    <div class="recorder-container">
+        <button id="record-btn" class="record-btn" onclick="toggleRecording()">
+            <span id="record-icon">●</span>
+            <span id="record-text">Start Recording</span>
+        </button>
+
+        <div id="recording-status" class="hidden">
+            <p>Recording... <span id="timer">00:00</span></p>
+            <div class="waveform" id="waveform"></div>
+        </div>
+
+        <div id="upload-status" class="hidden">
+            <p>Uploading...</p>
+            <progress id="upload-progress" value="0" max="100"></progress>
+        </div>
+    </div>
+
+    <div id="result" class="hidden">
+        <h3>Recording Saved</h3>
+        <p>Status: <span id="recording-status-text">Processing...</span></p>
+        <p>Your recording has been queued for transcription.</p>
+        <a href="/queue" class="btn">View Queue</a>
+    </div>
+</div>
+
+<script src="/static/js/recorder.js"></script>
+<script>
+    // Initialize with patient ID from server
+    const patientId = "{{ patient_id }}";
+</script>
+{% endblock %}

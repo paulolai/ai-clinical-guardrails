@@ -15,3 +15,9 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 async def home(request: Request) -> HTMLResponse:
     """Home page with patient list."""
     return templates.TemplateResponse("base.html", {"request": request})
+
+
+@router.get("/record/{patient_id}", response_class=HTMLResponse)
+async def record_page(request: Request, patient_id: str) -> HTMLResponse:
+    """Recording page for a specific patient."""
+    return templates.TemplateResponse("record.html", {"request": request, "patient_id": patient_id})
