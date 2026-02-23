@@ -1,5 +1,5 @@
 # pwa/backend/services/recording_service.py
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from sqlalchemy import select
@@ -93,3 +93,15 @@ class RecordingService:
         await self.db.commit()
         await self.db.refresh(recording_model)
         return Recording.model_validate(recording_model)
+
+    async def get_recordings_stuck_in_processing(self, minutes: int = 30) -> list[Recording]:
+        """Get recordings stuck in PROCESSING status for longer than specified minutes."""
+        cutoff_time = datetime.now(UTC) - timedelta(minutes=minutes)
+        query = (
+            select(RecordingModel)
+            .where(RecordingModel.status == RecordingStatus.PROCESSING.value)
+            .where(RecordingModel.transcription_started_at < cutoff_time)
+        )
+        result = await self.db.execute(query)
+        recording_models = result.scalars().all()
+        return [Recording.model_validate(r) for r in recording_models]
