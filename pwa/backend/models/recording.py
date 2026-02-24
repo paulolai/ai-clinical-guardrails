@@ -53,6 +53,11 @@ class Recording(BaseModel):
     local_storage_key: str | None = None  # IndexedDB key (client-generated UUID)
     upload_attempts: int = 0  # Retry counter
 
+    # NEW: Transcription (Phase 2b)
+    whisper_model: str = "base"
+    transcription_started_at: datetime | None = None
+    transcription_completed_at: datetime | None = None
+
     # NEW: Extraction (Phase 2b)
     fhir_bundle: dict[str, Any] | None = None
     llm_model: str | None = None

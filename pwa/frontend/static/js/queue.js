@@ -147,6 +147,14 @@
             const formattedDate = formatDate(recording.created_at);
             const duration = formatDuration(recording.duration_seconds);
 
+            // Add transcription info
+            let transcriptionInfo = '';
+            if (recording.final_transcript) {
+                transcriptionInfo = `<div class="transcript-preview">${recording.final_transcript.substring(0, 100)}...</div>`;
+            } else if (recording.transcription_started_at) {
+                transcriptionInfo = `<div class="transcription-progress">Transcribing...</div>`;
+            }
+
             return `
                 <div class="queue-item ${statusClass}" data-id="${recording.id}" onclick="QueueUI.showDetail('${recording.id}')">
                     <span class="status-icon">${statusIcon}</span>
@@ -155,6 +163,7 @@
                         <div class="recording-meta">
                             ${duration} • ${formattedDate} • ${formatStatus(recording.sync_status)}
                         </div>
+                        ${transcriptionInfo}
                         ${recording.last_error ? `<div class="error-message">${recording.last_error}</div>` : ''}
                     </div>
                     <div class="recording-actions" onclick="event.stopPropagation()">
@@ -291,6 +300,20 @@
                 <div class="detail-value" style="margin-top: 8px; padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px;">
                     ${recording.draft_transcript}
                 </div>
+            </div>
+            ` : ''}
+            ${recording.final_transcript ? `
+            <div class="detail-row">
+                <span class="detail-label">Transcript:</span>
+                <div class="detail-value transcript-box">${recording.final_transcript}</div>
+            </div>
+            ` : ''}
+            ${recording.verification_score ? `
+            <div class="detail-row">
+                <span class="detail-label">Verification Score:</span>
+                <span class="detail-value ${recording.verification_score >= 0.7 ? 'verification-good' : 'verification-bad'}">
+                    ${(recording.verification_score * 100).toFixed(1)}%
+                </span>
             </div>
             ` : ''}
             ${recording.retry_count ? `
