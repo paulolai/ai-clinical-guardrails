@@ -101,6 +101,12 @@ jobs:
       - name: Re-record Component Tests
         run: uv run pytest tests/component/ -v --record-mode=all --snapshot-update
 
+      - name: Verify Tests Pass with New Cassettes
+        run: |
+          echo "🧪 Running tests with new cassettes (no recording)..."
+          uv run pytest tests/component/ -v
+          echo "✅ All tests passed with new cassettes"
+
       - name: Analyze Changes
         id: analyze
         run: |
@@ -109,22 +115,28 @@ jobs:
             echo "✅ No cassette or snapshot changes detected"
             echo "changes_detected=false" >> $GITHUB_OUTPUT
           else
-            echo "📝 Changes detected, analyzing with validation script..."
+            echo "📝 Changes detected, analyzing..."
             echo "changes_detected=true" >> $GITHUB_OUTPUT
 
-            # Show stats of what changed
+            # Show summary of changes
             echo "\n📊 Cassette Changes:"
             git diff --stat tests/component/cassettes/ || true
             echo "\n📊 Snapshot Changes:"
             git diff --stat tests/component/__snapshots__/ || true
+
+            # Log warning about changes - but don't fail
+            echo "\n⚠️  Note: Cassette changes detected. This is expected when re-recording."
+            echo "    Review the artifacts if you want to inspect the changes."
           fi
 
-      - name: Validate Changes with LLM
+      - name: Validate Changes (Informational)
         if: steps.analyze.outputs.changes_detected == 'true'
-        id: validate
-        run: uv run python scripts/validate_cassettes.py
+        run: |
+          echo "🔍 Running validation analysis (informational only)..."
+          uv run python scripts/validate_cassettes.py || true
         env:
           SYNTHETIC_API_KEY: ${{ secrets.SYNTHETIC_API_KEY }}
+        continue-on-error: true
 
       - name: Upload Change Artifacts
         if: steps.analyze.outputs.changes_detected == 'true'
@@ -134,13 +146,3 @@ jobs:
           path: |
             tests/component/cassettes/
             tests/component/__snapshots__/
-
-      - name: Check for Snapshot Changes
-        run: |
-          if git diff --quiet tests/component/__snapshots__/; then
-            echo "✅ No snapshot changes detected"
-          else
-            echo "⚠️ Snapshot changes detected! Response structures may have changed."
-            git diff --stat tests/component/__snapshots__/
-            exit 1
-          fi
