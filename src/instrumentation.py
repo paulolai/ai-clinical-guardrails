@@ -52,10 +52,7 @@ class ComplianceTracer:
         report_path = os.path.join(self.run_dir, "attestation_report.html")
 
         rule_stats = "".join(
-            [
-                f"<li><strong>{rule}:</strong> {count} hits</li>"
-                for rule, count in self.stats["rule_counts"].items()
-            ]
+            [f"<li><strong>{rule}:</strong> {count} hits</li>" for rule, count in self.stats["rule_counts"].items()]
         )
 
         total = self.stats["total_runs"]

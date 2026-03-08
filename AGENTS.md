@@ -100,4 +100,86 @@ uv run python main.py
 
 ---
 
+## Component Test Troubleshooting
+
+### VCR Cassettes with Dynamic Dates
+
+**Problem:** Tests with VCR cassettes fail when run on different days because the LLM extraction prompt includes `date.today()` in the reference date field, causing cassette request mismatch.
+
+**Solution:** The `conftest.py` implements a custom VCR matcher that normalizes dates in request bodies before comparison:
+
+```python
+def normalize_request_body(body):
+    """Normalize request body by masking dynamic dates."""
+    if body and isinstance(body, str):
+        return re.sub(
+            r'Reference Date: \d{4}-\d{2}-\d{2}',
+            'Reference Date: <DATE_MASKED>',
+            body
+        )
+    return body
+
+def date_agnostic_matcher(r1, r2):
+    """Custom matcher that ignores date differences in request bodies."""
+    if r1.method != r2.method:
+        return False
+    if r1.uri != r2.uri:
+        return False
+
+    # Normalize both bodies (handle bytes vs strings)
+    def get_body_str(body):
+        if body is None:
+            return None
+        if isinstance(body, bytes):
+            return body.decode('utf-8')
+        return body
+
+    body1 = normalize_request_body(get_body_str(r1.body))
+    body2 = normalize_request_body(get_body_str(r2.body))
+
+    if body1 != body2:
+        raise AssertionError(f"Request bodies don't match")
+    return True
+
+# Register the custom matcher in pytest_configure
+def pytest_configure(config):
+    import vcr
+    _original_vcr_init = vcr.VCR.__init__
+    def _patched_vcr_init(self, *args, **kwargs):
+        _original_vcr_init(self, *args, **kwargs)
+        self.matchers['date_agnostic'] = date_agnostic_matcher
+    vcr.VCR.__init__ = _patched_vcr_init
+```
+
+**Key points:**
+- The matcher normalizes dates in BOTH the incoming request AND the stored cassette request
+- Handles both string and bytes bodies
+- Registered via pytest_configure to ensure it's available for all VCR instances
+- Cassettes still contain the original dates (no masking needed during recording)
+
+**When to use:** This is automatically applied to all component tests using VCR.
+
+### Cassette/Snapshot Validation
+
+**Problem:** LLM responses are non-deterministic. Re-recording cassettes may produce slightly different responses (wording, timestamps, token counts) that don't indicate real problems.
+
+**Solution:** Use `scripts/validate_cassettes.py` which:
+1. Categorizes changes as "benign" (timestamps, tokens) or "suspicious" (missing data, errors)
+2. Uses LLM to determine if changes require manual attention
+3. Only fails CI if changes are significant (structural changes, errors, missing data)
+
+**When to use:** The CI `validate-cassettes` job runs this automatically on schedule.
+
+**Local validation:**
+```bash
+# After re-recording cassettes
+uv run python scripts/validate_cassettes.py
+```
+
+**Output interpretation:**
+- ✅ **PASS**: Changes are benign (timestamps, minor wording)
+- ⚠️ **FAIL**: Changes require manual review (structural changes, errors)
+
+---
+
 *See [RATIONALE.md](RATIONALE.md) for architectural reasoning*

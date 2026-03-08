@@ -101,15 +101,39 @@ jobs:
       - name: Re-record Component Tests
         run: uv run pytest tests/component/ -v --record-mode=all --snapshot-update
 
-      - name: Check for Cassette Changes
+      - name: Analyze Changes
+        id: analyze
         run: |
-          if git diff --quiet tests/component/cassettes/; then
-            echo "✅ No cassette changes detected"
+          # Check if there are any changes
+          if git diff --quiet tests/component/cassettes/ tests/component/__snapshots__/; then
+            echo "✅ No cassette or snapshot changes detected"
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
           else
-            echo "⚠️ Cassette changes detected! API responses may have changed."
-            git diff --stat tests/component/cassettes/
-            exit 1
+            echo "📝 Changes detected, analyzing with validation script..."
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+
+            # Show stats of what changed
+            echo "\n📊 Cassette Changes:"
+            git diff --stat tests/component/cassettes/ || true
+            echo "\n📊 Snapshot Changes:"
+            git diff --stat tests/component/__snapshots__/ || true
           fi
+
+      - name: Validate Changes with LLM
+        if: steps.analyze.outputs.changes_detected == 'true'
+        id: validate
+        run: uv run python scripts/validate_cassettes.py
+        env:
+          SYNTHETIC_API_KEY: ${{ secrets.SYNTHETIC_API_KEY }}
+
+      - name: Upload Change Artifacts
+        if: steps.analyze.outputs.changes_detected == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cassette-changes
+          path: |
+            tests/component/cassettes/
+            tests/component/__snapshots__/
 
       - name: Check for Snapshot Changes
         run: |
