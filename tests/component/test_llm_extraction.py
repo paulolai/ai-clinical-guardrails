@@ -89,8 +89,14 @@ class TestLLMClientIntegration:
                 max_tokens=2000,
             )
 
-            # Should get valid JSON back
-            result = json.loads(response)
+            # Should get valid JSON back (strip markdown code fences if present)
+            text = response.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+            if text.endswith("```"):
+                text = text[: text.rfind("```")]
+            text = text.strip()
+            result = json.loads(text)
             assert isinstance(result, dict)
 
 
