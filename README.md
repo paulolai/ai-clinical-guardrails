@@ -1,8 +1,8 @@
 # AI Clinical Guardrails
 
 [![Python](https://img.shields.io/badge/python-3.12-blue)]()
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Tests](https://github.com/paulolai/executable-specs-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/paulolai/executable-specs-demo/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache_2.0-blue)](LICENSE)
 
 **High-Assurance Documentation Safety**
 
