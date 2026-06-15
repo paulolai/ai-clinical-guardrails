@@ -1,6 +1,6 @@
 # Adding a New Compliance Rule
 
-End-to-end walkthrough using the drug interaction checker as a worked example.
+End-to-end walkthrough with two worked examples: drug interactions and duplicate therapy.
 
 ## The Pipeline
 
@@ -145,6 +145,134 @@ span.add_event("alert", {
 
 **Source:** `tests/test_telemetry.py`
 
+---
+
+## Worked Example 2: Duplicate Therapy Detection
+
+Same pipeline, different matching pattern. This example shows what changes when the rule isn't about specific drug names — it's about therapeutic classes.
+
+### Clinical Insight
+
+A patient is on both Lisinopril and Enalapril. Both are ACE inhibitors. Taking two drugs from the same class increases side effects without additional benefit. The engine needs to catch redundant therapy.
+
+**Source:** `docs/plans/2026-02-22-medical-protocols-design.md`
+
+### Invariant
+
+> If extraction contains more than N medications in the same drug class, an alert MUST be raised.
+
+Unlike drug interactions (name-based matching), this requires **class-based matching** — grouping drugs into therapeutic categories first.
+
+### Config
+
+Add to `config/medical_protocols.yaml`:
+
+```yaml
+duplicate_therapy:
+  - name: "Duplicate ACE Inhibitor"
+    pattern:
+      drug_class: "ACE_INHIBITOR"
+      max_count: 1
+    severity: "HIGH"
+    message: "Multiple ACE inhibitors detected — consider consolidating"
+```
+
+Same format as drug interactions, but the pattern uses `drug_class` + `max_count` instead of trigger/conflict.
+
+### Matcher (New Pattern)
+
+Create `src/protocols/checkers/drug_class_matcher.py`:
+
+```python
+DRUG_CLASS_MAP = {
+    "lisinopril": "ACE_INHIBITOR",
+    "enalapril": "ACE_INHIBITOR",
+    "atorvastatin": "STATIN",
+    "rosuvastatin": "STATIN",
+    # ... ~20 drugs mapped to 6 classes
+}
+
+class DrugClassMatcher:
+    def count_by_class(self, extraction, drug_class: str) -> int:
+        # Count how many extracted medications belong to the class
+```
+
+**Key difference from DrugInteractionChecker:** This introduces a new matcher concept. Drug interactions match individual medication names; duplicate therapy groups medications into classes first, then counts within a class. The matcher is extracted as its own module because it's reusable across different class-based rules.
+
+### Checker
+
+Create `src/protocols/checkers/duplicate_therapy_checker.py`:
+
+```python
+class DuplicateTherapyChecker(ProtocolChecker):
+    def check(self, patient, extraction) -> list[ComplianceAlert]:
+        # Uses DrugClassMatcher.count_by_class()
+        # For each rule: if count > max_count → alert
+```
+
+Reads from config under the `duplicate_therapy` key. Same base class, same `_create_alert()` helper.
+
+**Source:** `src/protocols/checkers/duplicate_therapy_checker.py`
+
+### Registry
+
+Add to `checker_map` in `src/protocols/registry.py`:
+
+```python
+checker_map = {
+    "drug_interactions": DrugInteractionChecker,
+    "duplicate_therapy": DuplicateTherapyChecker,
+    "allergy_checks": AllergyChecker,
+    "required_fields": RequiredFieldsChecker,
+}
+```
+
+### Property-Based Tests
+
+Prove the counting invariant:
+
+```python
+@given(extraction=extraction_strategy(), drug_class=st.sampled_from(["ACE_INHIBITOR", "STATIN", ...]))
+def test_count_accurate(self, extraction, drug_class):
+    # Verify count_by_class matches manual count
+
+@given(extraction=extraction_with_class(drug_class), drug_class=st.sampled_from([...]))
+def test_never_miss_class_member(self, extraction, drug_class):
+    # Every drug in DRUG_CLASS_MAP for that class must be counted
+
+@given(extraction=extraction_without_class(drug_class), drug_class=st.sampled_from([...]))
+def test_never_false_positive(self, extraction, drug_class):
+    # No alert when extraction has no drugs in that class
+```
+
+**Source:** `tests/protocols/checkers/test_protocols_pbt.py`
+
+### Example Tests
+
+```python
+def test_duplicate_ace_inhibitors():
+    # Lisinopril + Enalapril → HIGH alert
+    ...
+
+def test_single_ace_inhibitor_no_alert():
+    # Only Lisinopril → no alert
+    ...
+
+def test_different_classes_no_alert():
+    # Lisinopril (ACE) + Atorvastatin (statin) → no alert
+    ...
+
+def test_empty_extraction():
+    # No medications → no alert
+    ...
+```
+
+**Source:** `tests/protocols/checkers/test_duplicate_therapy.py`
+
+### Engine Integration & Traces
+
+Same as drug interactions — the engine calls all registered checkers and captures OTEL spans automatically. No additional work needed.
+
 ## Adding a New Checker Type
 
 To add a completely new checker type (not just a new rule):
@@ -165,9 +293,12 @@ To add a completely new checker type (not just a new rule):
 | `src/protocols/config.py` | YAML loader |
 | `src/protocols/checkers/base.py` | Abstract base class |
 | `src/protocols/checkers/drug_checker.py` | Drug interaction logic |
+| `src/protocols/checkers/drug_class_matcher.py` | Drug-to-class mapping and counting |
+| `src/protocols/checkers/duplicate_therapy_checker.py` | Duplicate therapy logic |
 | `src/protocols/registry.py` | Checker orchestration |
 | `src/engine.py` | Integration with verification flow |
 | `tests/protocols/checkers/test_protocols_pbt.py` | Property-based tests |
-| `tests/protocols/checkers/test_drug_checker.py` | Example tests |
+| `tests/protocols/checkers/test_drug_checker.py` | Example tests (drug interactions) |
+| `tests/protocols/checkers/test_duplicate_therapy.py` | Example tests (duplicate therapy) |
 | `tests/test_compliance.py` | End-to-end engine test |
 | `tests/test_telemetry.py` | OTEL trace verification |

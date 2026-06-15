@@ -11,6 +11,9 @@ checkers:
   allergy_checks:
     enabled: true
     description: "Patient allergy cross-reference"
+  duplicate_therapy:
+    enabled: true
+    description: "Duplicate medication class detection"
 
 rules:
   drug_interactions:
@@ -31,3 +34,18 @@ rules:
           medications: ["amoxicillin", "ampicillin"]
       severity: "CRITICAL"
       message: "Patient allergic to penicillin prescribed penicillin-class antibiotic"
+
+  duplicate_therapy:
+    - name: "Duplicate ACE Inhibitor"
+      pattern:
+        drug_class: "ACE_INHIBITOR"
+        max_count: 1
+      severity: "HIGH"
+      message: "Multiple ACE inhibitors detected — consider consolidating to a single agent"
+
+    - name: "Duplicate Statin"
+      pattern:
+        drug_class: "STATIN"
+        max_count: 1
+      severity: "HIGH"
+      message: "Multiple statins detected — no additional cardiovascular benefit from combining"

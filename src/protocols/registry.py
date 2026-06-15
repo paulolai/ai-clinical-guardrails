@@ -7,6 +7,7 @@ from src.models import ComplianceAlert, PatientProfile
 from src.protocols.checkers.allergy_checker import AllergyChecker
 from src.protocols.checkers.documentation_checker import RequiredFieldsChecker
 from src.protocols.checkers.drug_checker import DrugInteractionChecker
+from src.protocols.checkers.duplicate_therapy_checker import DuplicateTherapyChecker
 from src.protocols.models import ProtocolConfig
 
 
@@ -24,6 +25,7 @@ class ProtocolRegistry:
             "drug_interactions": DrugInteractionChecker,
             "allergy_checks": AllergyChecker,
             "required_fields": RequiredFieldsChecker,
+            "duplicate_therapy": DuplicateTherapyChecker,
         }
 
         for checker_name, checker_class in checker_map.items():
