@@ -19,6 +19,7 @@ Verifies AI-generated clinical documentation against the EMR source of truth bef
 3. **Data Safety** — Automated summaries are scanned for PII patterns before filing
 4. **Drug Interactions** — Configurable rules catch dangerous medication combinations
 5. **Allergy Conflicts** — Patient allergies are checked against prescribed medications
+6. **Duplicate Therapy** — Multiple medications in the same therapeutic class are flagged
 
 ## Quick Start
 
@@ -67,6 +68,7 @@ The project uses [Property-Based Testing](https://hypothesis.readthedocs.io/) (H
 - **Python 3.12+** / **FastAPI** / **Pydantic v2**
 - **FHIR R5** via `fhir.resources`
 - **Hypothesis** for property-based testing
+- **OpenTelemetry** for traces, metrics, and logs (OTLP exporter)
 - **SQLite** (WAL mode) for local persistence
 - **HTMX** for the clinical transcription PWA (planned)
 
@@ -75,6 +77,7 @@ The project uses [Property-Based Testing](https://hypothesis.readthedocs.io/) (H
 | Document | Purpose |
 |----------|---------|
 | [RATIONALE](RATIONALE.md) | Architecture decisions |
+| [ADDING_A_RULE](docs/ADDING_A_RULE.md) | End-to-end workflow walkthrough |
 | [AGENTS](AGENTS.md) | Engineering standards |
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | System design |
 | [TESTING_FRAMEWORK](docs/TESTING_FRAMEWORK.md) | Testing strategy |
