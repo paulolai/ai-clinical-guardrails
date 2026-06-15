@@ -69,8 +69,8 @@ StructuredExtraction + PatientProfile
 ProtocolRegistry.check_all()
     ├─ DrugInteractionChecker
     ├─ AllergyChecker
-    ├─ PBSChecker
-    ├─ MBSChecker
+    ├─ PBSChecker *(future)*
+    ├─ MBSChecker *(future)*
     └─ RequiredFieldsChecker
     ↓
 ComplianceAlerts (aggregated)
@@ -183,7 +183,7 @@ Checks for:
 
 ---
 
-**PBSChecker** (`src/protocols/checkers/pbs_checker.py`)
+**PBSChecker** (`src/protocols/checkers/pbs_checker.py`) *(Future extension — not yet implemented)*
 
 Checks for:
 - Authority-required medications
@@ -532,7 +532,7 @@ tests/protocols/
 
 ## Implementation Notes
 
-**Completed:** See implementation plan `2026-02-22-medical-protocols-implementation.md`
+**Completed:** Implementation is complete. See the files listed below.
 
 **Files Created:**
 - `src/protocols/` - Complete protocol checking system
@@ -551,7 +551,7 @@ from src.protocols.config import load_protocol_config
 from src.engine import ComplianceEngine
 
 config = load_protocol_config("config/medical_protocols.yaml")
-result = ComplianceEngine.verify(patient, context, ai_output, protocol_config=config)
+result = ComplianceEngine(protocol_config=config).verify(patient, context, ai_output)
 ```
 
 **Test Results:**

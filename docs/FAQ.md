@@ -21,10 +21,8 @@
 **Q:** I want to add a rule that checks for medication interactions. How?
 
 **A:**
-1. Add rule to `src/engine.py` in `_check_rules()`
-2. Define violation type in `ViolationDetail`
-3. Write property test in `tests/test_compliance.py`
-4. Add component test in `tests/component/`
+- For existing checker types (`drug_interactions`, `allergy_checks`, `required_fields`): add a YAML entry in `config/medical_protocols.yaml`
+- For new checker types: create a new checker class in `src/protocols/checkers/`, register it in `src/protocols/registry.py`
 
 See [Contributing Guide](../CONTRIBUTING.md) for detailed steps.
 

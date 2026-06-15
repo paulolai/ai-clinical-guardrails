@@ -1,8 +1,10 @@
 import re
+import time
 from typing import TYPE_CHECKING
 
 from src.protocols.models import ProtocolConfig
 from src.protocols.registry import ProtocolRegistry
+from src.telemetry import get_alert_counter, get_tracer, get_verification_counter, get_verification_latency
 
 from .models import (
     AIGeneratedOutput,
@@ -18,6 +20,8 @@ if TYPE_CHECKING:
     from datetime import date
 
     from src.extraction.models import StructuredExtraction
+
+_tracer = get_tracer("ai-clinical-guardrails.engine")
 
 
 class ComplianceEngine:
@@ -42,8 +46,7 @@ class ComplianceEngine:
         context: EMRContext,
         ai_output: AIGeneratedOutput,
     ) -> Result[VerificationResult, list[ComplianceAlert]]:
-        """
-        Verify AI output against EMR source of truth.
+        """Verify AI output against EMR source of truth.
 
         Args:
             patient: Patient profile from EMR
@@ -53,43 +56,72 @@ class ComplianceEngine:
         Returns:
             Result with VerificationResult or list of critical alerts.
         """
-        alerts: list[ComplianceAlert] = []
+        start = time.perf_counter()
 
-        # 1. Zero-Trust Date Verification
-        # Ensures AI hasn't hallucinated dates outside the known clinical window
-        ComplianceEngine._verify_date_integrity(context, ai_output, alerts)
+        with _tracer.start_as_current_span("compliance.verify") as span:
+            span.set_attribute("patient_id", patient.patient_id)
+            span.set_attribute("visit_id", context.visit_id)
+            span.set_attribute("has_protocol_registry", self.protocol_registry is not None)
 
-        # 2. Administrative Protocol Enforcement
-        # Codifies the rule: "Sepsis documentation requires Antibiotic confirmation"
-        ComplianceEngine._verify_clinical_protocols(ai_output, alerts)
+            alerts: list[ComplianceAlert] = []
 
-        # 3. Data Safety & PII Firewall
-        # Detects patterns that should not exist in administrative summaries
-        ComplianceEngine._verify_data_safety(ai_output, alerts)
+            # 1. Zero-Trust Date Verification
+            ComplianceEngine._verify_date_integrity(context, ai_output, alerts)
 
-        # 4. Medical Protocol Checks
-        if self.protocol_registry:
-            protocol_alerts = self._verify_medical_protocols(patient, ai_output)
-            alerts.extend(protocol_alerts)
+            # 2. Administrative Protocol Enforcement
+            ComplianceEngine._verify_clinical_protocols(ai_output, alerts)
 
-        # Categorize results
-        critical_alerts = [a for a in alerts if a.severity == ComplianceSeverity.CRITICAL]
+            # 3. Data Safety & PII Firewall
+            ComplianceEngine._verify_data_safety(ai_output, alerts)
 
-        # If we have critical violations, we return a Failure Result
-        if critical_alerts:
-            return Result.failure(error=critical_alerts)
+            # 4. Medical Protocol Checks
+            if self.protocol_registry:
+                with _tracer.start_as_current_span("compliance.verify.protocols"):
+                    protocol_alerts = self._verify_medical_protocols(patient, ai_output)
+                    alerts.extend(protocol_alerts)
 
-        # Calculate a trust score based on non-critical alerts
-        high_alerts = [a for a in alerts if a.severity == ComplianceSeverity.HIGH]
-        score = 1.0
-        if high_alerts:
-            score = 0.7
-        elif alerts:
-            score = 0.9
+            # Categorize results
+            critical_alerts = [a for a in alerts if a.severity == ComplianceSeverity.CRITICAL]
 
-        verification = VerificationResult(is_safe_to_file=True, score=score, alerts=alerts)
+            # Record metrics
+            elapsed_ms = (time.perf_counter() - start) * 1000
+            outcome = "failure" if critical_alerts else "success"
+            span.set_attribute("compliance.outcome", outcome)
+            span.set_attribute("compliance.alert_count", len(alerts))
+            span.set_attribute("compliance.elapsed_ms", elapsed_ms)
 
-        return Result.success(value=verification)
+            vc = get_verification_counter()
+            if vc is not None:
+                vc.add(1, {"outcome": outcome})
+            vl = get_verification_latency()
+            if vl is not None:
+                vl.record(elapsed_ms)
+
+            for alert in alerts:
+                ac = get_alert_counter()
+                if ac is not None:
+                    ac.add(1, {"rule_id": alert.rule_id, "severity": alert.severity.value})
+                span.add_event(
+                    "alert",
+                    {"rule_id": alert.rule_id, "severity": alert.severity.value, "message": alert.message},
+                )
+
+            # If we have critical violations, we return a Failure Result
+            if critical_alerts:
+                span.set_attribute("compliance.critical_alerts", len(critical_alerts))
+                return Result.failure(error=critical_alerts)
+
+            # Calculate a trust score based on non-critical alerts
+            high_alerts = [a for a in alerts if a.severity == ComplianceSeverity.HIGH]
+            score = 1.0
+            if high_alerts:
+                score = 0.7
+            elif alerts:
+                score = 0.9
+
+            verification = VerificationResult(is_safe_to_file=True, score=score, alerts=alerts)
+
+            return Result.success(value=verification)
 
     def _verify_medical_protocols(self, patient: PatientProfile, ai_output: AIGeneratedOutput) -> list[ComplianceAlert]:
         """Run medical protocol checks if registry is configured."""

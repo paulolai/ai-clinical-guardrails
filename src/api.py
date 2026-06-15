@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from src.extraction.models import StructuredExtraction
 from src.review.service import ReviewService, ReviewServiceError
+from src.telemetry import setup_telemetry
 
 from .engine import ComplianceEngine
 from .instrumentation import ComplianceTracer, StatsDict
@@ -33,6 +34,7 @@ verification_workflow = VerificationWorkflow(fhir_client=emr_client)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    setup_telemetry()
     yield
     await emr_client.close()
     await verification_workflow.close()
