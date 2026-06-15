@@ -1,49 +1,45 @@
 # Adding a New Compliance Rule
 
-End-to-end walkthrough with two worked examples: drug interactions and duplicate therapy.
+How a clinical safety rule goes from problem to production-tested code.
 
-## The Pipeline
+## What This Demonstrates
 
-```
-Clinical Insight → Requirements → Config → Checker → Test → Verified
-```
+This repo uses a consistent pipeline for adding safety rules. Two things are enforced:
 
-## Step 1: Clinical Insight
+1. **Invariants are defined before code is written.** The test proves the rule works for randomized inputs, not just the examples you thought of.
+2. **Rules are config-driven.** Clinical staff can add or modify rules in YAML without touching Python.
 
-The problem: AI-generated clinical notes might prescribe Warfarin (blood thinner) and Ibuprofen (NSAID) together. This combination increases bleeding risk. The existing engine catches date mismatches and PII leaks, but not drug interactions.
+The pipeline is the same regardless of rule complexity. Two worked examples show what changes when the matching logic gets harder.
 
-**Source:** `docs/plans/2026-02-22-medical-protocols-design.md`
+---
 
-## Step 2: Define the Invariant
+## Worked Example 1: Drug Interaction Detection
 
-The invariant that must always hold:
+### Problem
 
-> If extraction contains both a trigger medication (Warfarin) AND a conflict medication (Ibuprofen), a CRITICAL alert MUST be raised.
+AI-generated clinical notes might prescribe Warfarin (blood thinner) and Ibuprofen (NSAID) together. The existing engine catches date mismatches and PII leaks, but not drug interactions. This is a patient safety gap.
 
-This becomes a property-based test before any code is written.
+### Invariant
 
-## Step 3: Write the Rule Config
+> If extraction contains both a trigger medication (Warfarin) AND a conflict medication (Ibuprofen), a CRITICAL alert must be raised.
 
-Add to `config/medical_protocols.yaml`:
+### Implementation
+
+**Config** — `config/medical_protocols.yaml`:
 
 ```yaml
-rules:
-  drug_interactions:
-    - name: "Warfarin NSAID"
-      pattern:
-        trigger:
-          medications: ["warfarin", "coumadin"]
-        conflicts:
-          medications: ["ibuprofen", "naproxen", "aspirin"]
-      severity: "CRITICAL"
-      message: "Warfarin + NSAID increases bleeding risk"
+drug_interactions:
+  - name: "Warfarin NSAID"
+    pattern:
+      trigger:
+        medications: ["warfarin", "coumadin"]
+      conflicts:
+        medications: ["ibuprofen", "naproxen", "aspirin"]
+    severity: "CRITICAL"
+    message: "Warfarin + NSAID increases bleeding risk"
 ```
 
-The config is the source of truth. Clinical staff can add rules here without code changes.
-
-## Step 4: Implement the Checker
-
-Create `src/protocols/checkers/drug_checker.py`:
+**Checker** — `src/protocols/checkers/drug_checker.py` (37 lines):
 
 ```python
 class DrugInteractionChecker(ProtocolChecker):
@@ -53,65 +49,42 @@ class DrugInteractionChecker(ProtocolChecker):
         # If both present → alert
 ```
 
-The checker reads from the config, matches against extracted medications, and returns alerts. The base class (`ProtocolChecker`) provides `_create_alert()` for consistent alert formatting.
-
-**Source:** `src/protocols/checkers/drug_checker.py` (37 lines)
-
-## Step 5: Register the Checker
-
-In `src/protocols/registry.py`, add to `checker_map`:
+**Registry** — `src/protocols/registry.py` adds to `checker_map`:
 
 ```python
 checker_map = {
     "drug_interactions": DrugInteractionChecker,
-    "allergy_checks": AllergyChecker,
-    "required_fields": RequiredFieldsChecker,
+    ...
 }
 ```
 
-The registry reads the config and instantiates enabled checkers.
+### Testing
 
-## Step 6: Write the Property-Based Test
-
-Before writing example tests, prove the invariant holds for random inputs:
+**Property-based** — `tests/protocols/checkers/test_protocols_pbt.py`:
 
 ```python
 @given(config=drug_interaction_config_strategy(), meds=medication_list_strategy())
 def test_both_sides_present_implies_alert(self, config, meds):
-    # Generate random medication lists
-    # Filter to cases where both trigger AND conflict are present
-    # Assert: checker MUST return an alert
+    # When trigger AND conflict are both extracted, checker must alert
 
 @given(config=drug_interaction_config_strategy(), meds=medication_list_strategy())
 def test_only_one_side_present_implies_no_alert(self, config, meds):
-    # Generate random medication lists
-    # Filter to cases where only one side is present
-    # Assert: checker MUST NOT return an alert
+    # When only one side is present, checker must not alert
 ```
 
-Hypothesis generates 200 random combinations per test run. If any combination violates the invariant, the test fails with a minimal counterexample.
+Hypothesis generates 200 random medication combinations per run. The strategies draw from actual drug names and vary the count, order, and mix.
 
-**Source:** `tests/protocols/checkers/test_protocols_pbt.py`
-
-## Step 7: Write Example Tests
-
-Add specific examples for documentation:
+**Example tests** — `tests/protocols/checkers/test_drug_checker.py`:
 
 ```python
 def test_detects_warfarin_nsaid_interaction():
     # Warfarin + Ibuprofen → CRITICAL alert
-    ...
 
 def test_no_alert_when_only_trigger_present():
     # Only Warfarin → no alert
-    ...
 ```
 
-**Source:** `tests/protocols/checkers/test_drug_checker.py`
-
-## Step 8: Verify End-to-End
-
-Test through the `ComplianceEngine` to confirm integration:
+**Engine integration** — `tests/test_compliance.py`:
 
 ```python
 engine = ComplianceEngine(protocol_config=config)
@@ -119,11 +92,9 @@ result = engine.verify(patient, context, ai_output)
 assert not result.is_success  # Warfarin + Ibuprofen detected
 ```
 
-**Source:** `tests/test_compliance.py::test_compliance_engine_with_protocols`
+### Observability
 
-## Step 9: Add Traces
-
-The engine automatically instruments verification spans:
+The engine automatically captures OTEL spans. No per-checker instrumentation needed:
 
 ```
 compliance.verify
@@ -133,39 +104,64 @@ compliance.verify
   └── compliance.verify.protocols
 ```
 
-Alert events are attached to the span:
-
-```python
-span.add_event("alert", {
-    "rule_id": "PROTOCOL_DRUG_INTERACTIONS_WARFARIN_NSAID",
-    "severity": "critical",
-    "message": "Warfarin + NSAID increases bleeding risk"
-})
-```
-
-**Source:** `tests/test_telemetry.py`
+Verified in `tests/test_telemetry.py` with `InMemorySpanExporter`.
 
 ---
 
 ## Worked Example 2: Duplicate Therapy Detection
 
-Same pipeline, different matching pattern. This example shows what changes when the rule isn't about specific drug names — it's about therapeutic classes.
+This example shows what changes when the matching logic isn't about specific drug names — it's about therapeutic classes.
 
-### Clinical Insight
+### Problem
 
-A patient is on both Lisinopril and Enalapril. Both are ACE inhibitors. Taking two drugs from the same class increases side effects without additional benefit. The engine needs to catch redundant therapy.
-
-**Source:** `docs/plans/2026-02-22-medical-protocols-design.md`
+A patient is on both Lisinopril and Enalapril. Both are ACE inhibitors. Taking two drugs from the same class increases side effects without additional benefit. The drug interaction checker can't catch this because it matches individual names, not drug classes.
 
 ### Invariant
 
-> If extraction contains more than N medications in the same drug class, an alert MUST be raised.
+> If extraction contains more than N medications in the same drug class, an alert must be raised.
 
-Unlike drug interactions (name-based matching), this requires **class-based matching** — grouping drugs into therapeutic categories first.
+### What's Different
 
-### Config
+Drug interactions use name-based matching: "is drug A in this list?" Duplicate therapy requires a new concept — grouping drugs into therapeutic categories, then counting within each group. This meant adding a new matcher type.
 
-Add to `config/medical_protocols.yaml`:
+### Implementation
+
+**Drug class map** — `src/protocols/checkers/drug_class_matcher.py`:
+
+```python
+DRUG_CLASS_MAP = {
+    "lisinopril": "ACE_INHIBITOR",
+    "enalapril": "ACE_INHIBITOR",
+    "ramipril": "ACE_INHIBITOR",
+    "atorvastatin": "STATIN",
+    "rosuvastatin": "STATIN",
+    # ~25 drugs mapped to 6 classes
+}
+
+class DrugClassMatcher(PatternMatcher):
+    def count_by_class(self, extraction, drug_class: str) -> int:
+        count = 0
+        for med in extraction.medications:
+            if DRUG_CLASS_MAP.get(med.name.lower()) == drug_class:
+                count += 1
+        return count
+```
+
+The matcher is its own module because it's reusable — any class-based rule (duplicate ACE inhibitors, duplicate statins, duplicate PPIs) uses the same mapping.
+
+**Checker** — `src/protocols/checkers/duplicate_therapy_checker.py`:
+
+```python
+class DuplicateTherapyChecker(ProtocolChecker):
+    def check(self, patient, extraction) -> list[ComplianceAlert]:
+        matcher = DrugClassMatcher()
+        for rule in self.config.rules["duplicate_therapy"]:
+            actual_count = matcher.count_by_class(extraction, rule.pattern["drug_class"])
+            if actual_count > rule.pattern["max_count"]:
+                alerts.append(self._create_alert(rule, patient, extraction))
+```
+
+**Config** — two rules, same pattern format:
 
 ```yaml
 duplicate_therapy:
@@ -175,107 +171,41 @@ duplicate_therapy:
       max_count: 1
     severity: "HIGH"
     message: "Multiple ACE inhibitors detected — consider consolidating"
+
+  - name: "Duplicate Statin"
+    pattern:
+      drug_class: "STATIN"
+      max_count: 1
+    severity: "HIGH"
+    message: "Multiple statins detected"
 ```
 
-Same format as drug interactions, but the pattern uses `drug_class` + `max_count` instead of trigger/conflict.
+### Testing
 
-### Matcher (New Pattern)
-
-Create `src/protocols/checkers/drug_class_matcher.py`:
+Same pattern as drug interactions. PBT proves the counting invariant; example tests document specific scenarios.
 
 ```python
-DRUG_CLASS_MAP = {
-    "lisinopril": "ACE_INHIBITOR",
-    "enalapril": "ACE_INHIBITOR",
-    "atorvastatin": "STATIN",
-    "rosuvastatin": "STATIN",
-    # ... ~20 drugs mapped to 6 classes
-}
-
-class DrugClassMatcher:
-    def count_by_class(self, extraction, drug_class: str) -> int:
-        # Count how many extracted medications belong to the class
-```
-
-**Key difference from DrugInteractionChecker:** This introduces a new matcher concept. Drug interactions match individual medication names; duplicate therapy groups medications into classes first, then counts within a class. The matcher is extracted as its own module because it's reusable across different class-based rules.
-
-### Checker
-
-Create `src/protocols/checkers/duplicate_therapy_checker.py`:
-
-```python
-class DuplicateTherapyChecker(ProtocolChecker):
-    def check(self, patient, extraction) -> list[ComplianceAlert]:
-        # Uses DrugClassMatcher.count_by_class()
-        # For each rule: if count > max_count → alert
-```
-
-Reads from config under the `duplicate_therapy` key. Same base class, same `_create_alert()` helper.
-
-**Source:** `src/protocols/checkers/duplicate_therapy_checker.py`
-
-### Registry
-
-Add to `checker_map` in `src/protocols/registry.py`:
-
-```python
-checker_map = {
-    "drug_interactions": DrugInteractionChecker,
-    "duplicate_therapy": DuplicateTherapyChecker,
-    "allergy_checks": AllergyChecker,
-    "required_fields": RequiredFieldsChecker,
-}
-```
-
-### Property-Based Tests
-
-Prove the counting invariant:
-
-```python
-@given(extraction=extraction_strategy(), drug_class=st.sampled_from(["ACE_INHIBITOR", "STATIN", ...]))
+# PBT: count_by_class accuracy
+@given(extraction=medication_class_strategy(), drug_class=st.sampled_from(CLASSES))
 def test_count_accurate(self, extraction, drug_class):
-    # Verify count_by_class matches manual count
+    matcher = DrugClassMatcher()
+    assert matcher.count_by_class(extraction, drug_class) == expected_count
 
-@given(extraction=extraction_with_class(drug_class), drug_class=st.sampled_from([...]))
-def test_never_miss_class_member(self, extraction, drug_class):
-    # Every drug in DRUG_CLASS_MAP for that class must be counted
-
-@given(extraction=extraction_without_class(drug_class), drug_class=st.sampled_from([...]))
-def test_never_false_positive(self, extraction, drug_class):
-    # No alert when extraction has no drugs in that class
-```
-
-**Source:** `tests/protocols/checkers/test_protocols_pbt.py`
-
-### Example Tests
-
-```python
+# Example: specific scenario
 def test_duplicate_ace_inhibitors():
-    # Lisinopril + Enalapril → HIGH alert
-    ...
-
-def test_single_ace_inhibitor_no_alert():
-    # Only Lisinopril → no alert
-    ...
-
-def test_different_classes_no_alert():
-    # Lisinopril (ACE) + Atorvastatin (statin) → no alert
-    ...
-
-def test_empty_extraction():
-    # No medications → no alert
-    ...
+    extraction = StructuredExtraction(medications=[
+        ExtractedMedication(name="lisinopril"),
+        ExtractedMedication(name="enalapril"),
+    ])
+    checker = DuplicateTherapyChecker(config)
+    alerts = checker.check(patient, extraction)
+    assert len(alerts) == 1
+    assert alerts[0].severity == ComplianceSeverity.HIGH
 ```
 
-**Source:** `tests/protocols/checkers/test_duplicate_therapy.py`
-
-### Engine Integration & Traces
-
-Same as drug interactions — the engine calls all registered checkers and captures OTEL spans automatically. No additional work needed.
+---
 
 ## Adding a New Checker Type
-
-To add a completely new checker type (not just a new rule):
 
 1. Create `src/protocols/checkers/new_checker.py` extending `ProtocolChecker`
 2. Implement `check(patient, extraction) -> list[ComplianceAlert]`
@@ -284,21 +214,21 @@ To add a completely new checker type (not just a new rule):
 5. Write PBT tests proving the invariants
 6. Write example tests for documentation
 
-## Files Involved
+## Files
 
 | File | Role |
 |------|------|
-| `config/medical_protocols.yaml` | Rule definitions (source of truth) |
-| `src/protocols/models.py` | Data models (ProtocolConfig, ProtocolRule) |
+| `config/medical_protocols.yaml` | Rule definitions |
+| `src/protocols/models.py` | ProtocolConfig, ProtocolRule |
 | `src/protocols/config.py` | YAML loader |
 | `src/protocols/checkers/base.py` | Abstract base class |
-| `src/protocols/checkers/drug_checker.py` | Drug interaction logic |
-| `src/protocols/checkers/drug_class_matcher.py` | Drug-to-class mapping and counting |
+| `src/protocols/checkers/drug_checker.py` | Drug interaction matching |
+| `src/protocols/checkers/drug_class_matcher.py` | Drug-to-class mapping |
 | `src/protocols/checkers/duplicate_therapy_checker.py` | Duplicate therapy logic |
 | `src/protocols/registry.py` | Checker orchestration |
-| `src/engine.py` | Integration with verification flow |
+| `src/engine.py` | Verification flow |
 | `tests/protocols/checkers/test_protocols_pbt.py` | Property-based tests |
-| `tests/protocols/checkers/test_drug_checker.py` | Example tests (drug interactions) |
-| `tests/protocols/checkers/test_duplicate_therapy.py` | Example tests (duplicate therapy) |
-| `tests/test_compliance.py` | End-to-end engine test |
+| `tests/protocols/checkers/test_drug_checker.py` | Drug interaction tests |
+| `tests/protocols/checkers/test_duplicate_therapy.py` | Duplicate therapy tests |
+| `tests/test_compliance.py` | Engine integration test |
 | `tests/test_telemetry.py` | OTEL trace verification |
