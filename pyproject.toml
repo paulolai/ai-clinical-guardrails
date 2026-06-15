@@ -1,5 +1,5 @@
 [project]
-name = "python-backend"
+name = "ai-clinical-guardrails"
 version = "0.1.0"
 description = "AI Clinical Guardrails - High Assurance Verification"
 readme = "README.md"

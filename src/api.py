@@ -113,7 +113,7 @@ async def verify_compliance(request: ComplianceRequest) -> VerificationResult:
     if not request.patient or not request.context:
         raise HTTPException(status_code=400, detail="Manual patient and context required")
 
-    result = ComplianceEngine.verify(request.patient, request.context, request.ai_output)
+    result = ComplianceEngine().verify(request.patient, request.context, request.ai_output)
     return _process_result(request.patient.patient_id, request.context.visit_id, result)
 
 
@@ -128,7 +128,7 @@ async def verify_fhir_compliance(patient_id: str, request: ComplianceRequest) ->
         context = await emr_client.get_latest_encounter(patient_id)
 
         # 2. Run Engine
-        result = ComplianceEngine.verify(patient, context, request.ai_output)
+        result = ComplianceEngine().verify(patient, context, request.ai_output)
 
         return _process_result(patient.patient_id, context.visit_id, result)
     except ValueError as ve:
@@ -240,7 +240,7 @@ async def get_compliance_stats() -> StatsDict:
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:
-    return {"status": "operational", "emr_integration": "FHIR R4 Connected"}
+    return {"status": "operational", "emr_integration": "FHIR R5 Connected"}
 
 
 @app.post("/review/create", response_model=UnifiedReview)

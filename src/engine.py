@@ -1,7 +1,6 @@
 import re
 from typing import TYPE_CHECKING
 
-# NEW: Import protocol components
 from src.protocols.models import ProtocolConfig
 from src.protocols.registry import ProtocolRegistry
 
@@ -22,14 +21,13 @@ if TYPE_CHECKING:
 
 
 class ComplianceEngine:
-    """
-    Deterministic Verification Engine for AI-generated Clinical Documentation.
-    Now includes configurable medical protocol checks.
+    """Deterministic Verification Engine for AI-generated Clinical Documentation.
+
+    Includes configurable medical protocol checks via ProtocolRegistry.
     """
 
     def __init__(self, protocol_config: ProtocolConfig | None = None):
-        """
-        Initialize ComplianceEngine.
+        """Initialize ComplianceEngine.
 
         Args:
             protocol_config: Optional protocol configuration for medical checks.
@@ -38,21 +36,19 @@ class ComplianceEngine:
         if protocol_config:
             self.protocol_registry = ProtocolRegistry(protocol_config)
 
-    @staticmethod
     def verify(
+        self,
         patient: PatientProfile,
         context: EMRContext,
         ai_output: AIGeneratedOutput,
-        protocol_config: ProtocolConfig | None = None,
     ) -> Result[VerificationResult, list[ComplianceAlert]]:
         """
-        Pure function that verifies AI output against EMR source of truth.
+        Verify AI output against EMR source of truth.
 
         Args:
             patient: Patient profile from EMR
             context: EMR context (dates, etc.)
             ai_output: AI-generated output to verify
-            protocol_config: Optional protocol configuration
 
         Returns:
             Result with VerificationResult or list of critical alerts.
@@ -71,10 +67,9 @@ class ComplianceEngine:
         # Detects patterns that should not exist in administrative summaries
         ComplianceEngine._verify_data_safety(ai_output, alerts)
 
-        # 4. NEW: Medical Protocol Checks
-        if protocol_config:
-            engine = ComplianceEngine(protocol_config)
-            protocol_alerts = engine._verify_medical_protocols(patient, ai_output)
+        # 4. Medical Protocol Checks
+        if self.protocol_registry:
+            protocol_alerts = self._verify_medical_protocols(patient, ai_output)
             alerts.extend(protocol_alerts)
 
         # Categorize results
@@ -112,7 +107,7 @@ class ComplianceEngine:
         from src.extraction.models import StructuredExtraction
 
         return StructuredExtraction(
-            medications=ai_output.extracted_medications if hasattr(ai_output, "extracted_medications") else [],
+            medications=ai_output.extracted_medications,
             diagnoses=[],
             temporal_expressions=[],
             vital_signs=[],

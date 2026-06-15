@@ -3,7 +3,7 @@
 This document is **GENERATED** from `docs/ARCHITECTURE_DECISIONS.md`.
 DO NOT EDIT MANUALLY - Changes will be overwritten.
 
-Last generated: 2026-03-08T17:59:52.617591
+Last generated: 2026-06-15T13:28:24.964811
 
 ---
 
@@ -27,7 +27,7 @@ Last generated: 2026-03-08T17:59:52.617591
 🏛️ **[DECISION]** We explicitly reject Gherkin/Cucumber layers.
    *ADR-2: Rejection of Gherkin (Cucumber)* (The Decision)
 
-🏛️ **[DECISION]** We use **TypeScript as the Specification Language**.
+🏛️ **[DECISION]** We use **Python as the Specification Language**.
    *ADR-2: Rejection of Gherkin (Cucumber)* (The Decision)
 
 🏛️ **[DECISION]** We define business invariants first, prove them via Property-Based Testing (PBT), then implement the logic.
@@ -36,34 +36,43 @@ Last generated: 2026-03-08T17:59:52.617591
 🏛️ **[DECISION]** Example-based tests are used sparingly for documentation only.
    *ADR-3: Property-Based Testing First* (The Decision)
 
-✅ **[MUST]** **Invariants over Examples:** Use `fast-check` to prove business rules.
+✅ **[MUST]** **Invariants over Examples:** Use Hypothesis to prove business rules.
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** **Examples are Documentation:** Only use `it('Example: ...')` to illustrate specific scenarios mentioned in the business spec.
+✅ **[MUST]** **Examples are Documentation:** Only use specific test functions to illustrate scenarios mentioned in the business spec.
    *ADR-3: Property-Based Testing First* (Rule)
 
 ✅ **[MUST]** *Example:**
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** // This single test verifies the rule across 100 random patient records
+✅ **[MUST]** @given(patient=patient_strategy(), context=context_strategy())
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** it('Admission Date cannot be after Discharge Date', () => {
+✅ **[MUST]** def test_date_integrity_invariant(patient, context):
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** verifyInvariant({
+✅ **[MUST]** """If the AI generates a date NOT in the EMR source, it MUST return Failure."""
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** ruleReference: 'PLAN.md §2.1',
+✅ **[MUST]** hallucinated_date = date(1900, 1, 1)
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** rule: 'Temporal consistency check'
+✅ **[MUST]** ai_output = AIGeneratedOutput(
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** }, (patient, summary, result) => {
+✅ **[MUST]** summary_text="Patient summary.",
    *ADR-3: Property-Based Testing First* (Rule)
 
-✅ **[MUST]** expect(result.dischargeDate >= result.admissionDate).toBe(true);
+✅ **[MUST]** extracted_dates=[hallucinated_date],
+   *ADR-3: Property-Based Testing First* (Rule)
+
+✅ **[MUST]** result = ComplianceEngine().verify(patient, context, ai_output)
+   *ADR-3: Property-Based Testing First* (Rule)
+
+✅ **[MUST]** assert not result.is_success
+   *ADR-3: Property-Based Testing First* (Rule)
+
+✅ **[MUST]** assert any(a.rule_id == "INVARIANT_DATE_MISMATCH" for a in result.error)
    *ADR-3: Property-Based Testing First* (Rule)
 
 ---
@@ -73,64 +82,91 @@ Last generated: 2026-03-08T17:59:52.617591
 🏛️ **[DECISION]** We use the `Result<T, E>` discriminated union type for explicit error handling instead of throwing exceptions for business logic errors.
    *ADR-4: Result Pattern for Error Handling* (The Decision)
 
-ℹ️ **[INFO]** // Type definition
+ℹ️ **[INFO]** from dataclasses import dataclass
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** type Result<T, E> = Success<T> | Failure<E>;
+ℹ️ **[INFO]** from typing import Generic, TypeVar
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** interface Success<T> {
+ℹ️ **[INFO]** T = TypeVar("T")
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** success: true;
+ℹ️ **[INFO]** E = TypeVar("E")
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** value: T;
+ℹ️ **[INFO]** @dataclass(frozen=True)
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** interface Failure<E> {
+ℹ️ **[INFO]** class Result(Generic[T, E]):
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** success: false;
+ℹ️ **[INFO]** is_success: bool
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** error: E;
+ℹ️ **[INFO]** value: T | None = None
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** // Example usage
+ℹ️ **[INFO]** error: E | None = None
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** function verifyCompliance(context: PatientContext, summary: AISummary): Result<Verified, ComplianceAlert[]> {
+ℹ️ **[INFO]** @classmethod
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** const alerts = runAllChecks(context, summary);
+ℹ️ **[INFO]** def success(cls, value: T) -> "Result[T, E]":
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** if (alerts.length > 0) {
+ℹ️ **[INFO]** return cls(value=value, is_success=True)
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** return failure(alerts);
+ℹ️ **[INFO]** @classmethod
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** return success({ status: 'VERIFIED', timestamp: Date.now() });
+ℹ️ **[INFO]** def failure(cls, error: E) -> "Result[T, E]":
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** // Compose operations safely
+ℹ️ **[INFO]** return cls(error=error, is_success=False)
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** const result = verifyCompliance(patientContext, generatedSummary);
+ℹ️ **[INFO]** def map(self, fn):
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** if (isSuccess(result)) {
+ℹ️ **[INFO]** """Transform success value, propagate failure."""
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** console.log('Compliance verified:', result.value.status);
+ℹ️ **[INFO]** if self.is_success:
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** } else {
+ℹ️ **[INFO]** return Result.success(fn(self.value))
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
-ℹ️ **[INFO]** console.error('Compliance violations:', result.error);
+ℹ️ **[INFO]** return Result.failure(self.error)
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** def chain(self, fn):
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** """Monadic bind: apply fn only on success, short-circuit on failure."""
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** if self.is_success:
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** return fn(self.value)
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** return Result.failure(self.error)
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** # Usage
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** result = engine.verify(patient, context, ai_output)
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** result.map(lambda v: file_to_emr(v))           # only on success
+   *ADR-4: Result Pattern for Error Handling* (The Pattern)
+
+ℹ️ **[INFO]** result.chain(lambda v: send_notification(v))    # short-circuits on failure
    *ADR-4: Result Pattern for Error Handling* (The Pattern)
 
 ✅ **[MUST]** **Use Result for Business Logic Failures:** Validation errors, compliance violations, expected failures.
@@ -142,14 +178,14 @@ Last generated: 2026-03-08T17:59:52.617591
 ✅ **[MUST]** **Prefer `chain()` Over Nested `if isSuccess`:** The `chain` utility composes linearly and stops at the first failure.
    *ADR-4: Result Pattern for Error Handling* (Rule)
 
-🏛️ **[DECISION]** All test data generation lives in a monorepo-style `packages/shared` directory, consumed by test suites.
-   *ADR-5: Shared Core Pattern* (The Decision)
+🏛️ **[DECISION]** Test data generation lives in shared fixture modules and Hypothesis strategies, consumed by test suites.
+   *ADR-5: Shared Test Fixtures* (The Decision)
 
-✅ **[MUST]** **Never Duplicate Builders:** If you need a helper for test data, it belongs in `packages/shared/fixtures`.
-   *ADR-5: Shared Core Pattern* (Rule)
+✅ **[MUST]** **Never Duplicate Strategies:** If you need a Hypothesis strategy for test data, it belongs in `tests/conftest.py` or a shared fixture module.
+   *ADR-5: Shared Test Fixtures* (Rule)
 
-✅ **[MUST]** **No Magic Objects:** Tests must never use raw `{ name: "item", price: 100 }` literals. Always use `CartBuilder.new()` or future `PatientRecordBuilder.new()`.
-   *ADR-5: Shared Core Pattern* (Rule)
+✅ **[MUST]** **No Raw Literals:** Tests should use strategy-generated data, not hardcoded `{ "name": "test" }` literals.
+   *ADR-5: Shared Test Fixtures* (Rule)
 
 ---
 
@@ -161,31 +197,19 @@ Last generated: 2026-03-08T17:59:52.617591
 🏛️ **[DECISION]** All tests **must** capture their inputs and outputs to a `tracer`. A test without a trace is considered **incomplete**.
    *ADR-7: Deep Observability (Mandatory Tracing)* (The Decision)
 
-ℹ️ **[INFO]** // API Tests - Manual tracing
+ℹ️ **[INFO]** # Each API call is traced with inputs and outputs
    *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
 
-ℹ️ **[INFO]** it('Invariant: Critical Protocol Check', () => {
+ℹ️ **[INFO]** tracer.log_interaction(patient_id, visit_id, verification)
    *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
 
-ℹ️ **[INFO]** verifyInvariant({
+ℹ️ **[INFO]** # The ComplianceTracer writes JSONL traces and generates HTML reports
    *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
 
-ℹ️ **[INFO]** ruleReference: 'PLAN.md §2.2',
+ℹ️ **[INFO]** # Reports show: timestamp, patient_id, visit_id, is_safe, score, alerts
    *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
 
-ℹ️ **[INFO]** rule: 'Sepsis requires antibiotic timing documentation'
-   *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
-
-ℹ️ **[INFO]** }, (patient, summary, result) => {
-   *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
-
-ℹ️ **[INFO]** tracer.log(testName, { patient, summary }, result);
-   *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
-
-ℹ️ **[INFO]** expect(result.hasAntibioticTiming).toBe(true);
-   *ADR-7: Deep Observability (Mandatory Tracing)* (The Pattern)
-
-✅ **[MUST]** After running tests, open `reports/{latest}/attestation-full.html`. If a test is listed but has no "Input/Output" trace, it is incomplete.
+✅ **[MUST]** After running tests, check `reports/` for the attestation report. Each traced interaction provides evidence that the verification engine was exercised with meaningful data.
    *ADR-7: Deep Observability (Mandatory Tracing)* (Verification Rule)
 
 🏛️ **[DECISION]** We verify quality using two distinct coverage metrics that must **both** pass quality gates.

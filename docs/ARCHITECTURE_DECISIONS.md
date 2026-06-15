@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADR)
 
-This repository demonstrates the **Invariant-Based Verification Pattern** for AI safety in regulated domains. We have made specific, non-standard choices to optimize for **Regulatory Compliance** and **Mathematical Rigor**.
+This repository implements **Invariant-Based Verification** for AI safety in regulated domains. We have made specific, non-standard choices to optimize for **Regulatory Compliance** and **Verification Rigor**.
 
 This document explains the *Why* behind these decisions, and what alternatives were rejected.
 
@@ -55,12 +55,12 @@ We prioritize **Sociable Tests** (Integration/Component) over **Solitary Unit Te
 
 #### The Decision
 We explicitly reject Gherkin/Cucumber layers.
-We use **TypeScript as the Specification Language**.
+We use **Python as the Specification Language**.
 
 #### Why?
-*   **The "Translation Tax":** Gherkin requires maintaining a regex mapping layer (`steps.ts`) between English and Code. This layer is expensive, brittle, and rarely read by stakeholders.
+*   **The "Translation Tax":** Gherkin requires maintaining a regex mapping layer between English and Code. This layer is expensive, brittle, and rarely read by stakeholders.
 *   **Type Safety:** Gherkin text has no type safety. `Given I have 5 items` passes a string "5" to code that expects a number.
-*   **Refactoring:** Renaming a business concept in TypeScript is one `F2` keypress. In Gherkin, it's a grep/sed nightmare.
+*   **Refactoring:** Renaming a business concept in Python is a single rename operation. In Gherkin, it's a grep/sed nightmare.
 
 #### The Alternative
 We use **Attestation Reporting** to generate the "English" view from the code metadata, rather than writing English to generate code execution.
@@ -88,20 +88,22 @@ Example-based tests are used sparingly for documentation only.
 **Rejected:** BDD "Scenario Outline" tables (e.g., 20 rows of test data) are brittle and create a false sense of completeness. They only verify the cases you explicitly write, not the infinite edge cases that PBT discovers automatically.
 
 #### Rule
-*   **Invariants over Examples:** Use `fast-check` to prove business rules.
-*   **Examples are Documentation:** Only use `it('Example: ...')` to illustrate specific scenarios mentioned in the business spec.
+*   **Invariants over Examples:** Use Hypothesis to prove business rules.
+*   **Examples are Documentation:** Only use specific test functions to illustrate scenarios mentioned in the business spec.
 
 **Example:**
-```typescript
-// This single test verifies the rule across 100 random patient records
-it('Admission Date cannot be after Discharge Date', () => {
-  verifyInvariant({
-    ruleReference: 'PLAN.md §2.1',
-    rule: 'Temporal consistency check'
-  }, (patient, summary, result) => {
-    expect(result.dischargeDate >= result.admissionDate).toBe(true);
-  });
-});
+```python
+@given(patient=patient_strategy(), context=context_strategy())
+def test_date_integrity_invariant(patient, context):
+    """If the AI generates a date NOT in the EMR source, it MUST return Failure."""
+    hallucinated_date = date(1900, 1, 1)
+    ai_output = AIGeneratedOutput(
+        summary_text="Patient summary.",
+        extracted_dates=[hallucinated_date],
+    )
+    result = ComplianceEngine().verify(patient, context, ai_output)
+    assert not result.is_success
+    assert any(a.rule_id == "INVARIANT_DATE_MISMATCH" for a in result.error)
 ```
 
 ---
@@ -124,50 +126,50 @@ We use the `Result<T, E>` discriminated union type for explicit error handling i
 **Rejected:** Using exceptions for normal business flows (validation failures, "not found" errors) conflates truly exceptional errors with expected failure modes. This makes it harder to reason about what errors a function can actually produce.
 
 #### The Pattern
-```typescript
-// Type definition
-type Result<T, E> = Success<T> | Failure<E>;
+```python
+from dataclasses import dataclass
+from typing import Generic, TypeVar
 
-interface Success<T> {
-  success: true;
-  value: T;
-}
+T = TypeVar("T")
+E = TypeVar("E")
 
-interface Failure<E> {
-  success: false;
-  error: E;
-}
+@dataclass(frozen=True)
+class Result(Generic[T, E]):
+    is_success: bool
+    value: T | None = None
+    error: E | None = None
 
-// Example usage
-function verifyCompliance(context: PatientContext, summary: AISummary): Result<Verified, ComplianceAlert[]> {
-  const alerts = runAllChecks(context, summary);
-  if (alerts.length > 0) {
-    return failure(alerts);
-  }
-  return success({ status: 'VERIFIED', timestamp: Date.now() });
-}
+    @classmethod
+    def success(cls, value: T) -> "Result[T, E]":
+        return cls(value=value, is_success=True)
 
-// Compose operations safely
-const result = verifyCompliance(patientContext, generatedSummary);
+    @classmethod
+    def failure(cls, error: E) -> "Result[T, E]":
+        return cls(error=error, is_success=False)
 
-if (isSuccess(result)) {
-  console.log('Compliance verified:', result.value.status);
-} else {
-  console.error('Compliance violations:', result.error);
-}
+    def map(self, fn):
+        """Transform success value, propagate failure."""
+        if self.is_success:
+            return Result.success(fn(self.value))
+        return Result.failure(self.error)
+
+    def chain(self, fn):
+        """Monadic bind: apply fn only on success, short-circuit on failure."""
+        if self.is_success:
+            return fn(self.value)
+        return Result.failure(self.error)
+
+# Usage
+result = engine.verify(patient, context, ai_output)
+result.map(lambda v: file_to_emr(v))           # only on success
+result.chain(lambda v: send_notification(v))    # short-circuits on failure
 ```
 
 #### Available Utilities
-*   `success(value)` / `failure(error)` - Create Results
-*   `isSuccess()` / `isFailure()` - Type guards
+*   `Result.success(value)` / `Result.failure(error)` - Create Results
 *   `map()` - Transform success values, propagate failures
 *   `chain()` - Compose operations that return Results
-*   `unwrap()` / `unwrapOr()` / `unwrapOrElse()` - Extract values
-*   `match()` - Pattern matching for side effects
-*   `all()` - Combine multiple Results
-*   `tryCatch()` / `tryCatchAsync()` - Convert exceptions to Results
-*   `fromNullable()` - Handle null/undefined values
-*   `fromZod()` - Convert Zod validation results
+*   `unwrap()` / `unwrap_error()` - Extract values (raises on wrong variant)
 
 #### Rule
 *   **Use Result for Business Logic Failures:** Validation errors, compliance violations, expected failures.
@@ -176,34 +178,20 @@ if (isSuccess(result)) {
 
 ---
 
-### 5. Shared Core Pattern
+### 5. Shared Test Fixtures
 **Status:** Accepted
 
 #### The Decision
-All test data generation lives in a monorepo-style `packages/shared` directory, consumed by test suites.
+Test data generation lives in shared fixture modules and Hypothesis strategies, consumed by test suites.
 
 #### Why?
-*   **Single Source of Truth:** The `CartBuilder` used in tests is identical across all test files.
-*   **Semantic Integrity:** Types and schemas are defined once and shared across layers. A schema change instantly breaks all tests (a good thing).
+*   **Single Source of Truth:** Hypothesis strategies like `patient_strategy()` are defined once and shared across all property-based tests.
+*   **Semantic Integrity:** Test data builders enforce valid domain constraints. A schema change instantly breaks all tests.
 *   **Cost Savings:** Avoids duplicate maintenance of test utilities.
 
-#### Alternative Rejected: Separate Test Utilities
-**Rejected:** Putting helpers in each implementation's `test/` directory creates duplication and drift. When a test changes in one file, the other files' helpers don't get updated, breaking the "Single Source of Truth."
-
-#### Structure
-```
-packages/shared/
-├── fixtures/
-│   ├── cart-builder.ts      # Fluent API for creating carts (legacy e-commerce reference)
-│   └── arbitraries.ts       # fast-check generators for PBT
-└── src/
-    ├── types.ts             # Zod schemas shared by all code and tests
-    └── result.ts            # Result<T,E> pattern utilities
-```
-
 #### Rule
-*   **Never Duplicate Builders:** If you need a helper for test data, it belongs in `packages/shared/fixtures`.
-*   **No Magic Objects:** Tests must never use raw `{ name: "item", price: 100 }` literals. Always use `CartBuilder.new()` or future `PatientRecordBuilder.new()`.
+*   **Never Duplicate Strategies:** If you need a Hypothesis strategy for test data, it belongs in `tests/conftest.py` or a shared fixture module.
+*   **No Raw Literals:** Tests should use strategy-generated data, not hardcoded `{ "name": "test" }` literals.
 
 ---
 
@@ -236,21 +224,16 @@ All tests **must** capture their inputs and outputs to a `tracer`. A test withou
 **Rejected:** A green checkmark proves code ran, not that it verified meaningful business rules. Without trace data, regulators have no evidence of *what* was tested.
 
 #### The Pattern
-```typescript
-// API Tests - Manual tracing
-it('Invariant: Critical Protocol Check', () => {
-  verifyInvariant({
-    ruleReference: 'PLAN.md §2.2',
-    rule: 'Sepsis requires antibiotic timing documentation'
-  }, (patient, summary, result) => {
-    tracer.log(testName, { patient, summary }, result);
-    expect(result.hasAntibioticTiming).toBe(true);
-  });
-});
+```python
+# Each API call is traced with inputs and outputs
+tracer.log_interaction(patient_id, visit_id, verification)
+
+# The ComplianceTracer writes JSONL traces and generates HTML reports
+# Reports show: timestamp, patient_id, visit_id, is_safe, score, alerts
 ```
 
 #### Verification Rule
-After running tests, open `reports/{latest}/attestation-full.html`. If a test is listed but has no "Input/Output" trace, it is incomplete.
+After running tests, check `reports/` for the attestation report. Each traced interaction provides evidence that the verification engine was exercised with meaningful data.
 
 ---
 

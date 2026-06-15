@@ -56,7 +56,7 @@ def test_compliance_engine_with_protocols():
         extracted_medications=[ExtractedMedication(name="warfarin"), ExtractedMedication(name="ibuprofen")],
     )
 
-    result = engine.verify(patient, context, ai_output, protocol_config=config)
+    result = engine.verify(patient, context, ai_output)
 
     # Should fail due to drug interaction
     assert not result.is_success
@@ -103,7 +103,7 @@ class TestComplianceEngine:
             extracted_diagnoses=[],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Verify it's a failure
         assert not result.is_success
@@ -123,7 +123,7 @@ class TestComplianceEngine:
             extracted_diagnoses=[],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         assert not result.is_success
         assert result.error is not None
@@ -140,7 +140,7 @@ class TestComplianceEngine:
             extracted_diagnoses=["Severe Sepsis"],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Non-critical alerts should still allow a Success result but with alerts inside
         assert result.is_success
@@ -161,7 +161,7 @@ class TestComplianceBoundaryCases:
             extracted_diagnoses=[],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Empty summary should pass basic checks
         assert result.is_success
@@ -179,7 +179,7 @@ class TestComplianceBoundaryCases:
             extracted_diagnoses=[],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Should always return a result, never crash
         assert result.is_success is not None
@@ -194,7 +194,7 @@ class TestComplianceBoundaryCases:
         )
 
         # Should handle gracefully without crashing
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Result may be success or failure, but should not raise exception
         assert result.is_success is not None or result.error is not None
@@ -210,7 +210,7 @@ class TestComplianceBoundaryCases:
             extracted_diagnoses=many_diagnoses,
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Should handle large lists without error
         assert result.is_success is not None
@@ -230,7 +230,7 @@ class TestComplianceBoundaryCases:
             extracted_diagnoses=[],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Should handle any valid date without error
         assert result.is_success is not None
@@ -248,7 +248,7 @@ class TestComplianceBoundaryCases:
             extracted_diagnoses=[],
         )
 
-        result = ComplianceEngine.verify(patient, context, ai_output)
+        result = ComplianceEngine().verify(patient, context, ai_output)
 
         # Future dates should be flagged
         if not result.is_success:

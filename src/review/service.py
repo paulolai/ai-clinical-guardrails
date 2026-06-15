@@ -75,7 +75,7 @@ class ReviewService:
         ai_output = self._note_to_ai_output(note)
 
         # 3. Verify
-        result = ComplianceEngine.verify(patient, emr_context, ai_output)
+        result = ComplianceEngine().verify(patient, emr_context, ai_output)
 
         # 4. Build unified review
         # If verification failed (critical alerts), we still return a review

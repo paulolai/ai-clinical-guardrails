@@ -1,14 +1,19 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import StrEnum
-from typing import Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
 from src.extraction.models import ExtractedMedication, StructuredExtraction  # noqa: TC001
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 T = TypeVar("T")
 E = TypeVar("E")
+U = TypeVar("U")
+F = TypeVar("F")
 
 
 @dataclass(frozen=True)
@@ -29,6 +34,36 @@ class Result(Generic[T, E]):
     @classmethod
     def failure(cls, error: E) -> "Result[T, E]":
         return cls(error=error, is_success=False)
+
+    def unwrap(self) -> T:
+        """Return the success value or raise ValueError."""
+        if self.is_success and self.value is not None:
+            return self.value
+        raise ValueError(f"Called unwrap() on a Failure: {self.error}")
+
+    def unwrap_error(self) -> E:
+        """Return the error value or raise ValueError."""
+        if not self.is_success and self.error is not None:
+            return self.error
+        raise ValueError("Called unwrap_error() on a Success")
+
+    def map(self, fn: "Callable[[T], U]") -> "Result[U, E]":
+        """Transform the success value, preserving the error path."""
+        if self.is_success:
+            return Result.success(fn(self.value))  # type: ignore[arg-type]
+        return Result.failure(self.error)  # type: ignore[arg-type]
+
+    def map_error(self, fn: "Callable[[E], F]") -> "Result[T, F]":
+        """Transform the error value, preserving the success path."""
+        if not self.is_success:
+            return Result.failure(fn(self.error))  # type: ignore[arg-type]
+        return Result.success(self.value)  # type: ignore[arg-type]
+
+    def chain(self, fn: "Callable[[T], Result[U, E]]") -> "Result[U, E]":
+        """Monadic bind: apply fn only on success, short-circuit on failure."""
+        if self.is_success:
+            return fn(self.value)  # type: ignore[arg-type]
+        return Result.failure(self.error)  # type: ignore[arg-type]
 
 
 class ComplianceSeverity(StrEnum):
